@@ -12,6 +12,7 @@
         'device/cordova_device.gyp:*',
         'file/cordova_file.gyp:*',
         'networkinformation/cordova_networkinformation.gyp:*',
+        'filetransfer/cordova_filetransfer.gyp:*',
       ],
     },
   ], # end targets
