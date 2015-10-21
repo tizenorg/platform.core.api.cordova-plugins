@@ -17,6 +17,28 @@
 var _global = window || global || {};
 var _document = document || {};
 
+function UUIDcreatePart(length) {
+    var uuidpart = "";
+    for (var i=0; i<length; i++) {
+        var uuidchar = parseInt((Math.random() * 256), 10).toString(16);
+        if (uuidchar.length == 1) {
+            uuidchar = "0" + uuidchar;
+        }
+        uuidpart += uuidchar;
+    }
+    return uuidpart;
+}
+
+var utils = {
+   createUUID : function() {
+       return UUIDcreatePart(4) + '-' +
+           UUIDcreatePart(2) + '-' +
+           UUIDcreatePart(2) + '-' +
+           UUIDcreatePart(2) + '-' +
+           UUIDcreatePart(6);
+   }
+}
+
 function Emitter() {
   var eventTarget = _document.createDocumentFragment();
 
@@ -57,5 +79,6 @@ var cordova = {
 };
 
 _global.cordova = cordova;
+_global.utils = utils;
 
 console.log('Loaded cordova API');
