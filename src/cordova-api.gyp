@@ -12,6 +12,7 @@
         'device/cordova_device.gyp:*',
         'dialog/cordova_dialog.gyp:*',
         'file/cordova_file.gyp:*',
+        'globalization/cordova_globalization.gyp:*',
         'networkinformation/cordova_networkinformation.gyp:*',
         'filetransfer/cordova_filetransfer.gyp:*',
       ],
