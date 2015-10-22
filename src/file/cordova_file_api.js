@@ -16,4 +16,16 @@
 
 var _global = window || global || {};
 
+var Metadata = function(metadata) {
+  if (typeof metadata == "object") {
+    this.modificationTime = new Date(metadata.modificationTime);
+    this.size = metadata.size || 0;
+  } else if (typeof metadata == "undefined") {
+    this.modificationTime = null;
+    this.size = 0;
+  }
+};
+
+_global.Metadata = Metadata;
+
 console.log('Loaded cordova.file API');
