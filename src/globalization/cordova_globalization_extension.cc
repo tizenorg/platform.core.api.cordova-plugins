@@ -15,11 +15,13 @@
  */
 
 #include "globalization/cordova_globalization_extension.h"
+#include "globalization/cordova_globalization_instance.h"
 
 // This will be generated from cordova_globalization_api.js
 extern const char kSource_cordova_globalization_api[];
 
 common::Extension* CreateExtension() {
+  LoggerD("Entered");
   return new extension::cordova::globalization::CordovaGlobalizationExtension();
 }
 
@@ -28,12 +30,20 @@ namespace cordova {
 namespace globalization {
 
 CordovaGlobalizationExtension::CordovaGlobalizationExtension() {
+  LoggerD("Entered");
   SetExtensionName("tizen.cordova.globalization");
   SetJavaScriptAPI(kSource_cordova_globalization_api);
 }
 
-CordovaGlobalizationExtension::~CordovaGlobalizationExtension() {}
+CordovaGlobalizationExtension::~CordovaGlobalizationExtension() {
+  LoggerD("Entered");
+}
 
-}  // globalization
-}  // cordova
-}  // extension
+common::Instance* CordovaGlobalizationExtension::CreateInstance() {
+  LoggerD("Entered");
+  return new extension::cordova::globalization::CordovaGlobalizationInstance();
+}
+
+} // globalization
+} // cordova
+} // extension

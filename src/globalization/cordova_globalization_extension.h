@@ -27,10 +27,14 @@ class CordovaGlobalizationExtension : public common::Extension {
  public:
   CordovaGlobalizationExtension();
   virtual ~CordovaGlobalizationExtension();
+
+ private:
+  // common::Extension implementation.
+  virtual common::Instance* CreateInstance();
 };
 
-}  // globalization
-}  // cordova
-}  // extension
+} // globalization
+} // cordova
+} // extension
 
 #endif // GLOBALIZATION_CORDOVA_GLOBALIZATION_EXTENSION_H_

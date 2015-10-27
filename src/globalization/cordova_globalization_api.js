@@ -14,6 +14,9 @@
  *    limitations under the License.
  */
 
+var utils_ = xwalk.utils;
+var native_ = new utils_.NativeManager(extension);
+
 var _navigator = navigator || {};
 var _global = window || global || {};
 
@@ -47,6 +50,15 @@ var formatMediumStr = 'medium';
 var formatLongStr = 'long';
 var formatFullStr = 'full';
 
+var typeWide = 'wide';
+var typeNarrow = 'narrow';
+var itemMonths = 'months';
+var itemDays = 'days';
+
+var numberTypeDecimal = 'decimal';
+var numberTypePercent = 'percent';
+var numberTypeCurrency = 'currency';
+
 var oneHourSeconds = 60*60;
 
 var Globalization = {};
@@ -64,7 +76,7 @@ Globalization.getPreferredLanguage = function(successCb, errorCb) {
     function(error) {
       console.log('Cordova, getLocaleName, An error occurred ' + error.message);
       errorCb(new GlobalizationError(GlobalizationError.UNKNOWN_ERROR ,
-      'cannot retrieve language name'));
+          'cannot retrieve language name'));
     }
   );
 }
@@ -73,125 +85,143 @@ Globalization.getLocaleName = function(successCb, errorCb) {
   Globalization.getPreferredLanguage(successCb, errorCb);
 }
 
-//TODO dateToString would support only full length (one format is supprted),
+//TODO JS implementation of dateToString would support only full length (one format is supprted),
 //     but selector for getting only needed values is fully supported
 Globalization.dateToString = function(date, successCb, errorCb, options) {
   // TODO add validation of parameters
   var result = null;
   var formatLength = formatFullStr;
   var selector = selectorDateAndTimeStr;
-  console.log("options " + JSON.stringify(options));
   if (options) {
     formatLength = options.formatLength || formatFullStr;
     selector = options.selector || selectorDateAndTimeStr;
   }
-  console.log("len: " + formatLength + " selector: " + selector);
 
-  var tzdate = new tizen.TZDate(date);
-  if (tzdate) {
-    // TODO only one format length is supprted
-    // "Wednesday, January 7, 2015, 12:33:15 PM"
-    if (selectorDateStr === selector) {
-      result = tzdate.toLocaleDateString();
-    } else if (selectorTimeStr === selector) {
-      result = tzdate.toLocaleTimeString();
+  var timestamp = date.getTime();
+  var callback = function(result) {
+    if (native_.isFailure(result)) {
+      var error = new GlobalizationError(
+          GlobalizationError.FORMATTING_ERROR , native_.getErrorObject(result).message);
+      native_.callIfPossible(errorCb, error);
     } else {
-      result = tzdate.toLocaleString();
+      successCb(native_.getResultObject(result));
     }
-  }
-
-  if (result) {
-    setTimeout( function() {
-      successCb ({'value': result});
-    }, 0);
-  } else {
-    setTimeout( function() {
-      errorCb(new GlobalizationError(
-          GlobalizationError.FORMATTING_ERROR , 'cannot format date string'));
-    }, 0);
-  }
+  };
+  var callArgs = {
+    formatLength: String(formatLength),
+    selector: String(selector),
+    timestamp: String(timestamp)
+  };
+  native_.call('CordovaGlobalization_dateToString', callArgs, callback);
 }
 
 //TODO implementation would try to convert string to Date using javascript Date object
 // constructor, options are basically ignored
 Globalization.stringToDate = function(dateString, successCb, errorCb, options) {
   // TODO add validation of parameters
-  var d = new Date(dateString);
-  if (!d.getTime()) {
-    setTimeout( function() {
-      errorCb(new GlobalizationError(
-          GlobalizationError.PARSING_ERROR , 'cannot parse date from string'));
-    }, 0);
-  } else {
-    var result = {
-      year : d.getYear() + 1900,
-      month : d.getMonth(),
-      day : d.getDate(),
-      hour : d.getHours(),
-      minute : d.getMinutes(),
-      second : d.getSeconds(),
-      millisecond : d.getMilliseconds()
-    };
-    setTimeout( function() {
-      successCb (result);
-    }, 0);
+  var result = null;
+  var formatLength = formatFullStr;
+  var selector = selectorDateAndTimeStr;
+  if (options) {
+    formatLength = options.formatLength || formatFullStr;
+    selector = options.selector || selectorDateAndTimeStr;
   }
+
+  var callback = function(result) {
+    if (native_.isFailure(result)) {
+      var error = new GlobalizationError(
+          GlobalizationError.PARSING_ERROR , native_.getErrorObject(result).message);
+      native_.callIfPossible(errorCb, error);
+    } else {
+      successCb(native_.getResultObject(result));
+    }
+  };
+  var callArgs = {
+      formatLength: String(formatLength),
+      selector: String(selector),
+      dateString : String(dateString)
+  };
+  native_.call('CordovaGlobalization_stringToDate', callArgs, callback);
 }
 
-// TODO getDatePattern would support only short and full length,
-// but selector for getting only needed values is fully supported
 Globalization.getDatePattern = function(successCb, errorCb, options) {
   // TODO add validation of parameters
+  var formatLength = formatFullStr;
   var selector = selectorDateAndTimeStr;
-  var isShortFormat = false;
+
   if (options) {
+    formatLength = options.formatLength || formatFullStr;
     selector = options.selector || selectorDateAndTimeStr;
-    isShortFormat = (options.formatLength === formatShortStr);
-  }
-  var pattern = null;
-  if (selectorTimeStr === selector) {
-    pattern = tizen.time.getTimeFormat();
-  } else if (selectorDateStr === selector) {
-    pattern = tizen.time.getDateFormat(isShortFormat);
-  } else {
-    // TODO in tizen there is no unified date and time format getter
-    // (for now implementation separates date and time formats with colon ','
-    pattern = tizen.time.getDateFormat(isShortFormat) + ", " + tizen.time.getTimeFormat();
   }
 
-  var currentDateTime = tizen.time.getCurrentDateTime();
-  if (pattern && currentDateTime) {
-    // TODO currently value as "GMT+09:00" will be returned,
-    // to get value "Asia/Seoul" use .getTimezone() instead
-    var timezoneAbbreviation = currentDateTime.getTimezoneAbbreviation();
+  var callback = function(result) {
+    // Checking succes of gathering pattern
+    var fullResult = {};
+    if (native_.isFailure(result)) {
+      var error = new GlobalizationError(
+          GlobalizationError.PATTERN_ERROR , native_.getErrorObject(result).message)
+      native_.callIfPossible(errorCb, error);
+      return;
+    } else {
+      // not calling success callback yet
+      fullResult = native_.getResultObject(result);
+    }
 
-    // TODO method secondsFromUTC returns inverted offset: if time zone is GMT+8, it will return -32,400.
-    // TODO currently utcOffset will include DST additional hour if it is present, value will be
-    // timezoneOffset = timezoneOffsetWithoutDST + DSTAdditionalOffset
-    // if other behaviour is correct, just need to substract dstOffset from utcOffset
-    var utcOffset = currentDateTime.secondsFromUTC() * (-1);
-    var dstOffset = currentDateTime.isDST() ? oneHourSeconds : 0;
+    // looking for missing pieces of fullResult object
+    var currentDateTime = tizen.time.getCurrentDateTime();
+    if (currentDateTime) {
+      // TODO currently value as "GMT+09:00" will be returned,
+      // to get value "Asia/Seoul" use .getTimezone() instead
+      var timezoneAbbreviation = currentDateTime.getTimezoneAbbreviation();
 
-    var result = {
-      "pattern": pattern,
-      "timezone": timezoneAbbreviation,
-      "utc_offset": utcOffset,
-      "dst_offset": dstOffset
-    };
-    setTimeout( function() {
-      successCb (result);
-    }, 0);
-  } else {
-    errorCb(new GlobalizationError(GlobalizationError.PATTERN_ERROR , "cannot get pattern"));
-  }
+      // TODO method secondsFromUTC returns inverted offset: if time zone is GMT+8, it will return -32,400.
+      // TODO currently utcOffset will include DST additional hour if it is present, value will be
+      // timezoneOffset = timezoneOffsetWithoutDST + DSTAdditionalOffset
+      // if other behaviour is correct, just need to substract dstOffset from utcOffset
+      var utcOffset = currentDateTime.secondsFromUTC() * (-1);
+      var dstOffset = currentDateTime.isDST() ? oneHourSeconds : 0;
+
+      //adding missing parts of result
+      fullResult["timezone"] = timezoneAbbreviation;
+      fullResult["utc_offset"] = utcOffset;
+      fullResult["dst_offset"] = dstOffset;
+      successCb(fullResult);
+    } else {
+      var error = new GlobalizationError(
+          GlobalizationError.PATTERN_ERROR , "cannot get pattern");
+      native_.callIfPossible(errorCb, error);
+    }
+  };
+  var callArgs = {
+      formatLength: String(formatLength),
+      selector: String(selector)
+  };
+  native_.call('CordovaGlobalization_getDatePattern', callArgs, callback);
 }
 
-// TODO implement this as native method
 Globalization.getDateNames = function(successCb, errorCb, options) {
   // TODO add validation of parameters
-  setTimeout( function() {
-    errorCb(new GlobalizationError(GlobalizationError.UNKNOWN_ERROR , "unsupported"))
-  }, 0);
+  var type = typeWide;
+  var item = itemDays;
+  if (options) {
+    type = options.type || typeWide;
+    item = options.item || itemDays;
+  }
+
+  var callback = function(result) {
+    if (native_.isFailure(result)) {
+      var error = new GlobalizationError(
+          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message)
+      native_.callIfPossible(errorCb, error);
+    } else {
+      successCb(native_.getResultObject(result));
+    }
+  };
+  var callArgs = {
+      type: String(type),
+      item: String(item)
+  };
+  native_.call('CordovaGlobalization_getDateNames', callArgs, callback);
 }
 
 Globalization.isDayLightSavingsTime = function(date, successCb, errorCb) {
@@ -209,53 +239,105 @@ Globalization.isDayLightSavingsTime = function(date, successCb, errorCb) {
   }
 }
 
-//TODO implement this as native method
 Globalization.getFirstDayOfWeek = function(successCb, errorCb) {
   // TODO add validation of parameters
-  setTimeout( function() {
-    errorCb(new GlobalizationError(GlobalizationError.UNKNOWN_ERROR , "unsupported"))
-  }, 0);
+  var callback = function(result) {
+    if (native_.isFailure(result)) {
+      var error = new GlobalizationError(
+          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message)
+      native_.callIfPossible(errorCb, error);
+    } else {
+      successCb(native_.getResultObject(result));
+    }
+  };
+  native_.call('CordovaGlobalization_getFirstDayOfWeek', {}, callback);
 }
 
-//TODO how to implement this??
 Globalization.numberToString = function(number, successCb, errorCb, options) {
   // TODO add validation of parameters
-  var result = number.toLocaleString();
-  setTimeout( function() {
-    successCb ( {'value' : result} );
-  }, 0);
+  var type = numberTypeDecimal;
+  if (options) {
+    type = options.type || numberTypeDecimal;
+  }
+
+  var callback = function(result) {
+    if (native_.isFailure(result)) {
+      var error = new GlobalizationError(
+          GlobalizationError.FORMATTING_ERROR , native_.getErrorObject(result).message)
+      native_.callIfPossible(errorCb, error);
+    } else {
+      successCb(native_.getResultObject(result));
+    }
+  };
+  var callArgs = {
+      number: String(number),
+      type: String(type)
+  };
+  native_.call('CordovaGlobalization_numberToString', callArgs, callback);
 }
 
-//TODO how should look this implementation about options??
 Globalization.stringToNumber = function(numberStr, successCb, errorCb, options) {
   // TODO add validation of parameters
-  var result = Number(numberStr);
-  if ('NaN' != result.toString()) {
-    setTimeout( function() {
-      successCb ( {'value' : result} );
-    }, 0);
-  } else {
-    setTimeout( function() {
-      errorCb(new GlobalizationError(GlobalizationError.PARSING_ERROR ,
-          "cannot convert string to number"))
-    }, 0);
+  var type = numberTypeDecimal;
+  if (options) {
+    type = options.type || numberTypeDecimal;
   }
+
+  var callback = function(result) {
+    if (native_.isFailure(result)) {
+      var error = new GlobalizationError(
+          GlobalizationError.PARSING_ERROR , native_.getErrorObject(result).message)
+      native_.callIfPossible(errorCb, error);
+    } else {
+      var result = native_.getResultObject(result);
+      result.value = Number(result.value);
+      successCb(result);
+    }
+  };
+  var callArgs = {
+      number: String(numberStr),
+      type: String(type)
+  };
+  native_.call('CordovaGlobalization_stringToNumber', callArgs, callback);
 }
 
-//TODO how to implement this??
 Globalization.getNumberPattern = function(successCb, errorCb, options) {
   // TODO add validation of parameters
-  setTimeout( function() {
-    errorCb(new GlobalizationError(GlobalizationError.UNKNOWN_ERROR , "unsupported"))
-  }, 0);
+  var type = numberTypeDecimal;
+  if (options) {
+    type = options.type || numberTypeDecimal;
+  }
+
+  var callback = function(result) {
+    if (native_.isFailure(result)) {
+      var error = new GlobalizationError(
+          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message)
+      native_.callIfPossible(errorCb, error);
+    } else {
+      successCb(native_.getResultObject(result));
+    }
+  };
+  var callArgs = {
+      type: String(type)
+  };
+  native_.call('CordovaGlobalization_getNumberPattern', callArgs, callback);
 }
 
-//TODO how to implement this??
 Globalization.getCurrencyPattern = function(currencyCode, successCb, errorCb) {
   // TODO add validation of parameters
-  setTimeout( function() {
-    errorCb(new GlobalizationError(GlobalizationError.UNKNOWN_ERROR , "unsupported"))
-  }, 0);
+  var callback = function(result) {
+    if (native_.isFailure(result)) {
+      var error = new GlobalizationError(
+          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message)
+      native_.callIfPossible(errorCb, error);
+    } else {
+      successCb(native_.getResultObject(result));
+    }
+  };
+  var callArgs = {
+      currencyCode : String(currencyCode)
+  };
+  native_.call('CordovaGlobalization_getCurrencyPattern', callArgs, callback);
 }
 
 _navigator.globalization = Globalization;
