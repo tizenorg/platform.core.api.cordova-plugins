@@ -14,26 +14,50 @@
  *    limitations under the License.
  */
 
-var _global = window || global || {};
+// TODO: remove when added to public cordova repository -> begin
+var plugin_name = 'cordova-plugin-device.tizen.Device';
 
-var device = {
-  cordova: cordova.version,
-  model: tizen.systeminfo.getCapability('http://tizen.org/system/model_name'),
-  platform: tizen.systeminfo.getCapability('http://tizen.org/system/platform.name'),
-  uuid: tizen.systeminfo.getCapability('http://tizen.org/system/tizenid'),
-  version: tizen.systeminfo.getCapability('http://tizen.org/feature/platform.version'),
-  manufacturer: tizen.systeminfo.getCapability('http://tizen.org/system/manufacturer')  // not documented, but required by tests
+cordova.define(plugin_name, function(require, exports, module) {
+// TODO: remove -> end
+
+function DeviceInfo() {
+  this.cordovaVersion = require('cordova/platform').cordovaVersion;
+  this.model = tizen.systeminfo.getCapability('http://tizen.org/system/model_name');
+  this.platform = tizen.systeminfo.getCapability('http://tizen.org/system/platform.name');
+  this.uuid = tizen.systeminfo.getCapability('http://tizen.org/system/tizenid');
+  this.version = tizen.systeminfo.getCapability('http://tizen.org/feature/platform.version');
+  this.manufacturer = tizen.systeminfo.getCapability('http://tizen.org/system/manufacturer');
+}
+
+var di;
+
+exports = {
+  getDeviceInfo: function (success, error) {
+    if (!di) {
+      di = new DeviceInfo();
+    }
+    success({
+      cordova: di.cordovaVersion,
+      model: di.model,
+      platform: di.platform,
+      uuid: di.uuid,
+      version: di.version,
+      manufacturer: di.manufacturer  // not documented, but required by tests
+    });
+  }
 };
 
-Object.freeze(device);
-Object.defineProperty(_global, 'device', {
-  configurable: false,
-  enumerable: true,
-  writable: false,
-  value: device
-});
+require("cordova/exec/proxy").add("Device", exports);
 
 console.log('Loaded cordova.device API');
 
+//TODO: remove when added to public cordova repository -> begin
+});
+
 exports = function(require) {
+  // this plugin is not loaded via cordova_plugins.js, we need to manually add
+  // it to module mapper
+  var mm = require('cordova/modulemapper');
+  mm.runs(plugin_name);
 };
+//TODO: remove -> end
