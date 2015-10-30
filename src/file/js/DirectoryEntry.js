@@ -14,14 +14,16 @@
  *    limitations under the License.
  */
 
-//= require('DirectoryEntry.js');
-//= require('DirectoryReader.js');
-//= require('Entry.js');
-//= require('FileReader.js');
-//= require('fileSystemPaths.js');
-//= require('fileSystems-roots.js');
-//= require('FileWriter.js');
-//= require('requestFileSystem.js');
-//= require('resolveLocalFileSystemURI.js');
+// TODO: remove when added to public cordova repository -> begin
+cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exports, module) {
+// TODO: remove -> end
 
-//= require('File.js');
+module.exports = {
+  getDirectory: function(successCallback, errorCallback, args) {},
+  removeRecursively: function(successCallback, errorCallback, args) {},
+  getFile: function(successCallback, errorCallback, args) {}
+};
+
+//TODO: remove when added to public cordova repository -> begin
+});
+//TODO: remove -> end

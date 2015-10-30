@@ -14,14 +14,22 @@
  *    limitations under the License.
  */
 
-//= require('DirectoryEntry.js');
-//= require('DirectoryReader.js');
-//= require('Entry.js');
-//= require('FileReader.js');
-//= require('fileSystemPaths.js');
-//= require('fileSystems-roots.js');
-//= require('FileWriter.js');
-//= require('requestFileSystem.js');
-//= require('resolveLocalFileSystemURI.js');
+// TODO: remove when added to public cordova repository -> begin
+cordova.define('cordova-plugin-file.tizen.fileSystemPaths', function(require, exports, module) {
+// TODO: remove -> end
 
-//= require('File.js');
+var pathsPrefix = {
+  // TODO: add other directories
+  // Read-only directory where the application is installed.
+  applicationDirectory: 'wgt-package/'
+};
+
+module.exports = {
+  requestAllPaths: function(successCallback, errorCallback, args) {
+    successCallback(pathsPrefix);
+  }
+};
+
+//TODO: remove when added to public cordova repository -> begin
+});
+//TODO: remove -> end

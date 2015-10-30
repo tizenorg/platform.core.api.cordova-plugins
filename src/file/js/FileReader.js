@@ -14,14 +14,17 @@
  *    limitations under the License.
  */
 
-//= require('DirectoryEntry.js');
-//= require('DirectoryReader.js');
-//= require('Entry.js');
-//= require('FileReader.js');
-//= require('fileSystemPaths.js');
-//= require('fileSystems-roots.js');
-//= require('FileWriter.js');
-//= require('requestFileSystem.js');
-//= require('resolveLocalFileSystemURI.js');
+// TODO: remove when added to public cordova repository -> begin
+cordova.define('cordova-plugin-file.tizen.FileReader', function(require, exports, module) {
+// TODO: remove -> end
 
-//= require('File.js');
+module.exports = {
+  readAsText: function(successCallback, errorCallback, args) {},
+  readAsDataURL: function(successCallback, errorCallback, args) {},
+  readAsBinaryString: function(successCallback, errorCallback, args) {},
+  readAsArrayBuffer: function(successCallback, errorCallback, args) {},
+};
+
+//TODO: remove when added to public cordova repository -> begin
+});
+//TODO: remove -> end
