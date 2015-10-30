@@ -14,28 +14,11 @@
  *    limitations under the License.
  */
 
-var _global = window || global || {};
+// TODO: remove when added to public cordova repository -> begin
+var plugin_name = 'cordova-plugin-file.tizen.FileTransfer';
 
-
-/**
- * FileTransferError
- * @constructor
- */
-var FileTransferError = function(code, source, target, status, body, exception) {
-    this.code = code || null;
-    this.source = source || null;
-    this.target = target || null;
-    this.http_status = status || null;
-    this.body = body || null;
-    this.exception = exception || null;
-};
-
-FileTransferError.FILE_NOT_FOUND_ERR = 1;
-FileTransferError.INVALID_URL_ERR = 2;
-FileTransferError.CONNECTION_ERR = 3;
-FileTransferError.ABORT_ERR = 4;
-FileTransferError.NOT_MODIFIED_ERR = 5;
-
+cordova.define(plugin_name, function(require, exports, module) {
+// TODO: remove -> end
 
 function TizenErrCodeToErrCode(err_code) {
   switch (err_code) {
@@ -56,271 +39,184 @@ function TizenErrCodeToErrCode(err_code) {
   }
 }
 
+var uploads = {};
+var downloads = {};
 
-var FileUploadResult = function() {
-    this.bytesSent = 0;
-    this.responseCode = null;
-    this.response = null;
-};
+exports = {
+  upload: function(successCallback, errorCallback, args) {
+    var filePath = args[0],
+        server = args[1],
+        fileKey = args[2],
+        fileName = args[3],
+        mimeType = args[4],
+        params = args[5],
+        trustAllHosts = args[6],  // not used
+        chunkedMode = args[7],
+        headers = args[8],
+        id = args[9],
+        httpMethod = args[10];
 
+    var fail = function(code, status, response) {
+      uploads[id] && delete uploads[id];
+      var error = new FileTransferError(code, filePath, server, status, response);
+      errorCallback && errorCallback(error);
+    };
 
-/**
- * Options to customize the HTTP request used to upload files.
- * @constructor
- * @param fileKey {String}   Name of file request parameter.
- * @param fileName {String}  Filename to be used by the server. Defaults to image.jpg.
- * @param mimeType {String}  Mimetype of the uploaded file. Defaults to image/jpeg.
- * @param params {Object}    Object with key: value params to send to the server.
- * @param headers {Object}   Keys are header names, values are header values. Multiple
- *                           headers of the same name are not supported.
- */
-var FileUploadOptions = function(fileKey, fileName, mimeType, params, headers, httpMethod) {
-    this.fileKey = fileKey || null;
-    this.fileName = fileName || null;
-    this.mimeType = mimeType || 'image/jpeg';
-    this.params = params || null;
-    this.headers = headers || null;
-    this.httpMethod = httpMethod || null;
-};
+    function successCB(entry) {
+      if (entry.isFile) {
+        entry.file(function(file) {
+          function uploadFile(blobFile) {
+            var fd = new FormData();
 
+            fd.append(fileKey, blobFile, fileName);
 
-function getUrlCredentials(urlString) {
-  var credentialsPattern = /^https?\:\/\/(?:(?:(([^:@\/]*)(?::([^@\/]*))?)?@)?([^:\/?#]*)(?::(\d*))?).*$/,
-      credentials = credentialsPattern.exec(urlString);
-
-  return credentials && credentials[1];
-}
-
-
-function getBasicAuthHeader(urlString) {
-  var header =  null;
-
-  // This is changed due to MS Windows doesn't support credentials in http uris
-  // so we detect them by regexp and strip off from result url
-  // Proof: http://social.msdn.microsoft.com/Forums/windowsapps/en-US/a327cf3c-f033-4a54-8b7f-03c56ba3203f/windows-foundation-uri-security-problem
-
-  if (window.btoa) {
-    var credentials = getUrlCredentials(urlString);
-    if (credentials) {
-      var authHeader = "Authorization";
-      var authHeaderValue = "Basic " + window.btoa(credentials);
-
-      header = {
-        name : authHeader,
-        value : authHeaderValue
-      };
-    }
-  }
-  return header;
-}
-
-
-var FileTransfer = function() {
-  this._downloadId = 0;
-  this.onprogress = null;   // optional callback
-};
-
-
-/**
-* Given an absolute file path, uploads a file on the device to a remote server
-* using a multipart HTTP request.
-* @param filePath {String}           Full path of the file on the device
-* @param server {String}             URL of the server to receive the file
-* @param successCallback (Function}  Callback to be invoked when upload has completed
-* @param errorCallback {Function}    Callback to be invoked upon error
-* @param options {FileUploadOptions} Optional parameters such as file name and mimetype
-*/
-FileTransfer.prototype.upload = function(filePath, server, successCallback, errorCallback, options, trustAllHosts) {
-  // TODO - check arguments
-
-  var fileKey = null;
-  var fileName = null;
-  var httpMethod = null;
-  var mimeType = null;
-  var params = null;
-  var chunkedMode = true;
-  var headers = null;
-
-  var basicAuthHeader = getBasicAuthHeader(server);
-  if (basicAuthHeader) {
-    options = options || {};
-    options.headers = options.headers || {};
-    options.headers[basicAuthHeader.name] = basicAuthHeader.value;
-  }
-
-  if (options) {
-    fileKey = options.fileKey;
-    fileName = options.fileName;
-    mimeType = options.mimeType;
-    headers = options.headers;
-    if (httpMethod.toUpperCase() === "PUT"){
-      httpMethod = "PUT";
-    } else {
-      httpMethod = "POST";
-    }
-    if (options.chunkedMode !== null || typeof options.chunkedMode !== "undefined") {
-      chunkedMode = options.chunkedMode;
-    }
-    params = options.params || {};
-  }
-
-  function successCB(entry) {
-    if (entry.isFile) {
-      entry.file( function(file) {
-        function uploadFile(blobFile) {
-          var fd = new FormData();
-
-          fd.append(fileKey, blobFile, fileName);
-
-          for (var prop in params) {
-            if(params.hasOwnProperty(prop)) {
-               fd.append(prop, params[prop]);
+            for (var prop in params) {
+              if(params.hasOwnProperty(prop)) {
+                 fd.append(prop, params[prop]);
+              }
             }
+            var xhr = uploads[id] = new XMLHttpRequest();
+
+            xhr.open(httpMethod, server);
+
+            // Fill XHR headers
+            for (var header in headers) {
+              if (headers.hasOwnProperty(header)) {
+                xhr.setRequestHeader(header, headers[header]);
+              }
+            }
+
+            xhr.onload = function(evt) {
+              if (xhr.status === 200) {
+                uploads[id] && delete uploads[id];
+                successCallback({
+                  bytesSent: file.size,
+                  responseCode: xhr.status,
+                  response: xhr.response
+                });
+              } else if (xhr.status == 404) {
+                fail(FileTransferError.INVALID_URL_ERR, this.status, this.response);
+              } else {
+                fail(FileTransferError.CONNECTION_ERR, this.status, this.response);
+              }
+            };
+
+            xhr.ontimeout = function(evt) {
+              fail(FileTransferError.CONNECTION_ERR, this.status, this.response);
+            };
+
+            xhr.onerror = function() {
+              fail(FileTransferError.CONNECTION_ERR, this.status, this.response);
+            };
+
+            xhr.onabort = function () {
+              fail(FileTransferError.ABORT_ERR, this.status, this.response);
+            };
+
+            xhr.upload.onprogress = function (e) {
+              successCallback(e);
+            };
+
+            xhr.send(fd);
           }
-          var xhr = new XMLHttpRequest();
 
-          xhr.open("POST", server);
+          var bytesPerChunk;
 
-          xhr.onload = function(evt) {
-            if (xhr.status == 200) {
-              var result = new FileUploadResult();
-              result.bytesSent = file.size;
-              result.responseCode = xhr.status;
-              result.response = xhr.response;
-              successCallback(result);
-            } else if (xhr.status == 404) {
-              if (errorCallback) {
-                errorCallback(new FileTransferError(FileTransferError.INVALID_URL_ERR));
-              }
-            } else {
-              if (errorCallback) {
-                errorCallback(new FileTransferError(FileTransferError.CONNECTION_ERR));
-              }
-            }
-          };
-
-          xhr.ontimeout = function(evt) {
-            if (errorCallback) {
-              errorCallback(new FileTransferError(FileTransferError.CONNECTION_ERR));
-            }
-          };
-
-          xhr.send(fd);
-        }
-
-        var bytesPerChunk;
-
-        if (options.chunkedMode === true) {
-          bytesPerChunk = 1024 * 1024; // 1MB chunk sizes.
-        } else {
-          bytesPerChunk = file.size;
-        }
-        var start = 0;
-        var end = bytesPerChunk;
-        while (start < file.size) {
-          var chunk = file.webkitSlice(start, end, mimeType);
-          uploadFile(chunk);
-          start = end;
-          end = start + bytesPerChunk;
-        }
-      }, function(error) {
-        if (errorCallback) {
-          errorCallback(new FileTransferError(FileTransferError.CONNECTION_ERR));
-        }
-      });
-    }
-  }
-
-  function errorCB() {
-    if (errorCallback) {
-      errorCallback(new FileTransferError(FileTransferError.CONNECTION_ERR));
-    }
-  }
-
-  window.webkitResolveLocalFilSystemURL(filePath, successCB, errorCB);
-};
-
-
-/**
- * Downloads a file form a given URL and saves it to the specified directory.
- * @param source {String}          URL of the server to receive the file
- * @param target {String}         Full path of the file on the device
- * @param successCallback (Function}  Callback to be invoked when upload has completed
- * @param errorCallback {Function}    Callback to be invoked upon error
- * @param trustAllHosts not used
- * @param options {FileDownloadOptions} Optional parameters such as headers
- */
-FileTransfer.prototype.download = function(source, target, successCallback, errorCallback, trustAllHosts, options) {
-  // TODO - check arguments
-  var self = this;
-
-  var basicAuthHeader = getBasicAuthHeader(source);
-  if (basicAuthHeader) {
-    source = source.replace(getUrlCredentials(source) + '@', '');
-
-    options = options || {};
-    options.headers = options.headers || {};
-    options.headers[basicAuthHeader.name] = basicAuthHeader.value;
-  }
-
-  var headers = null;
-  if (options) {
-    headers = options.headers || null;
-  }
-
-  var listener = {
-    onprogress: function(id, receivedSize, totalSize) {
-      if (self.onprogress) {
-        return self.onprogress(new ProgressEvent());
-      }
-    },
-    onpaused: function(id) {
-      // TODO not needed in filetransfer cordova plugin
-    },
-    oncanceled: function(id) {
-      if (errorCallback) {
-        errorCallback(new FileTransferError(FileTransferError.ABORT_ERR));
-      }
-    },
-    oncompleted: function(id, fullPath) {
-      if (successCallback) {
-        // TODO filesystem plugin should be implemented in order to pass the argument
-        // of successCallback.  Temporary null used instead
-        successCallback(null);
-      }
-    },
-    onfailed: function(id, error) {
-      if (errorCallback) {
-        errorCallback(new FileTransferError(TizenErrCodeToErrCode(error.code)));
+          if (options.chunkedMode === true) {
+            bytesPerChunk = 1024 * 1024; // 1MB chunk sizes.
+          } else {
+            bytesPerChunk = file.size;
+          }
+          var start = 0;
+          var end = bytesPerChunk;
+          while (start < file.size) {
+            var chunk = file.webkitSlice(start, end, mimeType);
+            uploadFile(chunk);
+            start = end;
+            end = start + bytesPerChunk;
+          }
+        }, function(error) {
+          fail(FileTransferError.CONNECTION_ERR);
+        });
       }
     }
-  };
 
-  var idx = target.lastIndexOf('/');
-  var targetPath = target.substr(0, idx);
-  var targetFilename = target.substr(idx + 1);
+    function errorCB() {
+      fail(FileTransferError.CONNECTION_ERR);
+    }
 
-  var downloadRequest = new tizen.DownloadRequest(source, targetPath, targetFilename, 'ALL', headers);
-  self._downloadId = tizen.download.start(downloadRequest, listener);
+    window.webkitResolveLocalFilSystemURL(filePath, successCB, errorCB);
+  },
+  download: function(successCallback, errorCallback, args) {
+    var source = args[0],
+        target = args[1],
+        trustAllHosts = args[2],  // not used
+        id = args[3],
+        headers = args[4];
+
+    var fail = function(code) {
+      downloads[id] && delete downloads[id];
+      var error = new FileTransferError(code, source, target);
+      errorCallback && errorCallback(error);
+    }
+
+    var listener = {
+      onprogress: function(id, receivedSize, totalSize) {
+        successCallback({
+          lengthComputable: true,
+          loaded: receivedSize,
+          total: totalSize
+        });
+      },
+      onpaused: function(id) {
+        // not needed in file-transfer plugin
+      },
+      oncanceled: function(id) {
+        fail(FileTransferError.ABORT_ERR);
+      },
+      oncompleted: function(id, fullPath) {
+        if (successCallback) {
+          // TODO: success callback should receive FileEntry Object
+          successCallback(null);
+        }
+      },
+      onfailed: function(id, error) {
+        fail(TizenErrCodeToErrCode(error.code));
+      }
+    };
+
+    var idx = target.lastIndexOf('/');
+    var targetPath = target.substr(0, idx);
+    var targetFilename = target.substr(idx + 1);
+
+    var downloadRequest = new tizen.DownloadRequest(source, targetPath, targetFilename, 'ALL', headers);
+    downloads[id] = tizen.download.start(downloadRequest, listener);
+  },
+  abort: function(successCallback, errorCallback, args) {
+    var id = args[0];
+    if (uploads[id]) {
+      uploads[id].abort();
+      delete uploads[id];
+    } else if (downloads[id]) {
+      tizen.download.cancel(downloads[id]);
+      delete downloads[id];
+    } else {
+      console.warn('Unknown file transfer ID: ' + id);
+    }
+  },
 };
 
+require("cordova/exec/proxy").add("FileTransfer", exports);
 
-/**
- * Aborts the ongoing file transfer on this object. The original error
- * callback for the file transfer will be called if necessary.
- */
-FileTransfer.prototype.abort = function() {
-  if (this._downloadId) {
-    tizen.download.cancel(this._downloadId);
-  }
-};
+console.log('Loaded cordova.file-transfer API');
 
-_global.FileUploadResult = FileUploadResult;
-_global.FileTransfer = FileTransfer;
-_global.FileTransferError = FileTransferError;
-_global.FileUploadOptions = FileUploadOptions;
-
-console.log('Loaded FileTransfer API');
+//TODO: remove when added to public cordova repository -> begin
+});
 
 exports = function(require) {
+  // this plugin is not loaded via cordova_plugins.js, we need to manually add
+  // it to module mapper
+  var mm = require('cordova/modulemapper');
+  mm.runs(plugin_name);
 };
+//TODO: remove -> end
