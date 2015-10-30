@@ -14,87 +14,81 @@
  *    limitations under the License.
  */
 
-var _global = window || global || {};
+// TODO: remove when added to public cordova repository -> begin
+var plugin_name = 'cordova-plugin-file.tizen.NetworkStatus';
 
-var Connection = {
-  UNKNOWN: "unknown",
-  ETHERNET: "ethernet",
-  WIFI: "wifi",
-  CELL_2G: "2g",
-  CELL_3G: "3g",
-  CELL_4G: "4g",
-  CELL:"cellular",
-  NONE: "none"
-};
+cordova.define(plugin_name, function(require, exports, module) {
+// TODO: remove -> end
 
-var type = Connection.UNKNOWN;
+function toCordovaConnectionType(type) {
+  switch (type) {
+    case 'NONE':
+      return Connection.NONE;
 
-var connection = {};
+    case '2G':
+      return Connection.CELL_2G;
 
-Object.defineProperty(connection, 'type', {
-  get: function() { return type; },
-  set: function() {},
-  enumerable: true
-});
+    case '2.5G':
+      // TODO: In cordova documentation there is no information about 2.5G
+      // so instead 2G is returned
+      return Connection.CELL_2G;
 
-var network = {
-  connection: connection
-};
+    case '3G':
+      return Connection.CELL_3G;
+
+    case '4G':
+      return Connection.CELL_4G;
+
+    case 'WIFI':
+      return Connection.WIFI;
+
+    case 'ETHERNET':
+      return Connection.ETHERNET;
+
+    default:
+      return Connection.UNKNOWN;
+  }
+}
 
 function onSuccessCallback(info) {
-  switch (info.networkType) {
-    case "NONE":
-      type = Connection.NONE;
-      break;
-    case "2G":
-      type = Connection.CELL_2G;
-      break;
-    case "2.5G":
-      // TODO consider. In cordova documentation there is no information about 2.5G
-      // so instead 2G is returned
-      type = Connection.CELL_2G;
-      break;
-    case "3G":
-      type = Connection.CELL_3G;
-      break;
-    case "4G":
-      type = Connection.CELL_4G;
-      break;
-    case "WIFI":
-      type = Connection.WIFI;
-      break;
-    case "ETHERNET":
-      type = Connection.ETHERNET;
-      break;
-    default:
-      type = Connection.UNKNOWN;
-      break;
-  }
+  var type = toCordovaConnectionType(info.networkType);
 
   if (Connection.NONE === type || Connection.UNKNOWN === type) {
-    document.dispatchEvent(new Event("offline"));
+    document.dispatchEvent(new Event('offline'));
   } else {
-    document.dispatchEvent(new Event("online"));
+    document.dispatchEvent(new Event('online'));
   }
 }
 
 function onErrorCallback(e) {
-  type = Connection.UNKNOWN;
-  console.error("Error appeared " + e.name + ", message "+ e.message);
+  console.error('Error appeared ' + e.name + ', message ' + e.message);
 }
 
-tizen.systeminfo.getPropertyValue("NETWORK", onSuccessCallback, onErrorCallback);
 // TODO currently method addPropertyValueChangeListener is registered only to SIM1 and
 // ignore changes on SIM2 (if device has dual SIM standby mode). Consider to use
 // method addPropertyValueChangeListenerArray to get information from both SIM, but
 // which type should be returned then?
-tizen.systeminfo.addPropertyValueChangeListener("NETWORK", onSuccessCallback, onErrorCallback);
+tizen.systeminfo.addPropertyValueChangeListener('NETWORK', onSuccessCallback, onErrorCallback);
 
-_global.Connection = Connection;
-_global.navigator.connection = connection;
-_global.navigator.network = network;
+exports = {
+  getConnectionInfo: function(successCallback, errorCallback, args) {
+    tizen.systeminfo.getPropertyValue('NETWORK', function(info) {
+      successCallback(toCordovaConnectionType(info.networkType));
+    }, errorCallback);
+  }
+};
+
+require('cordova/exec/proxy').add('NetworkStatus', exports);
 
 console.log('Loaded cordova.networkinformation API');
 
+//TODO: remove when added to public cordova repository -> begin
+});
+
 exports = function(require) {
+  // this plugin is not loaded via cordova_plugins.js, we need to manually add
+  // it to module mapper
+  var mm = require('cordova/modulemapper');
+  mm.runs(plugin_name);
 };
+//TODO: remove -> end
