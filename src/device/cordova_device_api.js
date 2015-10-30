@@ -33,17 +33,7 @@ Object.defineProperty(_global, 'device', {
   value: device
 });
 
-
-// fire the listener only once
-// TODO: find a better way of launching the listener, allowing more 'deviceready'
-//       listeners to be registered
-var listener = function (event) {
-  if ('addEventListener' === event.fun) {
-    cordova._broker.removeEventListener('deviceready', listener);
-    event.obj.dispatchEvent(new Event('deviceready'));
-  }
-};
-
-cordova._broker.addEventListener('deviceready', listener);
-
 console.log('Loaded cordova.device API');
+
+exports = function(require) {
+};

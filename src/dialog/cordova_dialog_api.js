@@ -339,3 +339,6 @@ Object.defineProperty(_navigator, 'notification', {
 });
 
 console.log('Loaded cordova.dialog API');
+
+exports = function(require) {
+};

@@ -95,3 +95,6 @@ _global.navigator.connection = connection;
 _global.navigator.network = network;
 
 console.log('Loaded cordova.networkinformation API');
+
+exports = function(require) {
+};

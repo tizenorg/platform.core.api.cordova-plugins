@@ -321,3 +321,6 @@ _global.FileTransferError = FileTransferError;
 _global.FileUploadOptions = FileUploadOptions;
 
 console.log('Loaded FileTransfer API');
+
+exports = function(require) {
+};

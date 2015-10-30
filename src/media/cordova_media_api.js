@@ -217,10 +217,7 @@ Media.prototype.stopRecord = function(){};
 
 _global.Media = Media;
 
-cordova._broker.addEventListener('deviceready', function (event) {
-  if ('addEventListener' === event.fun) {
-    event.obj.dispatchEvent(new Event('deviceready'));
-  }
-});
-
 console.log('Loaded cordova.device API');
+
+exports = function(require) {
+};

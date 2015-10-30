@@ -14,18 +14,33 @@
  *    limitations under the License.
  */
 
-var _global = window || global || {};
+// TODO: remove when added to public cordova repository -> begin
+var plugin_name = 'cordova-plugin-file.tizen.File';
 
-var Metadata = function(metadata) {
-  if (typeof metadata == "object") {
-    this.modificationTime = new Date(metadata.modificationTime);
-    this.size = metadata.size || 0;
-  } else if (typeof metadata == "undefined") {
-    this.modificationTime = null;
-    this.size = 0;
-  }
+cordova.define(plugin_name, function(require, exports, module) {
+// TODO: remove -> end
+
+var pathsPrefix = {
+  // TODO: add other directories
+  // Read-only directory where the application is installed.
+  applicationDirectory: 'wgt-package/'
 };
 
-_global.Metadata = Metadata;
+exports.requestAllPaths = function(successCallback) {
+  successCallback(pathsPrefix);
+};
+
+require("cordova/exec/proxy").add("File", exports);
 
 console.log('Loaded cordova.file API');
+
+// TODO: remove when added to public cordova repository -> begin
+});
+
+exports = function(require) {
+  // this plugin is not loaded via cordova_plugins.js, we need to manually add
+  // it to module mapper
+  var mm = require('cordova/modulemapper');
+  mm.runs(plugin_name);
+};
+//TODO: remove -> end
