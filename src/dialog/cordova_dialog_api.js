@@ -14,14 +14,19 @@
  *    limitations under the License.
  */
 
-var _navigator = navigator || {};
+// TODO: remove when added to public cordova repository -> begin
+var plugin_name = 'cordova-plugin-dialogs.tizen.Notification';
+
+cordova.define(plugin_name, function(require, exports, module) {
+// TODO: remove -> end
+
 var _document = document || {};
 
 var playback = (function() {
   var soundElement;
   var counter = 1;
 
-  tizen.systemsetting.getProperty("NOTIFICATION_EMAIL", function(v) {
+  tizen.systemsetting && tizen.systemsetting.getProperty("NOTIFICATION_EMAIL", function(v) {
     soundElement = new Audio(v);
     soundElement.addEventListener('ended', function() {
       if (--counter > 0) {
@@ -279,66 +284,51 @@ var popup = (function () {
   };
 })();
 
-var notification = {
-  alert: function(message, alertCallback, title, buttonName) {
-    title = title || 'Alert';
-    buttonName = buttonName || 'OK';
+exports = {
+  alert: function(successCallback, errorCallback, args) {
     popup.show({
-      message: message,
-      callback: alertCallback,
-      title: title,
-      buttons: [buttonName]
+      message: args[0],
+      callback: successCallback,
+      title: args[1],
+      buttons: [args[2]]
     });
   },
-  confirm: function(message, confirmCallback, title, buttonLabels) {
-    title = title || 'Confirm';
-    buttonLabels = buttonLabels || ['OK', 'Cancel'];
-    if (!Array.isArray(buttonLabels)) {
-      if (typeof buttonLabels === 'string') {
-        buttonLabels = buttonLabels.split(',');  // deprecated way of specifying the labels
-      } else {
-        buttonLabels = [buttonLabels];
-      }
-    }
+  confirm: function(successCallback, errorCallback, args) {
     popup.show({
-      message: message,
-      callback: confirmCallback,
-      title: title,
-      buttons: buttonLabels
+      message: args[0],
+      callback: successCallback,
+      title: args[1],
+      buttons: args[2]
     });
   },
-  prompt: function(message, promptCallback, title, buttonLabels, defaultText) {
-    title = title || 'Prompt';
-    buttonLabels = buttonLabels || ['OK', 'Cancel'];
-    if (!Array.isArray(buttonLabels)) {
-      buttonLabels = [buttonLabels];
-    }
-    defaultText = defaultText || '';
+  prompt: function(successCallback, errorCallback, args) {
     popup.show({
-      message: message,
+      message: args[0],
       callback: function(idx, text) {
-        promptCallback({buttonIndex: idx, input1: text});
+        successCallback({buttonIndex: idx, input1: text});
       },
-      title: title,
-      buttons: buttonLabels,
+      title: args[1],
+      buttons: args[2],
       prompt: true,
-      promptDefaultText: defaultText
+      promptDefaultText: args[3]
     });
   },
-  beep: function(times) {
-    playback.beep(times);
+  beep: function(successCallback, errorCallback, args) {
+    playback.beep(args[0]);
   }
 };
 
-Object.freeze(notification);
-Object.defineProperty(_navigator, 'notification', {
-  configurable: false,
-  enumerable: true,
-  writable: false,
-  value: notification
-});
+require("cordova/exec/proxy").add("Notification", exports);
 
 console.log('Loaded cordova.dialog API');
 
+//TODO: remove when added to public cordova repository -> begin
+});
+
 exports = function(require) {
+  // this plugin is not loaded via cordova_plugins.js, we need to manually add
+  // it to module mapper
+  var mm = require('cordova/modulemapper');
+  mm.runs(plugin_name);
 };
+//TODO: remove -> end
