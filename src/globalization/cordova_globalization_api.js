@@ -1,50 +1,27 @@
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 var utils_ = xwalk.utils;
 var native_ = new utils_.NativeManager(extension);
-
-var _navigator = navigator || {};
-var _global = window || global || {};
-
-///// GlobalizationError //////
-var GlobalizationError = function(code, message) {
-  this.code = code;
-  this.name = 'GlobalizationError';
-  this.message = message || 'Default Message';
-  this.stack = (new Error()).stack;
-};
-
-GlobalizationError.prototype = Object.create(Error.prototype);
-GlobalizationError.prototype.constructor = GlobalizationError;
-
-GlobalizationError.UNKNOWN_ERROR = 0;
-GlobalizationError.FORMATTING_ERROR = 1;
-GlobalizationError.PARSING_ERROR = 2;
-GlobalizationError.PATTERN_ERROR = 3;
-
-_global.GlobalizationError = GlobalizationError;
-
 
 ///// Globalization //////
 var selectorDateStr = 'date';
 var selectorTimeStr = 'time';
 var selectorDateAndTimeStr = selectorDateStr + ' and ' + selectorTimeStr;
 
-//TODO how to support all those lenghts??
 var formatShortStr = 'short';
 var formatMediumStr = 'medium';
 var formatLongStr = 'long';
@@ -61,10 +38,7 @@ var numberTypeCurrency = 'currency';
 
 var oneHourSeconds = 60*60;
 
-var Globalization = {};
-
-Globalization.getPreferredLanguage = function(successCb, errorCb) {
-  // TODO add validation of parameters
+function Globalization_getPreferredLanguage(successCb, errorCb) {
   // TODO Indicates the current language setting in the (LANGUAGE)_(REGION) syntax.
   // The language setting is in the ISO 630-2 format and the region setting is in the ISO 3166-1 format.
   tizen.systeminfo.getPropertyValue ('LOCALE',
@@ -81,15 +55,7 @@ Globalization.getPreferredLanguage = function(successCb, errorCb) {
   );
 }
 
-Globalization.getLocaleName = function(successCb, errorCb) {
-  Globalization.getPreferredLanguage(successCb, errorCb);
-}
-
-//TODO JS implementation of dateToString would support only full length (one format is supprted),
-//     but selector for getting only needed values is fully supported
-Globalization.dateToString = function(date, successCb, errorCb, options) {
-  // TODO add validation of parameters
-  var result = null;
+function Globalization_dateToString(timestamp, successCb, errorCb, options) {
   var formatLength = formatFullStr;
   var selector = selectorDateAndTimeStr;
   if (options) {
@@ -97,7 +63,6 @@ Globalization.dateToString = function(date, successCb, errorCb, options) {
     selector = options.selector || selectorDateAndTimeStr;
   }
 
-  var timestamp = date.getTime();
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -115,10 +80,7 @@ Globalization.dateToString = function(date, successCb, errorCb, options) {
   native_.call('CordovaGlobalization_dateToString', callArgs, callback);
 }
 
-//TODO implementation would try to convert string to Date using javascript Date object
-// constructor, options are basically ignored
-Globalization.stringToDate = function(dateString, successCb, errorCb, options) {
-  // TODO add validation of parameters
+function Globalization_stringToDate(dateString, successCb, errorCb, options) {
   var result = null;
   var formatLength = formatFullStr;
   var selector = selectorDateAndTimeStr;
@@ -144,8 +106,7 @@ Globalization.stringToDate = function(dateString, successCb, errorCb, options) {
   native_.call('CordovaGlobalization_stringToDate', callArgs, callback);
 }
 
-Globalization.getDatePattern = function(successCb, errorCb, options) {
-  // TODO add validation of parameters
+function Globalization_getDatePattern(successCb, errorCb, options) {
   var formatLength = formatFullStr;
   var selector = selectorDateAndTimeStr;
 
@@ -159,7 +120,7 @@ Globalization.getDatePattern = function(successCb, errorCb, options) {
     var fullResult = {};
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
-          GlobalizationError.PATTERN_ERROR , native_.getErrorObject(result).message)
+          GlobalizationError.PATTERN_ERROR , native_.getErrorObject(result).message);
       native_.callIfPossible(errorCb, error);
       return;
     } else {
@@ -199,8 +160,7 @@ Globalization.getDatePattern = function(successCb, errorCb, options) {
   native_.call('CordovaGlobalization_getDatePattern', callArgs, callback);
 }
 
-Globalization.getDateNames = function(successCb, errorCb, options) {
-  // TODO add validation of parameters
+function Globalization_getDateNames(successCb, errorCb, options) {
   var type = typeWide;
   var item = itemDays;
   if (options) {
@@ -211,7 +171,7 @@ Globalization.getDateNames = function(successCb, errorCb, options) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
-          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message)
+          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message);
       native_.callIfPossible(errorCb, error);
     } else {
       successCb(native_.getResultObject(result));
@@ -224,9 +184,8 @@ Globalization.getDateNames = function(successCb, errorCb, options) {
   native_.call('CordovaGlobalization_getDateNames', callArgs, callback);
 }
 
-Globalization.isDayLightSavingsTime = function(date, successCb, errorCb) {
-  // TODO add validation of parameters
-  var tzdate = new tizen.TZDate(date); //creates tzdate with local default timezone
+function Globalization_isDayLightSavingsTime(timestamp, successCb, errorCb) {
+  var tzdate = new tizen.TZDate(new Date(timestamp)); //creates tzdate with local default timezone
   if (tzdate) {
     var result = tzdate.isDST();
     setTimeout( function() {
@@ -234,17 +193,16 @@ Globalization.isDayLightSavingsTime = function(date, successCb, errorCb) {
     }, 0);
   } else {
     setTimeout( function() {
-      errorCb(new GlobalizationError(GlobalizationError.UNKNOWN_ERROR , "cannot get information"))
+      errorCb(new GlobalizationError(GlobalizationError.UNKNOWN_ERROR , "cannot get information"));
     }, 0);
   }
 }
 
-Globalization.getFirstDayOfWeek = function(successCb, errorCb) {
-  // TODO add validation of parameters
+function Globalization_getFirstDayOfWeek(successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
-          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message)
+          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message);
       native_.callIfPossible(errorCb, error);
     } else {
       successCb(native_.getResultObject(result));
@@ -253,8 +211,7 @@ Globalization.getFirstDayOfWeek = function(successCb, errorCb) {
   native_.call('CordovaGlobalization_getFirstDayOfWeek', {}, callback);
 }
 
-Globalization.numberToString = function(number, successCb, errorCb, options) {
-  // TODO add validation of parameters
+function Globalization_numberToString(number, successCb, errorCb, options) {
   var type = numberTypeDecimal;
   if (options) {
     type = options.type || numberTypeDecimal;
@@ -263,7 +220,7 @@ Globalization.numberToString = function(number, successCb, errorCb, options) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
-          GlobalizationError.FORMATTING_ERROR , native_.getErrorObject(result).message)
+          GlobalizationError.FORMATTING_ERROR , native_.getErrorObject(result).message);
       native_.callIfPossible(errorCb, error);
     } else {
       successCb(native_.getResultObject(result));
@@ -276,8 +233,7 @@ Globalization.numberToString = function(number, successCb, errorCb, options) {
   native_.call('CordovaGlobalization_numberToString', callArgs, callback);
 }
 
-Globalization.stringToNumber = function(numberStr, successCb, errorCb, options) {
-  // TODO add validation of parameters
+function Globalization_stringToNumber(numberStr, successCb, errorCb, options) {
   var type = numberTypeDecimal;
   if (options) {
     type = options.type || numberTypeDecimal;
@@ -286,7 +242,7 @@ Globalization.stringToNumber = function(numberStr, successCb, errorCb, options) 
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
-          GlobalizationError.PARSING_ERROR , native_.getErrorObject(result).message)
+          GlobalizationError.PARSING_ERROR , native_.getErrorObject(result).message);
       native_.callIfPossible(errorCb, error);
     } else {
       var result = native_.getResultObject(result);
@@ -301,8 +257,7 @@ Globalization.stringToNumber = function(numberStr, successCb, errorCb, options) 
   native_.call('CordovaGlobalization_stringToNumber', callArgs, callback);
 }
 
-Globalization.getNumberPattern = function(successCb, errorCb, options) {
-  // TODO add validation of parameters
+function Globalization_getNumberPattern(successCb, errorCb, options) {
   var type = numberTypeDecimal;
   if (options) {
     type = options.type || numberTypeDecimal;
@@ -311,7 +266,7 @@ Globalization.getNumberPattern = function(successCb, errorCb, options) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
-          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message)
+          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message);
       native_.callIfPossible(errorCb, error);
     } else {
       successCb(native_.getResultObject(result));
@@ -323,12 +278,11 @@ Globalization.getNumberPattern = function(successCb, errorCb, options) {
   native_.call('CordovaGlobalization_getNumberPattern', callArgs, callback);
 }
 
-Globalization.getCurrencyPattern = function(currencyCode, successCb, errorCb) {
-  // TODO add validation of parameters
+function Globalization_getCurrencyPattern(currencyCode, successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
-          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message)
+          GlobalizationError.UNKNOWN_ERROR , native_.getErrorObject(result).message);
       native_.callIfPossible(errorCb, error);
     } else {
       successCb(native_.getResultObject(result));
@@ -340,6 +294,57 @@ Globalization.getCurrencyPattern = function(currencyCode, successCb, errorCb) {
   native_.call('CordovaGlobalization_getCurrencyPattern', callArgs, callback);
 }
 
-_navigator.globalization = Globalization;
 
-console.log('Loaded cordova.globalization API');
+//TODO: remove when added to public cordova repository -> begin
+var plugin_name = 'cordova-plugin-device.tizen.Globalization';
+cordova.define(plugin_name, function(require, exports, module) {
+//TODO: remove -> end
+  exports = {
+      getPreferredLanguage: function (successCb, errorCb, args) {
+        Globalization_getPreferredLanguage(successCb, errorCb);
+      },
+      getLocaleName: function (successCb, errorCb, args) {
+        Globalization_getPreferredLanguage(successCb, errorCb);
+      },
+      dateToString: function (successCb, errorCb, args) {
+        Globalization_dateToString(args[0]['date'], successCb, errorCb, args[0]['options']);
+      },
+      stringToDate: function (successCb, errorCb, args) {
+        Globalization_stringToDate(args[0]['dateString'], successCb, errorCb, args[0]['options']);
+      },
+      getDatePattern: function (successCb, errorCb, args) {
+        Globalization_getDatePattern(successCb, errorCb, args[0]['options']);
+      },
+      getDateNames: function (successCb, errorCb, args) {
+        Globalization_getDateNames(successCb, errorCb, args[0]['options']);
+      },
+      isDayLightSavingsTime: function (successCb, errorCb, args) {
+        Globalization_isDayLightSavingsTime(args[0]['date'], successCb, errorCb);
+      },
+      getFirstDayOfWeek: function (successCb, errorCb, args) {
+        Globalization_getFirstDayOfWeek(successCb, errorCb);
+      },
+      numberToString: function (successCb, errorCb, args) {
+        Globalization_numberToString(args[0]['number'], successCb, errorCb, args[0]['options']);
+      },
+      stringToNumber: function (successCb, errorCb, args) {
+        Globalization_stringToNumber(args[0]['numberString'], successCb, errorCb, args[0]['options']);
+      },
+      getNumberPattern: function (successCb, errorCb, args) {
+        Globalization_getNumberPattern(successCb, errorCb, args[0]['options']);
+      },
+      getCurrencyPattern: function (successCb, errorCb, args) {
+        Globalization_getCurrencyPattern(args[0]['currencyCode'], successCb, errorCb);
+      }
+  };
+  require("cordova/exec/proxy").add("Globalization", exports);
+  console.log('Loaded cordova.globalization API');
+//TODO: remove when added to public cordova repository -> begin
+});
+exports = function(require) {
+//this plugin is not loaded via cordova_plugins.js, we need to manually add
+//it to module mapper
+  var mm = require('cordova/modulemapper');
+  mm.runs(plugin_name);
+};
+//TODO: remove -> end

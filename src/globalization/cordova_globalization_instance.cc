@@ -81,7 +81,7 @@ void CordovaGlobalizationInstance::DateToString(const picojson::value& args,
   const std::string& timestamp_str = args.get("timestamp").get<std::string>();
   UDate date = std::stod(timestamp_str);
 
-  auto get = [this, format_length, selector, date](const std::shared_ptr<picojson::value>& response) -> void {
+  auto get = [this, format_length, selector, date, callback_id](const std::shared_ptr<picojson::value>& response) -> void {
     string result_str = CordovaGlobalizationTools::GetDateString(
         date, CordovaGlobalizationTools::GetDateFormat(format_length), selector);
 

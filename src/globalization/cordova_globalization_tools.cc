@@ -48,9 +48,24 @@ const std::string kNumberTypePercent = "percent";
 const std::string kNumberTypeCurrency = "currency";
 
 Locale CordovaGlobalizationTools::GetDefaultLocale() {
-  //TODO add gathering locale according to settings
+  LoggerD("Entered");
+  char* tempstr = vconf_get_str(VCONFKEY_REGIONFORMAT);
+
+  if (nullptr != tempstr){
+    LoggerD("Region: %s", tempstr);
+
+    char* p = strchr(tempstr, '.');
+    int len = strlen(tempstr) - (p != nullptr ? strlen(p) : 0);
+
+    if (len > 0) {
+      char* str_region = strndup(tempstr, len); //.UTF8 => 5
+      free(tempstr);
+      Locale result = Locale::createFromName(str_region);
+      free(str_region);
+      return result;
+    }
+  }
   return Locale::createFromName("en_US");
-  //return Locale::getUK();
 }
 
 std::string CordovaGlobalizationTools::ToUTF8String(const UnicodeString& uni_str) {
@@ -190,13 +205,12 @@ PlatformResult CordovaGlobalizationTools::GetNames(const std::string& item,
     *result = tmp_result;
     return PlatformResult(ErrorCode::NO_ERROR);
   } else {
-    return PlatformResult(ErrorCode::UNKNOWN_ERR, "Could not get days names");
+    return PlatformResult(ErrorCode::UNKNOWN_ERR, "Could not get names");
   }
 }
 
 PlatformResult CordovaGlobalizationTools::GetFirstDayOfWeek(double* result) {
   LoggerD("Entered");
-  UnicodeString str;
   UErrorCode ec = U_ZERO_ERROR;
   std::unique_ptr<DateFormat> dfmt(DateFormat::createDateInstance(DateFormat::kFull,
                                                                   GetDefaultLocale()));
@@ -227,7 +241,7 @@ PlatformResult CordovaGlobalizationTools::FormatNumber(double number, const std:
   }
   if (U_ZERO_ERROR >= ec) {
     nfmt->format(number, str);
-    *result = ToUTF8String(str);;
+    *result = ToUTF8String(str);
     return PlatformResult(ErrorCode::NO_ERROR);
   } else {
     return PlatformResult(ErrorCode::UNKNOWN_ERR, "Could not format number");
