@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+//= require('Errors.js');
+//= require('rootsUtils.js');
 //= require('DirectoryEntry.js');
 //= require('DirectoryReader.js');
 //= require('Entry.js');
