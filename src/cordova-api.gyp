@@ -15,6 +15,7 @@
         'globalization/cordova_globalization.gyp:*',
         'networkinformation/cordova_networkinformation.gyp:*',
         'filetransfer/cordova_filetransfer.gyp:*',
+        'media/cordova_media.gyp:*',
       ],
     },
   ], # end targets

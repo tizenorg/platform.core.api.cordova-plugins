@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "cordova/media/cordova_media_extension.h"
+#include "media/cordova_media_extension.h"
 
 // This will be generated from cordova_media_api.js
 extern const char kSource_cordova_media_api[];
