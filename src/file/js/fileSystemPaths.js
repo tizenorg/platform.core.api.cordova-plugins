@@ -19,14 +19,44 @@ cordova.define('cordova-plugin-file.tizen.fileSystemPaths', function(require, ex
 // TODO: remove -> end
 
 var pathsPrefix = {
-  // TODO: add other directories
-  // Read-only directory where the application is installed.
-  applicationDirectory: 'wgt-package/'
+  applicationDirectory: 'wgt-package/',
+  dataDirectory: 'wgt-private/',
+  cacheDirectory:'wgt-private-tmp/',
+  sharedDirectory: '/opt/usr/media/',
 };
+
+function setExternalStorage(successCallback, errorCallback) {
+  var onSuccess = function(storages) {
+    for (var i = 0; i < storages.length; i++) {
+      if (storages[i].type === 'EXTERNAL' && storages[i].state === 'MOUNTED') {
+        pathsPrefix.externalRootDirectory = storages[i].label + '/';
+        successCallback && successCallback(pathsPrefix);
+        return;
+      }
+    }
+  }
+
+  var onError = function(error) {
+    console.error("Failed to get external storage: " + error.message);
+    errorCallback && errorCallback(ConvErrorCode(error.code));
+  }
+
+  tizen.filesystem.listStorages(onSuccess, onError);
+}
+
+function setApplicationStorageDirectory(successCallback, errorCallback) {
+  try {
+    var app = tizen.application.getCurrentApplication();
+    pathsPrefix.applicationStorageDirectory = '/opt/usr/apps/' + app.appInfo.packageId + '/';
+    setExternalStorage(successCallback, errorCallback);
+  } catch(error) {
+    errorCallback && errorCallback(ConvErrorCode(error.code));
+  }
+}
 
 module.exports = {
   requestAllPaths: function(successCallback, errorCallback, args) {
-    successCallback(pathsPrefix);
+    setApplicationStorageDirectory(successCallback, errorCallback);
   }
 };
 
