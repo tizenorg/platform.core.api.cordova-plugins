@@ -27,6 +27,8 @@ function DeviceInfo() {
   this.uuid = tizen.systeminfo.getCapability('http://tizen.org/system/tizenid');
   this.version = tizen.systeminfo.getCapability('http://tizen.org/feature/platform.version');
   this.manufacturer = tizen.systeminfo.getCapability('http://tizen.org/system/manufacturer');
+  this.isVirtual = -1 !== this.model.toLowerCase().indexOf('emulator');
+  this.serial = this.uuid;
 }
 
 var di;
@@ -42,7 +44,9 @@ exports = {
       platform: di.platform,
       uuid: di.uuid,
       version: di.version,
-      manufacturer: di.manufacturer  // not documented, but required by tests
+      manufacturer: di.manufacturer,  // not documented, but required by tests
+      isVirtual: di.isVirtual,
+      serial: di.serial
     });
   }
 };
