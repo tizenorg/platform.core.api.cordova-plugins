@@ -14,6 +14,8 @@ Source0:    %{name}-%{version}.tar.gz
 
 BuildRequires: ninja
 BuildRequires: pkgconfig(webapi-plugins)
+BuildRequires: pkgconfig(icu-i18n)
+BuildRequires: pkgconfig(vconf)
 
 %description
 Cordova API using Tizen plugins.
