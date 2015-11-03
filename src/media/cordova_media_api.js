@@ -108,10 +108,44 @@ cordova.define(plugin_name, function(require, exports, module) {
 
     audioObjects[id].play();
   },
-  stopPlayingAudio: function(successCallback, errorCallback, args) {},
+  stopPlayingAudio: function(successCallback, errorCallback, args) {
+      var id = args[0];
+
+      clearTimeout(audioObjects[id].timer);
+
+      audioObjects[id].pause();
+
+      if (audioObjects[id].currentTime !== 0)
+          audioObjects[id].currentTime = 0;
+
+      console.log("media::stopPlayingAudio() - MEDIA_STATE -> MEDIA_STOPPED");
+
+      audioObjects[id].removeEventListener('canplay', audioObjects[id].onCanPlayCB);
+      audioObjects[id].removeEventListener('ended', audioObjects[id].onEndedCB);
+      audioObjects[id].removeEventListener('timeupdate', audioObjects[id].onTimeUpdateCB);
+      audioObjects[id].removeEventListener('durationchange', audioObjects[id].onDurationChangeCB);
+      audioObjects[id].removeEventListener('playing', audioObjects[id].onPlayingCB);
+      audioObjects[id].removeEventListener('play', audioObjects[id].onPlayCB);
+      audioObjects[id].removeEventListener('error', audioObjects[id].onErrorCB);
+      audioObjects[id].removeEventListener('error', audioObjects[id].onStalledCB);
+
+      Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_STOPPED);
+  },
   seekToAudio: function(successCallback, errorCallback, args) {},
-  pausePlayingAudio: function(successCallback, errorCallback, args) {},
-  getCurrentPositionAudio: function(successCallback, errorCallback, args) {},
+  pausePlayingAudio: function(successCallback, errorCallback, args) {
+      var id = args[0];
+
+      console.log("media::pausePlayingAudio() - MEDIA_STATE -> MEDIA_PAUSED");
+
+      audioObjects[id].pause();
+
+      Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_PAUSED);
+  },
+  getCurrentPositionAudio: function(successCallback, errorCallback, args) {
+      var id = args[0];
+      console.log("media::getCurrentPositionAudio()");
+      successCallback(audioObjects[id].currentTime);
+  },
   startRecordingAudio: function(successCallback, errorCallback, args) {},
   stopRecordingAudio: function(successCallback, errorCallback, args) {},
   release: function(successCallback, errorCallback, args) {},
