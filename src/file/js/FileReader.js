@@ -18,11 +18,57 @@
 cordova.define('cordova-plugin-file.tizen.FileReader', function(require, exports, module) {
 // TODO: remove -> end
 
+function read(operation, url, start, end, successCallback, errorCallback, encoding) {
+  var fail = function(e) {
+    errorCallback && errorCallback(ConvErrorCode(e.code));
+  }
+  try {
+    tizen.filesystem.resolve(url, function(file) {
+      try {
+        file.openStream('r', function(stream) {
+          try {
+            stream.position = start;
+            var r = stream[operation](end - start);
+            stream.close();
+            successCallback && successCallback(r);
+          } catch (e) {
+            fail(e);
+          }
+        }, fail, encoding);
+      } catch (e) {
+        fail(e);
+      }
+    }, fail, 'r');
+  } catch (e) {
+    fail(e);
+  }
+}
+
 module.exports = {
-  readAsText: function(successCallback, errorCallback, args) {},
-  readAsDataURL: function(successCallback, errorCallback, args) {},
-  readAsBinaryString: function(successCallback, errorCallback, args) {},
-  readAsArrayBuffer: function(successCallback, errorCallback, args) {},
+  readAsText: function(successCallback, errorCallback, args) {
+    read('read', args[0], args[2], args[3], successCallback, errorCallback, args[1]);
+  },
+  readAsDataURL: function(successCallback, errorCallback, args) {
+    read('readBase64', args[0], args[1], args[2], function(r) {
+      r = 'data:;base64,' + r;  // MIME is missing because it's not passed to exec()
+      successCallback && successCallback(r);
+    }, errorCallback);
+  },
+  readAsBinaryString: function(successCallback, errorCallback, args) {
+    read('readBytes', args[0], args[1], args[2], function(r) {
+      var str = '';
+      // this may be not so efficient, but
+      //   String.fromCharCode.apply(null, r);
+      // may throw if r.length is large enough
+      for (var i = 0; i < r.length; ++i) {
+        str += String.fromCharCode(r[i]);
+      }
+      successCallback && successCallback(str);
+    }, errorCallback);
+  },
+  readAsArrayBuffer: function(successCallback, errorCallback, args) {
+    read('readBytes', args[0], args[1], args[2], successCallback, errorCallback);
+  },
 };
 
 //TODO: remove when added to public cordova repository -> begin
