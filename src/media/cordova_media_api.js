@@ -20,11 +20,94 @@ var plugin_name = 'cordova-plugin-media.tizen.Media';
 cordova.define(plugin_name, function(require, exports, module) {
 // TODO: remove -> end
 
+  var audioObjects = {};
+
   exports = {
   create: function(successCallback, errorCallback, args) {
-    console.log("Media create stub");
+    var id = args[0], src = args[1];
+
+    console.log("media::create() - id =" + id + ", src =" + src);
+
+    audioObjects[id] = new Audio(src);
+
+    audioObjects[id].onStalledCB = function () {
+      console.log("media::onStalled()");
+
+      audioObjects[id].timer = setTimeout(
+        function () {
+          audioObjects[id].pause();
+
+          if (audioObjects[id].currentTime !== 0)
+            audioObjects[id].currentTime = 0;
+
+          console.log("media::onStalled() - MEDIA_ERROR -> " + MediaError.MEDIA_ERR_ABORTED);
+
+          var err = new MediaError(MediaError.MEDIA_ERR_ABORTED, "Stalled");
+
+          Media.onStatus(id, Media.MEDIA_ERROR, err);
+      }, 2000);
+    };
+
+    audioObjects[id].onEndedCB = function () {
+        console.log("media::onEndedCB() - MEDIA_STATE -> MEDIA_STOPPED");
+
+        Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_STOPPED);
+    };
+
+    audioObjects[id].onErrorCB = function (event) {
+        console.log("media::onErrorCB() - MEDIA_ERROR -> " + event.srcElement.error);
+
+        Media.onStatus(id, Media.MEDIA_ERROR, event.srcElement.error);
+    };
+
+    audioObjects[id].onPlayCB = function () {
+        console.log("media::onPlayCB() - MEDIA_STATE -> MEDIA_STARTING");
+
+        Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_STARTING);
+    };
+
+    audioObjects[id].onPlayingCB = function () {
+        console.log("media::onPlayingCB() - MEDIA_STATE -> MEDIA_RUNNING");
+
+        Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_RUNNING);
+    };
+
+    audioObjects[id].onDurationChangeCB = function () {
+        console.log("media::onDurationChangeCB() - MEDIA_DURATION -> " +  audioObjects[id].duration);
+
+        Media.onStatus(id, Media.MEDIA_DURATION, audioObjects[id].duration);
+    };
+
+    audioObjects[id].onTimeUpdateCB = function () {
+        console.log("media::onTimeUpdateCB() - MEDIA_POSITION -> " +  audioObjects[id].currentTime);
+
+        Media.onStatus(id, Media.MEDIA_POSITION, audioObjects[id].currentTime);
+    };
+
+    audioObjects[id].onCanPlayCB = function () {
+        console.log("media::onCanPlayCB()");
+
+        window.clearTimeout(audioObjects[id].timer);
+
+        audioObjects[id].play();
+    };
   },
-  startPlayingAudio: function(successCallback, errorCallback, args) {},
+  startPlayingAudio: function(successCallback, errorCallback, args) {
+    var id = args[0], src = args[1];
+
+    console.log("media::startPlayingAudio() - id =" + id + ", src =" + src);
+
+    audioObjects[id].addEventListener('canplay', audioObjects[id].onCanPlayCB);
+    audioObjects[id].addEventListener('ended', audioObjects[id].onEndedCB);
+    audioObjects[id].addEventListener('timeupdate', audioObjects[id].onTimeUpdateCB);
+    audioObjects[id].addEventListener('durationchange', audioObjects[id].onDurationChangeCB);
+    audioObjects[id].addEventListener('playing', audioObjects[id].onPlayingCB);
+    audioObjects[id].addEventListener('play', audioObjects[id].onPlayCB);
+    audioObjects[id].addEventListener('error', audioObjects[id].onErrorCB);
+    audioObjects[id].addEventListener('stalled', audioObjects[id].onStalledCB);
+
+    audioObjects[id].play();
+  },
   stopPlayingAudio: function(successCallback, errorCallback, args) {},
   seekToAudio: function(successCallback, errorCallback, args) {},
   pausePlayingAudio: function(successCallback, errorCallback, args) {},
