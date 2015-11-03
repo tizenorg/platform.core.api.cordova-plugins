@@ -10,6 +10,8 @@
         'cordova_file_api.js',
         'cordova_file_extension.cc',
         'cordova_file_extension.h',
+        'cordova_file_instance.cc',
+        'cordova_file_instance.h',
       ],
       'include_dirs': [
         '../',

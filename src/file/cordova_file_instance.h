@@ -14,32 +14,26 @@
  *    limitations under the License.
  */
 
-#include "file/cordova_file_extension.h"
-#include "file/cordova_file_instance.h"
+#ifndef FILE_CORDOVA_FILE_INSTANCE_H_
+#define FILE_CORDOVA_FILE_INSTANCE_H_
 
-// This will be generated from cordova_file_api.js
-extern const char kSource_cordova_file_api[];
-
-common::Extension* CreateExtension() {
-  return new extension::cordova::file::CordovaFileExtension();
-}
+#include <common/extension.h>
+#include <common/picojson.h>
 
 namespace extension {
 namespace cordova {
 namespace file {
 
-CordovaFileExtension::CordovaFileExtension() {
-  SetExtensionName("tizen.cordova.file");
-  SetJavaScriptAPI(kSource_cordova_file_api);
-}
+class CordovaFileInstance : public common::ParsedInstance {
+ public:
+  CordovaFileInstance();
+  virtual ~CordovaFileInstance();
 
-CordovaFileExtension::~CordovaFileExtension() {}
-
-common::Instance* CordovaFileExtension::CreateInstance() {
-  LoggerD("Entered");
-  return new CordovaFileInstance();
-}
-
+ private:
+  void Truncate(const picojson::value& args, picojson::object& out);
+};
 }  // file
 }  // cordova
 }  // extension
+
+#endif  // FILE_CORDOVA_FILE_INSTANCE_H_

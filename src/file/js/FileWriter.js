@@ -18,9 +18,76 @@
 cordova.define('cordova-plugin-file.tizen.FileWriter', function(require, exports, module) {
 // TODO: remove -> end
 
+var utils_ = xwalk.utils;
+var native_ = new utils_.NativeManager(extension);
+
 module.exports = {
-  write: function(successCallback, errorCallback, args) {},
-  truncate: function(successCallback, errorCallback, args) {}
+  write: function(successCallback, errorCallback, args) {
+    var uri = args[0];
+    var data = args[1];
+    var position = args[2];
+
+    var onSuccess = function (file) {
+      if (file.isDirectory) {
+        errorCallback && errorCallback(FileError.INVALID_MODIFICATION_ERR);
+        return;
+      }
+
+      var openStreamSuccess = function (stream) {
+        try {
+          stream.position = position;
+          stream.write(data);
+          var length = stream.position - position;
+          stream.close();
+          successCallback && successCallback(length);
+        } catch (error) {
+          errorCallback && errorCallback(ConvErrorCode(error.code));
+        }
+      }
+
+      var openStreamError = function (error) {
+        errorCallback && errorCallback(ConvErrorCode(error.code));
+      }
+
+      try {
+        file.openStream('rw', openStreamSuccess, openStreamError);
+      } catch (error) {
+        errorCallback && errorCallback(ConvErrorCode(error.code));
+      }
+    }
+
+    var onError = function (error) {
+      errorCallback && errorCallback(ConvErrorCode(error.code));
+    }
+
+    try {
+      tizen.filesystem.resolve(uri, onSuccess, onError, 'rw');
+    } catch (error) {
+      errorCallback && errorCallback(ConvErrorCode(error.code));
+    }
+  },
+
+  truncate: function(successCallback, errorCallback, args) {
+    var uriPrefix = 'file://';
+    var uri = args[0];
+    var length = args[1];
+
+    if (uri.indexOf(uriPrefix) === 0) {
+      uri = uri.substr(uriPrefix.length);
+    }
+
+    var callArgs = {
+      'uri': uri,
+      'length': length
+    };
+
+    var result = native_.callSync('File_truncate', callArgs);
+    if (native_.isFailure(result)) {
+      errorCallback && errorCallback(ConvErrorCode(native_.getErrorObject(result).code));
+    } else {
+      successCallback && successCallback(length);
+    }
+  }
 };
 
 //TODO: remove when added to public cordova repository -> begin

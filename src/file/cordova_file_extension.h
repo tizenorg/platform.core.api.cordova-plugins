@@ -27,6 +27,10 @@ class CordovaFileExtension : public common::Extension {
  public:
   CordovaFileExtension();
   virtual ~CordovaFileExtension();
+
+ private:
+  // common::Extension implementation.
+  virtual common::Instance* CreateInstance();
 };
 
 }  // file
