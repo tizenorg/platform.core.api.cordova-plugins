@@ -322,13 +322,10 @@ require("cordova/exec/proxy").add("Notification", exports);
 
 console.log('Loaded cordova.dialog API');
 
-//TODO: remove when added to public cordova repository -> begin
+// TODO: remove when added to public cordova repository -> begin
 });
 
 exports = function(require) {
-  // this plugin is not loaded via cordova_plugins.js, we need to manually add
-  // it to module mapper
-  var mm = require('cordova/modulemapper');
-  mm.runs(plugin_name);
+  require('cordova-tizen').addPlugin('cordova-plugin-dialogs.notification', plugin_name, 'runs');
 };
-//TODO: remove -> end
+// TODO: remove -> end

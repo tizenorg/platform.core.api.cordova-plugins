@@ -296,7 +296,7 @@ function Globalization_getCurrencyPattern(currencyCode, successCb, errorCb) {
 
 
 //TODO: remove when added to public cordova repository -> begin
-var plugin_name = 'cordova-plugin-device.tizen.Globalization';
+var plugin_name = 'cordova-plugin-globalization.tizen.Globalization';
 cordova.define(plugin_name, function(require, exports, module) {
 //TODO: remove -> end
   exports = {
@@ -339,12 +339,9 @@ cordova.define(plugin_name, function(require, exports, module) {
   };
   require("cordova/exec/proxy").add("Globalization", exports);
   console.log('Loaded cordova.globalization API');
-//TODO: remove when added to public cordova repository -> begin
+// TODO: remove when added to public cordova repository -> begin
 });
 exports = function(require) {
-//this plugin is not loaded via cordova_plugins.js, we need to manually add
-//it to module mapper
-  var mm = require('cordova/modulemapper');
-  mm.runs(plugin_name);
+  require('cordova-tizen').addPlugin('cordova-plugin-globalization.globalization', plugin_name, 'runs');
 };
-//TODO: remove -> end
+// TODO: remove -> end

@@ -15,7 +15,7 @@
  */
 
 // TODO: remove when added to public cordova repository -> begin
-var plugin_name = 'cordova-plugin-file.tizen.NetworkStatus';
+var plugin_name = 'cordova-plugin-network-information.tizen.NetworkStatus';
 
 cordova.define(plugin_name, function(require, exports, module) {
 // TODO: remove -> end
@@ -82,13 +82,10 @@ require('cordova/exec/proxy').add('NetworkStatus', exports);
 
 console.log('Loaded cordova.networkinformation API');
 
-//TODO: remove when added to public cordova repository -> begin
+// TODO: remove when added to public cordova repository -> begin
 });
 
 exports = function(require) {
-  // this plugin is not loaded via cordova_plugins.js, we need to manually add
-  // it to module mapper
-  var mm = require('cordova/modulemapper');
-  mm.runs(plugin_name);
+  require('cordova-tizen').addPlugin('cordova-plugin-network-information.network', plugin_name, 'runs');
 };
-//TODO: remove -> end
+// TODO: remove -> end
