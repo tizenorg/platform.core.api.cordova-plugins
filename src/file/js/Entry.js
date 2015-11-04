@@ -18,13 +18,147 @@
 cordova.define('cordova-plugin-file.tizen.Entry', function(require, exports, module) {
 // TODO: remove -> end
 
+var resolveParent = function(srcURL, errorCallback, rest){
+  try {
+    tizen.filesystem.resolve(
+        srcURL,
+        function (srcFile) {
+          var parentDir = srcFile.parent;
+          if (!parentDir) {
+            console.error('Error - could not resolve file ' + srcURL);
+            errorCallback && errorCallback(ConvErrorCode(WebAPIException.UNKNOWN_ERR));
+          } else {
+            rest(srcFile, parentDir);
+          }
+        }, function (err) {
+          console.error('Error - resolve file ' + srcURL + ' failed');
+          errorCallback && errorCallback(
+              ConvErrorCode(err.code || WebAPIException.UNKNOWN_ERR));
+        },
+    'r');
+  } catch (exception) {
+    console.error('Error - resolve ' + srcURL + ' file thrown exception');
+    errorCallback && errorCallback(ConvErrorCode(
+        exception.code || WebAPIException.UNKNOWN_ERR));
+  }
+};
+
+var changeFile = function(method, successCallback, errorCallback, args) {
+  var srcURL = args[0];
+  var name = args[2];
+  var destURL = args[1] + ((args[1][args[1].length-1] === '/') ? '' : '/') + name;
+
+  resolveParent (srcURL, errorCallback,
+      function(srcFile, parentDir) {
+          try {
+            parentDir[method](srcFile.fullPath,
+                destURL,
+                false,
+                function () {
+                  try {
+                    tizen.filesystem.resolve(
+                      destURL,
+                      function (destFile) {
+                        var destEntry = {
+                            'isDirectory' : destFile.isDirectory,
+                            'name' : name,
+                            'fullPath' : destFile.fullPath,
+                            'nativeURL' : destFile.toURI()
+                        };
+                        successCallback && successCallback(destEntry);
+                      }, function (err) {
+                        console.error('Error - resolve result entry failed');
+                        errorCallback && errorCallback(ConvErrorCode(err.code));
+                      }
+                    );
+                  } catch (exception) {
+                    console.error('Error - resolve result entry thrown exception');
+                    errorCallback && errorCallback(ConvErrorCode(
+                        exception.code || WebAPIException.UNKNOWN_ERR));
+                  }
+                }, function (err) {
+                  console.error('Error - ' + method + ' operation failed');
+                  errorCallback && errorCallback(ConvErrorCode(err.code));
+                }
+            );
+          } catch (exception) {
+            console.error('Error - ' + method + ' operation thrown exception');
+            errorCallback && errorCallback(ConvErrorCode(
+                exception.code || WebAPIException.UNKNOWN_ERR));
+          }
+      }
+  );
+};
+
 module.exports = {
-  getFileMetadata: function(successCallback, errorCallback, args) {},
-  setMetadata: function(successCallback, errorCallback, args) {},
-  moveTo: function(successCallback, errorCallback, args) {},
-  copyTo: function(successCallback, errorCallback, args) {},
-  remove: function(successCallback, errorCallback, args) {},
-  getParent: function(successCallback, errorCallback, args) {}
+  getFileMetadata: function(successCallback, errorCallback, args) {
+      try {
+        tizen.filesystem.resolve(args[0], function (file) {
+          var result = { 'size': file.fileSize, 'lastModifiedDate': file.modified };
+          successCallback && successCallback(result);
+        }, function (err) {
+          errorCallback && errorCallback(ConvErrorCode(
+              err.code || WebAPIException.UNKNOWN_ERR));
+        }, 'r');
+      } catch (exception) {
+        console.error('Error - resolve failed');
+        errorCallback && errorCallback(ConvErrorCode(
+            exception.code || WebAPIException.UNKNOWN_ERR));
+      }
+    },
+  setMetadata: function(successCallback, errorCallback, args) {
+    console.error('setMetadata - Not supported');
+    errorCallback && errorCallback(ConvErrorCode(WebAPIException.UNKNOWN_ERR));
+  },
+  moveTo: function(successCallback, errorCallback, args) {
+    changeFile('moveTo', successCallback, errorCallback, args);
+  },
+  copyTo: function(successCallback, errorCallback, args) {
+    changeFile('copyTo', successCallback, errorCallback, args);
+  },
+  remove: function(successCallback, errorCallback, args) {
+    var url = args[0];
+
+    resolveParent(url,  errorCallback,
+        function(srcFile, parentDir){
+          var method = srcFile.isFile ? 'deleteFile' : 'deleteDirectory';
+          var args = [srcFile.fullPath,
+                      false,
+                      function() {successCallback && successCallback();},
+                      function(err) {
+                        console.error('Error - ' + method + ' failed');
+                        errorCallback && errorCallback(
+                            ConvErrorCode(err.code || WebAPIException.UNKNOWN_ERR));
+                        }];
+          if (srcFile.isFile) {
+            //remove recursive flag
+            args.splice(1, 1);
+          }
+          try {
+            parentDir[method].apply(parentDir, args);
+          } catch (exception) {
+            console.error('Error - ' + method + ' thrown exception ' + JSON.stringify(exception));
+            errorCallback && errorCallback(ConvErrorCode(
+                exception.code || WebAPIException.UNKNOWN_ERR));
+          }
+        }
+    );
+  },
+  getParent: function(successCallback, errorCallback, args) {
+    var url = args[0];
+    console.log('url ' + url);
+
+    resolveParent(url, errorCallback,
+        function(srcFile, parentDir){
+          var resultEntry = {
+              'name' : srcFile.parent.name,
+              'fullPath' : srcFile.parent.fullPath,
+              'nativeURL' : srcFile.parent.toURI()
+          };
+          successCallback && successCallback(resultEntry);
+        }
+    );
+  }
 };
 
 //TODO: remove when added to public cordova repository -> begin
