@@ -14,25 +14,20 @@
  *    limitations under the License.
  */
 
-// TODO: remove when added to public cordova repository -> begin
-cordova.define('cordova-plugin-file.tizen.fileSystems-roots', function(require, exports, module) {
-// TODO: remove -> end
+/**
+ * Function converting a tizen error to a cordova error
+ *
+ * {unsigned short} WebAPIError error code
+ */
+function ConvErrorCode(err_code) {
+  switch (err_code) {
+    case WebAPIException.INVALID_VALUES_ERR:
+      return FileError.ENCODING_ERR;
 
-var channel = require('cordova/channel');
+    case WebAPIException.NOT_FOUND_ERR:
+      return FileError.NOT_FOUND_ERR;
 
-channel.waitForInitialization('onGetRootsReady');
-channel.onCordovaReady.subscribe(function() {
-  rootsUtils.getRoots(function () {
-    channel.initializationComplete('onGetRootsReady');
-  });
-});
-
-module.exports = {
-  requestAllFileSystems: function(successCallback, errorCallback, args) {
-    rootsUtils.getRoots(successCallback);
+    default:
+      return FileError.ENCODING_ERR;
   }
-};
-
-//TODO: remove when added to public cordova repository -> begin
-});
-//TODO: remove -> end
+}
