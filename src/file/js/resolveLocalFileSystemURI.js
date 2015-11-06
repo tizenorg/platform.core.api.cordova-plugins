@@ -19,7 +19,28 @@ cordova.define('cordova-plugin-file.tizen.resolveLocalFileSystemURI', function(r
 // TODO: remove -> end
 
 module.exports = {
-  resolveLocalFileSystemURI: function(successCallback, errorCallback, args) {}
+  resolveLocalFileSystemURI: function(successCallback, errorCallback, args) {
+    var path = args[0];
+
+    function onResolve(file) {
+      var filesystem = rootsUtils.findFilesystem(file.toURI());
+
+      var entry = {
+        'filesystemName' : filesystem.filesystemName,
+        'name' : file.name,
+        'fullPath' : file.fullPath,
+        'isDirectory' : file.isDirectory,
+        'nativeURL' : file.toURI(),
+      };
+      successCallback(entry);
+    }
+
+    function onError(error) {
+      errorCallback && errorCallback(ConvErrorCode(error.code));
+    }
+
+    tizen.filesystem.resolve(path, onResolve, onError, 'r');
+  }
 };
 
 //TODO: remove when added to public cordova repository -> begin

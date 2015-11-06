@@ -19,7 +19,33 @@ cordova.define('cordova-plugin-file.tizen.requestFileSystem', function(require, 
 // TODO: remove -> end
 
 module.exports = {
-  requestFileSystem: function(successCallback, errorCallback, args) {}
+  requestFileSystem: function(successCallback, errorCallback, args) {
+    var type = args[0];
+
+    //TEMPORARY = 0 PERSISTENT = 1 cordova layer checks only if type is less than 0
+    if (type >= 2) {
+      errorCallback && errorCallback(FileError.TYPE_MISMATCH_ERR);
+      return;
+    }
+
+    var path = type === LocalFileSystem.PERSISTENT ?
+        cordova.file.dataDirectory : cordova.file.cacheDirectory;
+
+    var filesystem = rootsUtils.findFilesystem(path.substr(0, path.length-1));
+
+    if (filesystem.filesystemName !== 'temporary' && filesystem.filesystemName !== 'persistent') {
+      errorCallback && errorCallback(FileError.NOT_FOUND_ERR);
+      return;
+    }
+
+    var root = {
+      'name' : filesystem.name,
+      'fullPath' : filesystem.fullPath,
+      'nativeURL' : filesystem.nativeURL,
+    };
+
+    successCallback({'name' : filesystem.filesystemName, 'root' : root});
+  }
 };
 
 //TODO: remove when added to public cordova repository -> begin
