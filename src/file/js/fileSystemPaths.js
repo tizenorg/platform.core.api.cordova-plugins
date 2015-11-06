@@ -25,38 +25,49 @@ var pathsPrefix = {
   sharedDirectory: '/opt/usr/media/',
 };
 
-function setExternalStorage(successCallback, errorCallback) {
+function setExternalStorage(callback) {
   var onSuccess = function(storages) {
-    for (var i = 0; i < storages.length; i++) {
+    for (var i = 0; i < storages.length; ++i) {
       if (storages[i].type === 'EXTERNAL' && storages[i].state === 'MOUNTED') {
         pathsPrefix.externalRootDirectory = storages[i].label + '/';
-        successCallback && successCallback(pathsPrefix);
-        return;
+        break;
       }
     }
+
+    callback(pathsPrefix);
   }
 
   var onError = function(error) {
-    console.error("Failed to get external storage: " + error.message);
-    errorCallback && errorCallback(ConvErrorCode(error.code));
+    console.error('Failed to get external storage: ' + error.message);
+    callback(pathsPrefix);
   }
 
-  tizen.filesystem.listStorages(onSuccess, onError);
+  try {
+    tizen.filesystem.listStorages(onSuccess, onError);
+  } catch(error) {
+    console.error('Failed to list storages: ' + error.message);
+    callback(pathsPrefix);
+  }
 }
 
-function setApplicationStorageDirectory(successCallback, errorCallback) {
+function setApplicationStorageDirectory(callback) {
   try {
     var app = tizen.application.getCurrentApplication();
     pathsPrefix.applicationStorageDirectory = '/opt/usr/apps/' + app.appInfo.packageId + '/';
-    setExternalStorage(successCallback, errorCallback);
+    setExternalStorage(callback);
   } catch(error) {
-    errorCallback && errorCallback(ConvErrorCode(error.code));
+    console.error('Failed to get current application: ' + error.message);
+    callback(pathsPrefix);
   }
 }
 
 module.exports = {
   requestAllPaths: function(successCallback, errorCallback, args) {
-    setApplicationStorageDirectory(successCallback, errorCallback);
+    // we ignore errorCallback here, as we're always reporting as much
+    // information as we currently have
+    setApplicationStorageDirectory(function(r) {
+      successCallback && successCallback(r);
+    });
   }
 };
 
