@@ -19,7 +19,33 @@ cordova.define('cordova-plugin-file.tizen.DirectoryReader', function(require, ex
 // TODO: remove -> end
 
 module.exports = {
-  readEntries: function(successCallback, errorCallback, args) {}
+  readEntries: function(successCallback, errorCallback, args) {
+    var uri = args[0];
+    var fail = function(e) {
+      errorCallback && errorCallback(ConvErrorCode(e.code));
+    }
+    try {
+      tizen.filesystem.resolve(uri,
+        function (v) {
+          v.listFiles(function(f) {
+            var retVal = [];
+            for (var i = 0; i < v.length; ++i) {
+              var obj = {};
+              obj.isDirectory = v[i].isDirectory;
+              obj.isFile = v[i].isFile;
+              obj.name = v[i].name;
+              obj.fullPath = v[i].fullPath;
+              obj.filesystemName = rootsUtils.findFilesystem(v[i].fullPath).filesystemName;
+              obj.nativeURL = v[i].toURI();
+              retVal.push(obj);
+            };
+            successCallback(retVal);
+          }, fail);
+        }, fail, 'r');
+    } catch (e) {
+      fail(e);
+    }
+  }
 };
 
 //TODO: remove when added to public cordova repository -> begin
