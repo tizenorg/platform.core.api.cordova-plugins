@@ -25,13 +25,9 @@ module.exports = {
     function onResolve(file) {
       var filesystem = rootsUtils.findFilesystem(file.toURI());
 
-      var entry = {
-        'filesystemName' : filesystem.filesystemName,
-        'name' : file.name,
-        'fullPath' : file.fullPath,
-        'isDirectory' : file.isDirectory,
-        'nativeURL' : file.toURI(),
-      };
+      var entry = rootsUtils.createEntry(file, filesystem.filesystemName);
+      entry.isDirectory = file.isDirectory;
+
       successCallback(entry);
     }
 

@@ -59,12 +59,8 @@ var changeFile = function(method, successCallback, errorCallback, args) {
                     tizen.filesystem.resolve(
                       destURL,
                       function (destFile) {
-                        var destEntry = {
-                            'isDirectory' : destFile.isDirectory,
-                            'name' : name,
-                            'fullPath' : destFile.fullPath,
-                            'nativeURL' : destFile.toURI()
-                        };
+                        var destEntry = rootsUtils.createEntry(destFile);
+                        destEntry.isDirectory = destFile.isDirectory;
                         successCallback && successCallback(destEntry);
                       }, function (err) {
                         console.error('Error - resolve result entry failed');
@@ -150,12 +146,7 @@ module.exports = {
 
     resolveParent(url, errorCallback,
         function(srcFile, parentDir){
-          var resultEntry = {
-              'name' : srcFile.parent.name,
-              'fullPath' : srcFile.parent.fullPath,
-              'nativeURL' : srcFile.parent.toURI()
-          };
-          successCallback && successCallback(resultEntry);
+          successCallback && successCallback(rootsUtils.createEntry(srcFile.parent));
         }
     );
   }

@@ -15,6 +15,40 @@
  */
 
 var rootsUtils = (function() {
+  var uriPrefix = 'file://';
+
+  function stripTrailingSlash(str) {
+    if ('/' === str.substr(-1)) {
+      return str.substr(0, str.length - 1);
+    }
+    return str;
+  }
+
+  function getName(uri) {
+    return stripTrailingSlash(uri).replace(/^.*(\\|\/|\:)/, '');
+  }
+
+  function getFullPath(uri) {
+    if (0 === uri.indexOf(uriPrefix)) {
+      uri = uri.substr(uriPrefix.length);
+    }
+    return stripTrailingSlash(uri);
+  }
+
+  function getNativeUrl(uri) {
+    return stripTrailingSlash(uri);
+  }
+
+  function createEntry(file, fsName) {
+    var uri = file.toURI();
+    return {
+      name: getName(uri),
+      fullPath: getFullPath(uri),
+      nativeURL: getNativeUrl(uri),
+      filesystemName: fsName
+    };
+  }
+
   var roots_to_resolve = [
     {
       filesystemName: 'temporary',
@@ -30,20 +64,21 @@ var rootsUtils = (function() {
     }
   ];
 
+  var rootDirUri = 'file:///';
+
   var roots = [
     {
       filesystemName: 'root',
-      name: '',
-      fullPath: '/',
-      nativeURL: '/'
+      name: getName(rootDirUri),
+      fullPath: getFullPath(rootDirUri),
+      nativeURL: getNativeUrl(rootDirUri)
     }
   ];
 
   function getRoots(successCallback) {
     if (roots_to_resolve.length > 0) {
       tizen.filesystem.resolve(roots_to_resolve[0].nativeURL, function(dir) {
-        roots_to_resolve[0].fullPath = dir.toURI().substr(7);
-        roots_to_resolve[0].name = roots_to_resolve[0].fullPath.replace(/^.*(\\|\/|\:)/, '');  // extract name of the directory
+        roots_to_resolve[0] = createEntry(dir, roots_to_resolve[0].filesystemName);
         roots.push(roots_to_resolve[0]);
         roots_to_resolve.splice(0, 1); // remove first item
 
@@ -65,24 +100,11 @@ var rootsUtils = (function() {
     return ((str1 === str2) ? 0 : ((str1 > str2) ? 1 : -1 ));
   }
 
-  function findFilesystem(url) {
-    for (var i = roots.length - 1; i >= 0; i--) {
-      if (url.indexOf('file://') == 0) {
-        url = url.substr(7);
-      }
-
-      if (url.charAt(0) == '/') {
-        if (url == roots[i].fullPath) {
-          return roots[i];
-        }
-
-        if (strncmp(url, roots[i].fullPath + '/', roots[i].fullPath.length + 1) == 0) {
-          return roots[i];
-        }
-      } else {
-        if (url == roots[i].nativeURL) {
-          return roots[i];
-        }
+  function findFilesystem(uri) {
+    var fullPath = getFullPath(uri);
+    for (var i = roots.length - 1; i > 0; --i) {
+      if (0 === strncmp(fullPath, roots[i].fullPath, roots[i].fullPath.length)) {
+        return roots[i];
       }
     }
 
@@ -91,6 +113,11 @@ var rootsUtils = (function() {
 
   return {
     getRoots: getRoots,
-    findFilesystem: findFilesystem
+    findFilesystem: findFilesystem,
+    getName: getName,
+    getFullPath: getFullPath,
+    getNativeUrl: getNativeUrl,
+    stripTrailingSlash: stripTrailingSlash,
+    createEntry: createEntry
   };
 })();

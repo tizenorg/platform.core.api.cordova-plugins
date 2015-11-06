@@ -21,30 +21,34 @@ cordova.define('cordova-plugin-file.tizen.requestFileSystem', function(require, 
 module.exports = {
   requestFileSystem: function(successCallback, errorCallback, args) {
     var type = args[0];
+    var fsName;
 
-    //TEMPORARY = 0 PERSISTENT = 1 cordova layer checks only if type is less than 0
-    if (type >= 2) {
-      errorCallback && errorCallback(FileError.TYPE_MISMATCH_ERR);
-      return;
+    switch(type) {
+      case LocalFileSystem.TEMPORARY:
+        fsName = 'temporary';
+        break;
+
+      case LocalFileSystem.PERSISTENT:
+        fsName = 'persistent';
+        break;
+
+      default:
+        console.error('Unknown FS type: ' + type);
+        errorCallback && errorCallback(FileError.TYPE_MISMATCH_ERR);
+        return;
     }
 
-    var path = type === LocalFileSystem.PERSISTENT ?
-        cordova.file.dataDirectory : cordova.file.cacheDirectory;
+    rootsUtils.getRoots(function(roots) {
+      for (var i = 0; i < roots.length; ++i) {
+        if (fsName === roots[i].filesystemName) {
+          successCallback({ 'name': fsName, 'root': roots[i] });
+          return;
+        }
+      }
 
-    var filesystem = rootsUtils.findFilesystem(path.substr(0, path.length-1));
-
-    if (filesystem.filesystemName !== 'temporary' && filesystem.filesystemName !== 'persistent') {
+      console.error('Filesystem not found: ' + fsName);
       errorCallback && errorCallback(FileError.NOT_FOUND_ERR);
-      return;
-    }
-
-    var root = {
-      'name' : filesystem.name,
-      'fullPath' : filesystem.fullPath,
-      'nativeURL' : filesystem.nativeURL,
-    };
-
-    successCallback({'name' : filesystem.filesystemName, 'root' : root});
+    });
   }
 };
 

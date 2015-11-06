@@ -30,13 +30,9 @@ module.exports = {
           f.listFiles(function(v) {
             var retVal = [];
             for (var i = 0; i < v.length; ++i) {
-              var obj = {};
+              var obj = rootsUtils.createEntry(v[i], rootsUtils.findFilesystem(v[i].toURI()).filesystemName);
               obj.isDirectory = v[i].isDirectory;
               obj.isFile = v[i].isFile;
-              obj.name = v[i].name;
-              obj.fullPath = v[i].fullPath;
-              obj.filesystemName = rootsUtils.findFilesystem(v[i].fullPath).filesystemName;
-              obj.nativeURL = v[i].toURI();
               retVal.push(obj);
             };
             successCallback(retVal);
