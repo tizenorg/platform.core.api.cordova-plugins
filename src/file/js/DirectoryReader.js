@@ -26,8 +26,8 @@ module.exports = {
     }
     try {
       tizen.filesystem.resolve(uri,
-        function (v) {
-          v.listFiles(function(f) {
+        function (f) {
+          f.listFiles(function(v) {
             var retVal = [];
             for (var i = 0; i < v.length; ++i) {
               var obj = {};
