@@ -15,7 +15,7 @@
  */
 
 // TODO: remove when added to public cordova repository -> begin
-var plugin_name = 'cordova-plugin-file.tizen.FileTransfer';
+var plugin_name = 'cordova-plugin-file-transfer.tizen.FileTransfer';
 
 cordova.define(plugin_name, function(require, exports, module) {
 // TODO: remove -> end
@@ -210,13 +210,10 @@ require("cordova/exec/proxy").add("FileTransfer", exports);
 
 console.log('Loaded cordova.file-transfer API');
 
-//TODO: remove when added to public cordova repository -> begin
+// TODO: remove when added to public cordova repository -> begin
 });
 
 exports = function(require) {
-  // this plugin is not loaded via cordova_plugins.js, we need to manually add
-  // it to module mapper
-  var mm = require('cordova/modulemapper');
-  mm.runs(plugin_name);
+  require('cordova-tizen').addPlugin('cordova-plugin-file-transfer.FileTransfer', plugin_name, 'runs');
 };
-//TODO: remove -> end
+// TODO: remove -> end

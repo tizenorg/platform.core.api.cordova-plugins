@@ -1334,12 +1334,7 @@ module.exports = {
 
      modulemapper.clobbers('cordova/exec/proxy', 'cordova.commandProxy');
 
-     // load all Tizen plugins
-     for (var plugin in tizen.cordova) {
-       if (tizen.cordova.hasOwnProperty(plugin)) {
-         tizen.cordova[plugin](require);
-       }
-     }
+     tizen.cordova.load(require);
 
      channel.onNativeReady.fire();
 

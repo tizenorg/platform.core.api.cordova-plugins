@@ -15,3 +15,50 @@
  */
 
 console.log('Loaded cordova API');
+
+exports = {
+  load: function(require) {
+    // delete this method
+    delete exports.load;
+
+    var plugins = [];
+
+    // mechanism to add Tizen-specific plugins to cordova
+    cordova.define('cordova-tizen', function(require, exports, module) {
+      module.exports = {
+        addPlugin: function(dependency, name, algorithm, symbol) {
+          plugins.push({
+            dependency: dependency,
+            name: name,
+            algorithm: algorithm,
+            symbol: symbol
+          });
+        }
+      };
+    });
+
+    var channel = require('cordova/channel');
+
+    // executed when all cordova plugins have been loaded
+    channel.onPluginsReady.subscribe(function() {
+      var mm = require('cordova/modulemapper');
+
+      // add plugins to module mapper, but only if they are required
+      // (their dependencies have been defined/loaded)
+      for (var i = 0; i < plugins.length; ++i) {
+        var p = plugins[i];
+        if (cordova.define.moduleMap[p.dependency]) {
+          mm[p.algorithm](p.name, p.symbol);
+        }
+      }
+    });
+
+    // load all native plugins
+    for (var prop in tizen.cordova) {
+      if (tizen.cordova.hasOwnProperty(prop)) {
+        console.log('Trying to load: tizen.cordova.' + prop);
+        tizen.cordova[prop](require);
+      }
+    }
+  }
+};

@@ -157,12 +157,10 @@ require("cordova/exec/proxy").add("Media", exports);
 
 console.log('Loaded cordova.media API');
 
-//TODO: remove when added to public cordova repository -> begin
+// TODO: remove when added to public cordova repository -> begin
 });
 
 exports = function(require) {
-  // this plugin is not loaded via cordova_plugins.js, we need to manually add
-  // it to module mapper
-  var mm = require('cordova/modulemapper');
-  mm.runs(plugin_name);
+  require('cordova-tizen').addPlugin('cordova-plugin-media.Media', plugin_name, 'runs');
 };
+// TODO: remove -> end
