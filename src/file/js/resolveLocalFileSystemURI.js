@@ -24,6 +24,12 @@ module.exports = {
     // fix for file.spec.10
     path = path.split('?')[0];
 
+    // fix for file.spec.12
+    if (0 !== path.indexOf('file://')) {  // 'file://' scheme is required
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
+    }
+
     function onResolve(file) {
       var filesystem = rootsUtils.findFilesystem(file.toURI());
 
