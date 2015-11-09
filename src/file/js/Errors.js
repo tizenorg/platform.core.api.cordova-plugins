@@ -15,17 +15,20 @@
  */
 
 /**
- * Function converting a tizen error to a cordova error
+ * Function converting a Tizen error to a cordova error
  *
- * {unsigned short} WebAPIError error code
+ * {unsigned short} WebAPIError error
  */
-function ConvErrorCode(err_code) {
-  switch (err_code) {
-    case WebAPIException.INVALID_VALUES_ERR:
+function ConvertTizenFileError(err) {
+  switch (err.name) {
+    case 'InvalidValuesError':
       return FileError.ENCODING_ERR;
 
-    case WebAPIException.NOT_FOUND_ERR:
+    case 'NotFoundError':
       return FileError.NOT_FOUND_ERR;
+
+    case 'IOError':
+      return FileError.INVALID_MODIFICATION_ERR;
 
     default:
       return FileError.ENCODING_ERR;

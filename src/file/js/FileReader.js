@@ -20,7 +20,7 @@ cordova.define('cordova-plugin-file.tizen.FileReader', function(require, exports
 
 function read(operation, url, start, end, successCallback, errorCallback, encoding) {
   var fail = function(e) {
-    errorCallback && errorCallback(ConvErrorCode(e.code));
+    errorCallback && errorCallback(ConvertTizenFileError(e));
   }
   try {
     tizen.filesystem.resolve(url, function(file) {

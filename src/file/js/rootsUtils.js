@@ -111,6 +111,11 @@ var rootsUtils = (function() {
     return roots[0];  // root filesystem
   }
 
+  function isRootUri(uri) {
+    var fs = findFilesystem(uri);
+    return (fs.fullPath === getFullPath(uri));
+  }
+
   return {
     getRoots: getRoots,
     findFilesystem: findFilesystem,
@@ -118,6 +123,7 @@ var rootsUtils = (function() {
     getFullPath: getFullPath,
     getNativeUrl: getNativeUrl,
     stripTrailingSlash: stripTrailingSlash,
-    createEntry: createEntry
+    createEntry: createEntry,
+    isRootUri: isRootUri
   };
 })();

@@ -96,8 +96,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
           );
         } catch (err) {
           console.error('Error - Could not resolve');
-          errorCallback && errorCallback(
-              ConvErrorCode(exception.code || WebAPIException.UNKNOWN_ERR));
+          errorCallback && errorCallback(ConvertTizenFileError(err));
         }
       } else {
         console.error('Error - create flag is false - new directory would not be created');
@@ -110,8 +109,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
       tizen.filesystem.resolve(absolute_path, resolveSuccess, resolveError, 'rw');
     } catch (err) {
       console.error('Error - Could not resolve');
-      errorCallback && errorCallback(
-          ConvErrorCode(exception.code || WebAPIException.UNKNOWN_ERR));
+      errorCallback && errorCallback(ConvertTizenFileError(err));
     }
   };
 
@@ -121,6 +119,13 @@ module.exports = {
   },
   removeRecursively: function(successCallback, errorCallback, args) {
     var uri = args[0];
+
+    if (rootsUtils.isRootUri(uri)) {
+      console.error('It is not allowed to remove root directory.');
+      errorCallback && errorCallback(FileError.NO_MODIFICATION_ALLOWED_ERR);
+      return;
+    }
+
     // resolve parent
     var tmp_path = uri[uri.length-1] === '/' ? uri.substring(0, uri.lastIndexOf('/')) : uri;
     var parent_path = tmp_path.substring(0, tmp_path.lastIndexOf('/')+1);
@@ -145,18 +150,16 @@ module.exports = {
               }
             } catch (err) {
               console.error('Error - Could not deleteDirectory');
-              errorCallback && errorCallback(
-                  ConvErrorCode(exception.code || WebAPIException.UNKNOWN_ERR));
+              errorCallback && errorCallback(ConvertTizenFileError(err));
             }
           }, function(e) {
-            console.error('Error' + e.message);
-            errorCallback && errorCallback(FileError.NOT_FOUND_ERR);
+            console.error('Error: ' + e.message);
+            errorCallback && errorCallback(ConvertTizenFileError(e));
           }, 'rw'
       );
     } catch (err) {
       console.error('Error - Could not resolve');
-      errorCallback && errorCallback(
-          ConvErrorCode(exception.code || WebAPIException.UNKNOWN_ERR));
+      errorCallback && errorCallback(ConvertTizenFileError(err));
     }
   },
   getFile: function(successCallback, errorCallback, args) {
