@@ -21,6 +21,8 @@ cordova.define('cordova-plugin-file.tizen.resolveLocalFileSystemURI', function(r
 module.exports = {
   resolveLocalFileSystemURI: function(successCallback, errorCallback, args) {
     var path = args[0];
+    // fix for file.spec.10
+    path = path.split('?')[0];
 
     function onResolve(file) {
       var filesystem = rootsUtils.findFilesystem(file.toURI());
