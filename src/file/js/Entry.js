@@ -44,48 +44,84 @@ var resolveParent = function(srcURL, errorCallback, rest){
 var changeFile = function(method, successCallback, errorCallback, args) {
   var srcURL = args[0];
   var name = args[2];
-  var destURL = args[1] + ((args[1][args[1].length-1] === '/') ? '' : '/') + name;
+  var destDir = args[1];
+  var destURL = rootsUtils.stripTrailingSlash(destDir) + '/' + name;
+
+  function fail(e, msg) {
+    console.error(msg);
+    if (errorCallback) {
+      errorCallback(e);
+    }
+  }
 
   if (!rootsUtils.isValidFileName(name)) {
-    console.error('Disallowed character detected in file name: ' + name);
-    errorCallback && errorCallback(FileError.ENCODING_ERR);
+    fail(FileError.ENCODING_ERR, 'Error - Disallowed character detected in the file name: ' + name);
     return;
   }
 
-  resolveParent (srcURL, errorCallback,
-      function(srcFile, parentDir) {
-          try {
-            parentDir[method](srcFile.fullPath,
+  if (rootsUtils.getFullPath(srcURL) === rootsUtils.getFullPath(destURL)) {
+    fail(FileError.INVALID_MODIFICATION_ERR, 'Error - Cannot copy/move onto itself.');
+    return;
+  }
+
+  function performAction(srcFile, parentDir) {
+    try {
+      parentDir[method](srcFile.fullPath,
+          destURL,
+          true,
+          function () {
+            try {
+              tizen.filesystem.resolve(
                 destURL,
-                false,
-                function () {
-                  try {
-                    tizen.filesystem.resolve(
-                      destURL,
-                      function (destFile) {
-                        var destEntry = rootsUtils.createEntry(destFile);
-                        destEntry.isDirectory = destFile.isDirectory;
-                        successCallback && successCallback(destEntry);
-                      }, function (err) {
-                        console.error('Error - resolve result entry failed');
-                        errorCallback && errorCallback(ConvertTizenFileError(err));
-                      }
-                    );
-                  } catch (exception) {
-                    console.error('Error - resolve result entry thrown exception');
-                    errorCallback && errorCallback(ConvertTizenFileError(exception));
-                  }
+                function (destFile) {
+                  var destEntry = rootsUtils.createEntry(destFile);
+                  destEntry.isDirectory = destFile.isDirectory;
+                  successCallback && successCallback(destEntry);
                 }, function (err) {
-                  console.error('Error - ' + method + ' operation failed');
-                  errorCallback && errorCallback(ConvertTizenFileError(err));
+                  fail(ConvertTizenFileError(err), 'Error - resolve result entry failed');
                 }
-            );
-          } catch (exception) {
-            console.error('Error - ' + method + ' operation thrown exception');
-            errorCallback && errorCallback(ConvertTizenFileError(exception));
+              );
+            } catch (exception) {
+              fail(ConvertTizenFileError(exception), 'Error - resolve result entry thrown exception');
+            }
+          }, function (err) {
+            fail(ConvertTizenFileError(err), 'Error - ' + method + ' operation failed');
           }
-      }
-  );
+      );
+    } catch (exception) {
+      fail(ConvertTizenFileError(exception), 'Error - ' + method + ' operation thrown exception');
+    }
+  }
+
+  try {
+    tizen.filesystem.resolve(destDir, function(d) {
+      resolveParent (srcURL, errorCallback,
+          function(srcFile, parentDir) {
+            try {
+              // check if destination entry exists
+              tizen.filesystem.resolve(destURL, function(d) {
+                // destination exists, we may proceed only if it's the same type
+                // as source
+                if (d.isFile === srcFile.isFile && d.isDirectory === srcFile.isDirectory) {
+                  performAction(srcFile, parentDir);
+                } else {
+                  fail(FileError.INVALID_MODIFICATION_ERR, 'Error - source and destination have mismatched types');
+                }
+              }, function() {
+                // error means that we're safe to proceed
+                performAction(srcFile, parentDir);
+              }, 'r');
+            } catch (exception) {
+              fail(ConvertTizenFileError(exception), 'Error - resolve destination entry threw exception');
+            }
+          }
+      );
+    }, function() {
+      fail(FileError.NOT_FOUND_ERR, 'Error - destination directory does not exist');
+    }, 'r');
+  } catch (e) {
+    fail(ConvertTizenFileError(e), 'Error - resolve destination directory threw exception');
+  }
 };
 
 module.exports = {
