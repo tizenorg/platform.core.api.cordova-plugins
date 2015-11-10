@@ -46,6 +46,12 @@ var changeFile = function(method, successCallback, errorCallback, args) {
   var name = args[2];
   var destURL = args[1] + ((args[1][args[1].length-1] === '/') ? '' : '/') + name;
 
+  if (!rootsUtils.isValidFileName(name)) {
+    console.error('Disallowed character detected in file name: ' + name);
+    errorCallback && errorCallback(FileError.ENCODING_ERR);
+    return;
+  }
+
   resolveParent (srcURL, errorCallback,
       function(srcFile, parentDir) {
           try {
