@@ -22,21 +22,29 @@ function read(operation, url, start, end, successCallback, errorCallback, encodi
   var fail = function(e) {
     errorCallback && errorCallback(ConvertTizenFileError(e));
   }
+  var win = function(size) {
+    successCallback && successCallback(size);
+  }
   try {
     tizen.filesystem.resolve(url, function(file) {
-      try {
-        file.openStream('r', function(stream) {
-          try {
-            stream.position = start;
-            var r = stream[operation](end - start);
-            stream.close();
-            successCallback && successCallback(r);
-          } catch (e) {
-            fail(e);
-          }
-        }, fail, encoding);
-      } catch (e) {
-        fail(e);
+      if (0 === end - start) {
+        // nothing to read, report success
+        win();
+      } else {
+        try {
+          file.openStream('r', function(stream) {
+            try {
+              stream.position = start;
+              var r = stream[operation](end - start);
+              stream.close();
+              win(r);
+            } catch (e) {
+              fail(e);
+            }
+          }, fail, encoding);
+        } catch (e) {
+          fail(e);
+        }
       }
     }, fail, 'r');
   } catch (e) {
@@ -46,16 +54,19 @@ function read(operation, url, start, end, successCallback, errorCallback, encodi
 
 module.exports = {
   readAsText: function(successCallback, errorCallback, args) {
-    read('read', args[0], args[2], args[3], successCallback, errorCallback, args[1]);
+    read('read', args[0], args[2], args[3], function(r) {
+      successCallback && successCallback(r || '');
+    }, errorCallback, args[1]);
   },
   readAsDataURL: function(successCallback, errorCallback, args) {
     read('readBase64', args[0], args[1], args[2], function(r) {
-      r = 'data:;base64,' + r;  // MIME is missing because it's not passed to exec()
+      r = 'data:;base64,' + (r || '');  // MIME is missing because it's not passed to exec()
       successCallback && successCallback(r);
     }, errorCallback);
   },
   readAsBinaryString: function(successCallback, errorCallback, args) {
     read('readBytes', args[0], args[1], args[2], function(r) {
+      r = r || [];
       var str = '';
       // this may be not so efficient, but
       //   String.fromCharCode.apply(null, r);
@@ -67,7 +78,9 @@ module.exports = {
     }, errorCallback);
   },
   readAsArrayBuffer: function(successCallback, errorCallback, args) {
-    read('readBytes', args[0], args[1], args[2], successCallback, errorCallback);
+    read('readBytes', args[0], args[1], args[2], function(r) {
+      successCallback && successCallback(r || []);
+    }, errorCallback);
   },
 };
 
