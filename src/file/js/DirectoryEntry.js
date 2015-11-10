@@ -56,12 +56,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
         console.error('Error while resolving dir - already exist file');
         errorCallback && errorCallback(FileError.TYPE_MISMATCH_ERR);
       } else {
-        var result = {
-            'name' : dir.name,
-            'fullPath' : dir.fullPath,
-            'nativeURL' : dir.toURI()
-        };
-        successCallback && successCallback(result);
+        successCallback && successCallback(rootsUtils.createEntry(dir));
       }
     };
 
@@ -80,12 +75,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
                   new_obj = dir.createFile(child_name);
                 }
 
-                var result = {
-                    'name' : new_obj.name,
-                    'fullPath' : new_obj.fullPath,
-                    'nativeURL' : new_obj.toURI()
-                };
-                successCallback && successCallback(result);
+                successCallback && successCallback(rootsUtils.createEntry(new_obj));
               },
               function () {
                 console.error('Error -  immediate parent does not exist');
