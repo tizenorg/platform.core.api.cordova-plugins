@@ -18,16 +18,43 @@
 cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exports, module) {
 // TODO: remove -> end
 
+  function sanitizePath(path) {
+    var prepend = '/' === path[0];
+    var input = path.split('/');
+    var output = [];
+
+    for (var i = 0; i < input.length; ++i) {
+      var part = input[i];
+      switch (part) {
+        case '':
+        case '.':
+          // ignore
+          break;
+
+        case '..':
+          // remove previous part
+          output.pop();
+          break;
+
+        default:
+          output.push(part);
+          break;
+      }
+    }
+
+    return (prepend ? '/' : '') + output.join('/');
+  }
+
   var getFunction = function(successCallback, errorCallback, args, isDirectory) {
-    var uri = args[0],
-        path = args[1],
+    var uri = rootsUtils.stripTrailingSlash(args[0]),
+        path = rootsUtils.stripTrailingSlash(args[1]),
         options = args[2] || {},
         create_flag = !!options.create,
         exclusive_flag = !!options.exclusive,
         absolute_path = '';
 
     if ('/' === path[0]) {
-      // path seems absolute, checking if path is a child of this object uri
+      // path seems absolute, checking if path is a child of this object URI
       if (0 === path.indexOf(uri)) {
         // path is child - OK
         absolute_path = path;
@@ -39,13 +66,20 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
       }
     } else {
       // path seems to be relative path, combining absolute path
-      absolute_path = uri + (uri[uri.length-1] === '/' ? '' : '/') + path;
+      absolute_path = uri + '/' + path;
     }
-    // removing slash at the end for safety when getting parent path
-    absolute_path = absolute_path[absolute_path.length-1] === '/' ?
-        absolute_path.substring(0, absolute_path.length-1) : absolute_path;
-    var parent_path = absolute_path.substring(0, absolute_path.lastIndexOf('/'));
-    var child_name = absolute_path.substring(absolute_path.lastIndexOf('/') + 1);
+
+    var root = rootsUtils.findFilesystem(absolute_path).fullPath;
+    var clean_path = sanitizePath(absolute_path);
+
+    if (0 !== clean_path.indexOf(root)) {
+      // we went above the root directory, force the absolute path to be
+      // at least in that directory
+      clean_path = root + '/' + sanitizePath(absolute_path.substring(root.length + 1));
+    }
+
+    var parent_path = clean_path.substring(0, clean_path.lastIndexOf('/'));
+    var child_name = clean_path.substring(clean_path.lastIndexOf('/') + 1);
 
     if (!rootsUtils.isValidFileName(child_name)) {
       console.error('Disallowed character detected in file name: ' + child_name);
@@ -54,7 +88,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
     }
 
     var resolveSuccess = function(dir) {
-      // absolute_path points to existing destination
+      // clean_path points to existing destination
       if (create_flag && exclusive_flag) {
         console.error('Error while resolving dir - already exist dir');
         errorCallback && errorCallback(FileError.PATH_EXISTS_ERR);
@@ -101,7 +135,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
 
     // try to resolve
     try {
-      tizen.filesystem.resolve(absolute_path, resolveSuccess, resolveError, 'rw');
+      tizen.filesystem.resolve(clean_path, resolveSuccess, resolveError, 'rw');
     } catch (err) {
       console.error('Error - Could not resolve');
       errorCallback && errorCallback(ConvertTizenFileError(err));
