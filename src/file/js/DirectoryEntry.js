@@ -47,11 +47,22 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
     var parent_path = absolute_path.substring(0, absolute_path.lastIndexOf('/'));
     var child_name = absolute_path.substring(absolute_path.lastIndexOf('/') + 1);
 
+    // http://www.w3.org/TR/2011/WD-file-system-api-20110419/#naming-restrictions
+    var disallowedCharacters = [ '/', '\\', '<', '>', ':', '?', '*', '"', '|' ];
+
+    for (var i = 0; i < disallowedCharacters.length; ++i) {
+      if (-1 !== child_name.indexOf(disallowedCharacters[i])) {
+        console.error('File name contains disallowed character: ' + disallowedCharacters[i]);
+        errorCallback && errorCallback(FileError.ENCODING_ERR);
+        return;
+      }
+    }
+
     var resolveSuccess = function(dir) {
       // absolute_path points to existing destination
       if (create_flag && exclusive_flag) {
         console.error('Error while resolving dir - already exist dir');
-        errorCallback && errorCallback(FileError.NO_MODIFICATION_ALLOWED_ERR);
+        errorCallback && errorCallback(FileError.PATH_EXISTS_ERR);
       } else if (!create_flag && dir.isDirectory !== isDirectory) {
         console.error('Error while resolving dir - already exist file');
         errorCallback && errorCallback(FileError.TYPE_MISMATCH_ERR);
@@ -90,7 +101,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
         }
       } else {
         console.error('Error - create flag is false - new directory would not be created');
-        errorCallback && errorCallback(FileError.NO_MODIFICATION_ALLOWED_ERR);
+        errorCallback && errorCallback(FileError.NOT_FOUND_ERR);
       }
     };
 
