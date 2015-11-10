@@ -140,7 +140,11 @@ module.exports = {
   },
   getParent: function(successCallback, errorCallback, args) {
     var url = args[0];
-    console.log('url ' + url);
+
+    if (rootsUtils.isRootUri(url)) {
+      successCallback && successCallback(rootsUtils.findFilesystem(url));
+      return;
+    }
 
     resolveParent(url, errorCallback,
         function(srcFile, parentDir){
