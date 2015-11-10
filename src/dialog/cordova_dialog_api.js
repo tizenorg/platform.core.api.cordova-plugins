@@ -61,12 +61,22 @@ var popup = (function () {
   var overlay;
   var popup;
   var dismissCallback;
+  var tizenHwKeyListener = null;
 
   function isPopupVisible() {
     if (box) {
       return box.style.display === 'block';
     } else {
       return false;
+    }
+  }
+
+  function tizenHwKeyFunc(evt) {
+    if (evt.keyName === "back") {
+      evt.stopImmediatePropagation();
+      if (dismissCallback) {
+        dismissCallback();
+      }
     }
   }
 
@@ -84,6 +94,12 @@ var popup = (function () {
       if (prompt) {
         text = d.getElementById(inputId).value;
       }
+
+      if (tizenHwKeyListener) {
+        window.removeEventListener('tizenhwkey', tizenHwKeyListener, true);
+        tizenHwKeyListener = null;
+      }
+
       hidePopup();
       callback(id, text);
     }
@@ -273,6 +289,11 @@ var popup = (function () {
     for (var i = 0; i < buttons.length; ++i) {
       var e = d.getElementById(buttonIdPrefix + (i + 1));
       e.addEventListener('click', createCloseCallback(callback, i + 1, options.prompt), false);
+    }
+
+    if (!tizenHwKeyListener) {
+      tizenHwKeyListener = tizenHwKeyFunc;
+      window.addEventListener('tizenhwkey', tizenHwKeyListener, true);
     }
 
     // show popup
