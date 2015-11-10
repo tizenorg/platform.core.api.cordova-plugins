@@ -22,7 +22,7 @@ module.exports = {
   readEntries: function(successCallback, errorCallback, args) {
     var uri = args[0];
     var fail = function(e) {
-      errorCallback && errorCallback(ConvErrorCode(e.code));
+      errorCallback && errorCallback(ConvertTizenFileError(e));
     }
     try {
       tizen.filesystem.resolve(uri,

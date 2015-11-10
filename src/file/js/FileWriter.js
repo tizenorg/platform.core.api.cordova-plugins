@@ -41,29 +41,29 @@ module.exports = {
           stream.close();
           successCallback && successCallback(length);
         } catch (error) {
-          errorCallback && errorCallback(ConvErrorCode(error.code));
+          errorCallback && errorCallback(ConvertTizenFileError(error));
         }
       }
 
       var openStreamError = function (error) {
-        errorCallback && errorCallback(ConvErrorCode(error.code));
+        errorCallback && errorCallback(ConvertTizenFileError(error));
       }
 
       try {
         file.openStream('rw', openStreamSuccess, openStreamError);
       } catch (error) {
-        errorCallback && errorCallback(ConvErrorCode(error.code));
+        errorCallback && errorCallback(ConvertTizenFileError(error));
       }
     }
 
     var onError = function (error) {
-      errorCallback && errorCallback(ConvErrorCode(error.code));
+      errorCallback && errorCallback(ConvertTizenFileError(error));
     }
 
     try {
       tizen.filesystem.resolve(uri, onSuccess, onError, 'rw');
     } catch (error) {
-      errorCallback && errorCallback(ConvErrorCode(error.code));
+      errorCallback && errorCallback(ConvertTizenFileError(error));
     }
   },
 
@@ -83,7 +83,7 @@ module.exports = {
 
     var result = native_.callSync('File_truncate', callArgs);
     if (native_.isFailure(result)) {
-      errorCallback && errorCallback(ConvErrorCode(native_.getErrorObject(result).code));
+      errorCallback && errorCallback(ConvertTizenFileError(native_.getErrorObject(result)));
     } else {
       successCallback && successCallback(length);
     }

@@ -40,7 +40,7 @@ module.exports = {
     }
 
     function onError(error) {
-      errorCallback && errorCallback(ConvErrorCode(error.code));
+      errorCallback && errorCallback(ConvertTizenFileError(error));
     }
 
     tizen.filesystem.resolve(path, onResolve, onError, 'r');

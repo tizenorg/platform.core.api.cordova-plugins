@@ -26,20 +26,18 @@ var resolveParent = function(srcURL, errorCallback, rest){
           var parentDir = srcFile.parent;
           if (!parentDir) {
             console.error('Error - could not resolve file ' + srcURL);
-            errorCallback && errorCallback(ConvErrorCode(WebAPIException.UNKNOWN_ERR));
+            errorCallback && errorCallback(FileError.ENCODING_ERR);
           } else {
             rest(srcFile, parentDir);
           }
         }, function (err) {
           console.error('Error - resolve file ' + srcURL + ' failed');
-          errorCallback && errorCallback(
-              ConvErrorCode(err.code || WebAPIException.UNKNOWN_ERR));
+          errorCallback && errorCallback(ConvertTizenFileError(err));
         },
     'r');
   } catch (exception) {
     console.error('Error - resolve ' + srcURL + ' file thrown exception');
-    errorCallback && errorCallback(ConvErrorCode(
-        exception.code || WebAPIException.UNKNOWN_ERR));
+    errorCallback && errorCallback(ConvertTizenFileError(exception));
   }
 };
 
@@ -64,23 +62,21 @@ var changeFile = function(method, successCallback, errorCallback, args) {
                         successCallback && successCallback(destEntry);
                       }, function (err) {
                         console.error('Error - resolve result entry failed');
-                        errorCallback && errorCallback(ConvErrorCode(err.code));
+                        errorCallback && errorCallback(ConvertTizenFileError(err));
                       }
                     );
                   } catch (exception) {
                     console.error('Error - resolve result entry thrown exception');
-                    errorCallback && errorCallback(ConvErrorCode(
-                        exception.code || WebAPIException.UNKNOWN_ERR));
+                    errorCallback && errorCallback(ConvertTizenFileError(exception));
                   }
                 }, function (err) {
                   console.error('Error - ' + method + ' operation failed');
-                  errorCallback && errorCallback(ConvErrorCode(err.code));
+                  errorCallback && errorCallback(ConvertTizenFileError(err));
                 }
             );
           } catch (exception) {
             console.error('Error - ' + method + ' operation thrown exception');
-            errorCallback && errorCallback(ConvErrorCode(
-                exception.code || WebAPIException.UNKNOWN_ERR));
+            errorCallback && errorCallback(ConvertTizenFileError(exception));
           }
       }
   );
@@ -93,18 +89,16 @@ module.exports = {
           var result = { 'size': file.fileSize, 'lastModifiedDate': file.modified };
           successCallback && successCallback(result);
         }, function (err) {
-          errorCallback && errorCallback(ConvErrorCode(
-              err.code || WebAPIException.UNKNOWN_ERR));
+          errorCallback && errorCallback(ConvertTizenFileError(err));
         }, 'r');
       } catch (exception) {
         console.error('Error - resolve failed');
-        errorCallback && errorCallback(ConvErrorCode(
-            exception.code || WebAPIException.UNKNOWN_ERR));
+        errorCallback && errorCallback(ConvertTizenFileError(exception));
       }
     },
   setMetadata: function(successCallback, errorCallback, args) {
     console.error('setMetadata - Not supported');
-    errorCallback && errorCallback(ConvErrorCode(WebAPIException.UNKNOWN_ERR));
+    errorCallback && errorCallback(FileError.ENCODING_ERR);
   },
   moveTo: function(successCallback, errorCallback, args) {
     changeFile('moveTo', successCallback, errorCallback, args);
@@ -115,6 +109,12 @@ module.exports = {
   remove: function(successCallback, errorCallback, args) {
     var url = args[0];
 
+    if (rootsUtils.isRootUri(url)) {
+      console.error('It is not allowed to remove root directory.');
+      errorCallback && errorCallback(FileError.NO_MODIFICATION_ALLOWED_ERR);
+      return;
+    }
+
     resolveParent(url,  errorCallback,
         function(srcFile, parentDir){
           var method = srcFile.isFile ? 'deleteFile' : 'deleteDirectory';
@@ -123,8 +123,7 @@ module.exports = {
                       function() {successCallback && successCallback();},
                       function(err) {
                         console.error('Error - ' + method + ' failed');
-                        errorCallback && errorCallback(
-                            ConvErrorCode(err.code || WebAPIException.UNKNOWN_ERR));
+                        errorCallback && errorCallback(ConvertTizenFileError(err));
                         }];
           if (srcFile.isFile) {
             //remove recursive flag
@@ -134,8 +133,7 @@ module.exports = {
             parentDir[method].apply(parentDir, args);
           } catch (exception) {
             console.error('Error - ' + method + ' thrown exception ' + JSON.stringify(exception));
-            errorCallback && errorCallback(ConvErrorCode(
-                exception.code || WebAPIException.UNKNOWN_ERR));
+            errorCallback && errorCallback(ConvertTizenFileError(exception));
           }
         }
     );
