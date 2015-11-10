@@ -21,6 +21,7 @@ cordova.define('cordova-plugin-file.tizen.requestFileSystem', function(require, 
 module.exports = {
   requestFileSystem: function(successCallback, errorCallback, args) {
     var type = args[0];
+    var size = args[1];
     var fsName;
 
     switch(type) {
@@ -38,17 +39,42 @@ module.exports = {
         return;
     }
 
-    rootsUtils.getRoots(function(roots) {
-      for (var i = 0; i < roots.length; ++i) {
-        if (fsName === roots[i].filesystemName) {
-          successCallback({ 'name': fsName, 'root': roots[i] });
-          return;
-        }
-      }
+    try {
+      tizen.systeminfo.getPropertyValue('STORAGE', function (r) {
+          for (var i = 0; i < r.units.length; ++i) {
+            // both filesystems are located on internal storage
+            if ('INTERNAL' === r.units[i].type) {
+              if (size < r.units[i].availableCapacity) {
+                rootsUtils.getRoots(function(roots) {
+                  for (var i = 0; i < roots.length; ++i) {
+                    if (fsName === roots[i].filesystemName) {
+                      successCallback({ 'name': fsName, 'root': roots[i] });
+                      return;
+                    }
+                  }
 
-      console.error('Filesystem not found: ' + fsName);
+                  console.error('Filesystem not found: ' + fsName);
+                  errorCallback && errorCallback(FileError.NOT_FOUND_ERR);
+                });
+              } else {
+                console.error('Quote exceeded, requested: ' + size + ', available: ' + r.units[i].availableCapacity);
+                errorCallback && errorCallback(FileError.QUOTA_EXCEEDED_ERR);
+              }
+              return;
+            }
+          }
+
+          console.error('Internal storage not found');
+          errorCallback && errorCallback(FileError.NOT_FOUND_ERR);
+        }, function(e) {
+          console.error('Failed to get storage info: ' + fsName);
+          errorCallback && errorCallback(FileError.NOT_FOUND_ERR);
+        }
+      );
+    } catch (e) {
+      console.error('Exception: ' + e);
       errorCallback && errorCallback(FileError.NOT_FOUND_ERR);
-    });
+    }
   }
 };
 
