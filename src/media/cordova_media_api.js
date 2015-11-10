@@ -131,7 +131,14 @@ cordova.define(plugin_name, function(require, exports, module) {
 
       Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_STOPPED);
   },
-  seekToAudio: function(successCallback, errorCallback, args) {},
+  seekToAudio: function(successCallback, errorCallback, args) {
+      var id = args[0], milliseconds = args[1];
+
+      console.log("media::seekToAudio()");
+
+      audioObjects[id].currentTime = milliseconds;
+      successCallback( audioObjects[id].currentTime);
+  },
   pausePlayingAudio: function(successCallback, errorCallback, args) {
       var id = args[0];
 
@@ -148,10 +155,19 @@ cordova.define(plugin_name, function(require, exports, module) {
   },
   startRecordingAudio: function(successCallback, errorCallback, args) {},
   stopRecordingAudio: function(successCallback, errorCallback, args) {},
-  release: function(successCallback, errorCallback, args) {},
-  setVolume: function(successCallback, errorCallback, args) {},
-  setRate: function(successCallback, errorCallback, args) {},
-  messageChannel: function(successCallback, errorCallback, args) {}
+  release: function(successCallback, errorCallback, args) {
+      exports.stopPlayingAudio(successCallback, errorCallback, args);
+      var id = args[0];
+      delete audioObjects[id];
+      console.log("media::release()");
+  },
+  setVolume: function(successCallback, errorCallback, args) {
+      var id = args[0], volume = args[1];
+
+      console.log("media::setVolume()");
+
+      audioObjects[id].volume = volume;
+  }
 };
 require("cordova/exec/proxy").add("Media", exports);
 
