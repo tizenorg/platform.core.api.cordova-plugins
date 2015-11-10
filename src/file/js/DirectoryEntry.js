@@ -47,15 +47,10 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
     var parent_path = absolute_path.substring(0, absolute_path.lastIndexOf('/'));
     var child_name = absolute_path.substring(absolute_path.lastIndexOf('/') + 1);
 
-    // http://www.w3.org/TR/2011/WD-file-system-api-20110419/#naming-restrictions
-    var disallowedCharacters = [ '/', '\\', '<', '>', ':', '?', '*', '"', '|' ];
-
-    for (var i = 0; i < disallowedCharacters.length; ++i) {
-      if (-1 !== child_name.indexOf(disallowedCharacters[i])) {
-        console.error('File name contains disallowed character: ' + disallowedCharacters[i]);
-        errorCallback && errorCallback(FileError.ENCODING_ERR);
-        return;
-      }
+    if (!rootsUtils.isValidFileName(child_name)) {
+      console.error('Disallowed character detected in file name: ' + child_name);
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
     }
 
     var resolveSuccess = function(dir) {

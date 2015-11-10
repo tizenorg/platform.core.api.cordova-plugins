@@ -116,6 +116,19 @@ var rootsUtils = (function() {
     return (fs.fullPath === getFullPath(uri));
   }
 
+  // http://www.w3.org/TR/2011/WD-file-system-api-20110419/#naming-restrictions
+  var disallowedCharacters = [ '/', '\\', '<', '>', ':', '?', '*', '"', '|' ];
+
+  function isValidFileName(name) {
+    for (var i = 0; i < disallowedCharacters.length; ++i) {
+      if (-1 !== name.indexOf(disallowedCharacters[i])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   return {
     getRoots: getRoots,
     findFilesystem: findFilesystem,
@@ -124,6 +137,7 @@ var rootsUtils = (function() {
     getNativeUrl: getNativeUrl,
     stripTrailingSlash: stripTrailingSlash,
     createEntry: createEntry,
-    isRootUri: isRootUri
+    isRootUri: isRootUri,
+    isValidFileName: isValidFileName
   };
 })();
