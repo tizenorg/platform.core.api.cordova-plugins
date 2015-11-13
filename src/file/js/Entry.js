@@ -59,7 +59,7 @@ var changeFile = function(method, successCallback, errorCallback, args) {
     return;
   }
 
-  if (rootsUtils.getFullPath(srcURL) === rootsUtils.getFullPath(destURL)) {
+  if (-1 !== (rootsUtils.getFullPath(destURL) + '/').indexOf(rootsUtils.getFullPath(srcURL) + '/')) {
     fail(FileError.INVALID_MODIFICATION_ERR, 'Error - Cannot copy/move onto itself.');
     return;
   }
