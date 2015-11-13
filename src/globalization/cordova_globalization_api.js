@@ -56,12 +56,8 @@ function Globalization_getPreferredLanguage(successCb, errorCb) {
 }
 
 function Globalization_dateToString(timestamp, successCb, errorCb, options) {
-  var formatLength = formatFullStr;
-  var selector = selectorDateAndTimeStr;
-  if (options) {
-    formatLength = options.formatLength || formatFullStr;
-    selector = options.selector || selectorDateAndTimeStr;
-  }
+  var formatLength = (options && options.formatLength) || formatShortStr;
+  var selector = (options && options.selector) || selectorDateAndTimeStr;
 
   var callback = function(result) {
     if (native_.isFailure(result)) {
@@ -82,12 +78,8 @@ function Globalization_dateToString(timestamp, successCb, errorCb, options) {
 
 function Globalization_stringToDate(dateString, successCb, errorCb, options) {
   var result = null;
-  var formatLength = formatFullStr;
-  var selector = selectorDateAndTimeStr;
-  if (options) {
-    formatLength = options.formatLength || formatFullStr;
-    selector = options.selector || selectorDateAndTimeStr;
-  }
+  var formatLength = (options && options.formatLength) || formatShortStr;
+  var selector = (options && options.selector) || selectorDateAndTimeStr;
 
   var callback = function(result) {
     if (native_.isFailure(result)) {
@@ -107,13 +99,8 @@ function Globalization_stringToDate(dateString, successCb, errorCb, options) {
 }
 
 function Globalization_getDatePattern(successCb, errorCb, options) {
-  var formatLength = formatFullStr;
-  var selector = selectorDateAndTimeStr;
-
-  if (options) {
-    formatLength = options.formatLength || formatFullStr;
-    selector = options.selector || selectorDateAndTimeStr;
-  }
+  var formatLength = (options && options.formatLength) || formatShortStr;
+  var selector = (options && options.selector) || selectorDateAndTimeStr;
 
   var callback = function(result) {
     // Checking succes of gathering pattern
@@ -161,12 +148,8 @@ function Globalization_getDatePattern(successCb, errorCb, options) {
 }
 
 function Globalization_getDateNames(successCb, errorCb, options) {
-  var type = typeWide;
-  var item = itemDays;
-  if (options) {
-    type = options.type || typeWide;
-    item = options.item || itemDays;
-  }
+  var type = (options && options.type) || typeWide;
+  var item = (options && options.item) || itemMonths;
 
   var callback = function(result) {
     if (native_.isFailure(result)) {
@@ -212,10 +195,7 @@ function Globalization_getFirstDayOfWeek(successCb, errorCb) {
 }
 
 function Globalization_numberToString(number, successCb, errorCb, options) {
-  var type = numberTypeDecimal;
-  if (options) {
-    type = options.type || numberTypeDecimal;
-  }
+  var type = (options && options.type) || numberTypeDecimal;
 
   var callback = function(result) {
     if (native_.isFailure(result)) {
@@ -234,10 +214,7 @@ function Globalization_numberToString(number, successCb, errorCb, options) {
 }
 
 function Globalization_stringToNumber(numberStr, successCb, errorCb, options) {
-  var type = numberTypeDecimal;
-  if (options) {
-    type = options.type || numberTypeDecimal;
-  }
+  var type = (options && options.type) || numberTypeDecimal;
 
   var callback = function(result) {
     if (native_.isFailure(result)) {
@@ -258,10 +235,7 @@ function Globalization_stringToNumber(numberStr, successCb, errorCb, options) {
 }
 
 function Globalization_getNumberPattern(successCb, errorCb, options) {
-  var type = numberTypeDecimal;
-  if (options) {
-    type = options.type || numberTypeDecimal;
-  }
+  var type = (options && options.type) || numberTypeDecimal;
 
   var callback = function(result) {
     if (native_.isFailure(result)) {
