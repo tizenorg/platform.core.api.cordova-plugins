@@ -20,12 +20,9 @@ cordova.define('cordova-plugin-file.tizen.resolveLocalFileSystemURI', function(r
 
 module.exports = {
   resolveLocalFileSystemURI: function(successCallback, errorCallback, args) {
-    var path = args[0];
-    // fix for file.spec.10
-    path = path.split('?')[0];
+    var path = rootsUtils.internalUrlToNativePath(args[0]);
 
-    // fix for file.spec.12
-    if (0 !== path.indexOf('file://')) {  // 'file://' scheme is required
+    if (!path) {
       errorCallback && errorCallback(FileError.ENCODING_ERR);
       return;
     }

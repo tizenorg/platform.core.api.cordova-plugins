@@ -51,5 +51,6 @@ console.log('Loaded cordova.file API');
 
 exports = function(require) {
   require('cordova-tizen').addPlugin('cordova-plugin-file.File', plugin_name, 'runs');
+  require('cordova-tizen').addPlugin('cordova-plugin-file.FileSystem', 'cordova-plugin-file.tizen.FileSystem', 'merges', 'window.FileSystem');
 };
 // TODO: remove -> end

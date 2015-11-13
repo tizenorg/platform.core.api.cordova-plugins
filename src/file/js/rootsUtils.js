@@ -15,24 +15,26 @@
  */
 
 var rootsUtils = (function() {
-  var uriPrefix = 'file://';
+  var filePrefix = 'file:///';
 
   function stripTrailingSlash(str) {
-    if ('/' === str.substr(-1)) {
+    if (filePrefix !== str && '/' === str.substr(-1)) {
       return str.substr(0, str.length - 1);
     }
     return str;
   }
 
   function getName(uri) {
-    return stripTrailingSlash(uri).replace(/^.*(\\|\/|\:)/, '');
+    return getFullPath(uri).replace(/^.*(\\|\/|\:)/, '');
   }
 
   function getFullPath(uri) {
-    if (0 === uri.indexOf(uriPrefix)) {
-      uri = uri.substr(uriPrefix.length);
+    var tmp = findFilesystem(uri);
+    tmp = getNativeUrl(uri).substring(tmp.nativeURL.length);
+    if (!tmp) {
+      tmp = '/';
     }
-    return stripTrailingSlash(uri);
+    return tmp;
   }
 
   function getNativeUrl(uri) {
@@ -53,32 +55,32 @@ var rootsUtils = (function() {
     {
       filesystemName: 'temporary',
       name: '',
-      fullPath: '',
+      fullPath: '/',
       nativeURL: 'wgt-private-tmp'
     },
     {
       filesystemName: 'persistent',
       name: '',
-      fullPath: '',
+      fullPath: '/',
       nativeURL: 'wgt-private'
     }
   ];
 
-  var rootDirUri = 'file:///';
-
   var roots = [
     {
       filesystemName: 'root',
-      name: getName(rootDirUri),
-      fullPath: getFullPath(rootDirUri),
-      nativeURL: getNativeUrl(rootDirUri)
+      name: '',
+      fullPath: '/',
+      nativeURL: 'file:///'
     }
   ];
+
+  var name_to_root;
 
   function getRoots(successCallback) {
     if (roots_to_resolve.length > 0) {
       tizen.filesystem.resolve(roots_to_resolve[0].nativeURL, function(dir) {
-        roots_to_resolve[0] = createEntry(dir, roots_to_resolve[0].filesystemName);
+        roots_to_resolve[0].nativeURL = getNativeUrl(dir.toURI());
         roots.push(roots_to_resolve[0]);
         roots_to_resolve.splice(0, 1); // remove first item
 
@@ -90,6 +92,12 @@ var rootsUtils = (function() {
         successCallback(roots);
       });
     } else {
+      if (!name_to_root) {
+        name_to_root = {};
+        for (var i = 0; i < roots.length; ++i) {
+          name_to_root[roots[i].filesystemName] = roots[i];
+        }
+      }
       successCallback(roots.slice());
     }
   }
@@ -101,9 +109,9 @@ var rootsUtils = (function() {
   }
 
   function findFilesystem(uri) {
-    var fullPath = getFullPath(uri);
+    var nativeUrl = getNativeUrl(uri);
     for (var i = roots.length - 1; i > 0; --i) {
-      if (0 === strncmp(fullPath, roots[i].fullPath, roots[i].fullPath.length)) {
+      if (0 === strncmp(nativeUrl, roots[i].nativeURL, roots[i].nativeURL.length)) {
         return roots[i];
       }
     }
@@ -113,7 +121,7 @@ var rootsUtils = (function() {
 
   function isRootUri(uri) {
     var fs = findFilesystem(uri);
-    return (fs.fullPath === getFullPath(uri));
+    return (fs.nativeURL === getNativeUrl(uri));
   }
 
   // http://www.w3.org/TR/2011/WD-file-system-api-20110419/#naming-restrictions
@@ -129,6 +137,63 @@ var rootsUtils = (function() {
     return true;
   }
 
+  var localhost = '//localhost/'
+  var cdvPrefix = 'cdvfile:///';
+
+  function internalUrlToNativePath(url) {
+    var input = url;
+
+    // skip parameters
+    url = url.split('?')[0];
+
+    // remove localhost
+    url = url.replace(localhost, '///');
+
+    if (0 === url.indexOf(cdvPrefix)) {
+      // cdvfile protocol
+      url = url.substring(cdvPrefix.length);
+
+      var idx = url.indexOf('/');
+
+      if (-1 !== idx) {
+        var fsName = url.substring(0, idx);
+        var fullPath = url.substring(idx);
+        url = name_to_root[fsName] ? name_to_root[fsName].nativeURL + fullPath : undefined;
+      } else {
+        // malformed URL
+        url = undefined;
+      }
+    } else if (0 === url.indexOf(filePrefix)) {
+      // check if the filesystem for this URL exists
+      var found = false;
+      for (var i = 0; i < roots.length && !found; ++i) {
+        if (0 === url.indexOf(roots[i].nativeURL)) {
+          found = true;
+        }
+      }
+
+      if (!found) {
+        url = undefined;
+      }
+    } else {
+      // backwards compatibility, device absolute path
+      // only TEMPORARY and PERSISTENT paths are allowed
+      url = filePrefix + url.substring(1);  // skip '/'
+      if (0 !== url.indexOf(name_to_root.temporary.nativeURL) &&
+          0 !== url.indexOf(name_to_root.persistent.nativeURL)) {
+        url = undefined;
+      }
+    }
+
+    if (url) {
+      url = getNativeUrl(url);
+    } else {
+      console.error('Failed to decode internal URL: ' + input);
+    }
+
+    return url;
+  }
+
   return {
     getRoots: getRoots,
     findFilesystem: findFilesystem,
@@ -138,6 +203,7 @@ var rootsUtils = (function() {
     stripTrailingSlash: stripTrailingSlash,
     createEntry: createEntry,
     isRootUri: isRootUri,
-    isValidFileName: isValidFileName
+    isValidFileName: isValidFileName,
+    internalUrlToNativePath: internalUrlToNativePath
   };
 })();

@@ -14,17 +14,18 @@
  *    limitations under the License.
  */
 
-//= require('Errors.js');
-//= require('rootsUtils.js');
-//= require('DirectoryEntry.js');
-//= require('DirectoryReader.js');
-//= require('Entry.js');
-//= require('FileReader.js');
-//= require('fileSystemPaths.js');
-//= require('fileSystems-roots.js');
-//= require('FileWriter.js');
-//= require('requestFileSystem.js');
-//= require('resolveLocalFileSystemURI.js');
+// TODO: remove when added to public cordova repository -> begin
+cordova.define('cordova-plugin-file.tizen.FileSystem', function(require, exports, module) {
+// TODO: remove -> end
 
-//= require('FileSystem.js');
-//= require('File.js');
+module.exports = {
+  __format__: function(fullPath) {
+    return 'cdvfile://localhost/' + this.name + fullPath;
+  }
+};
+
+console.log('Loaded cordova.file FileSystem');
+
+// TODO: remove when added to public cordova repository -> begin
+});
+// TODO: remove -> end

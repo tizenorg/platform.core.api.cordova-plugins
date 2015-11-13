@@ -42,10 +42,10 @@ var resolveParent = function(srcURL, errorCallback, rest){
 };
 
 var changeFile = function(method, successCallback, errorCallback, args) {
-  var srcURL = args[0];
+  var srcURL = rootsUtils.internalUrlToNativePath(args[0]);
   var name = args[2];
-  var destDir = args[1];
-  var destURL = rootsUtils.stripTrailingSlash(destDir) + '/' + name;
+  var destDir = rootsUtils.internalUrlToNativePath(args[1]);
+  var destURL = destDir + '/' + name;
 
   function fail(e, msg) {
     console.error(msg);
@@ -54,12 +54,17 @@ var changeFile = function(method, successCallback, errorCallback, args) {
     }
   }
 
+  if (!srcURL || !destDir) {
+    fail(FileError.ENCODING_ERR, 'Error - Failed to decode internal URL.');
+    return;
+  }
+
   if (!rootsUtils.isValidFileName(name)) {
     fail(FileError.ENCODING_ERR, 'Error - Disallowed character detected in the file name: ' + name);
     return;
   }
 
-  if (-1 !== (rootsUtils.getFullPath(destURL) + '/').indexOf(rootsUtils.getFullPath(srcURL) + '/')) {
+  if (-1 !== (destURL + '/').indexOf(srcURL + '/')) {
     fail(FileError.INVALID_MODIFICATION_ERR, 'Error - Cannot copy/move onto itself.');
     return;
   }
@@ -126,18 +131,23 @@ var changeFile = function(method, successCallback, errorCallback, args) {
 
 module.exports = {
   getFileMetadata: function(successCallback, errorCallback, args) {
-      try {
-        tizen.filesystem.resolve(args[0], function (file) {
-          var result = { 'size': file.fileSize, 'lastModifiedDate': file.modified };
-          successCallback && successCallback(result);
-        }, function (err) {
-          errorCallback && errorCallback(ConvertTizenFileError(err));
-        }, 'r');
-      } catch (exception) {
-        console.error('Error - resolve failed');
-        errorCallback && errorCallback(ConvertTizenFileError(exception));
-      }
-    },
+    var uri = rootsUtils.internalUrlToNativePath(args[0]);
+    if (!uri) {
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
+    }
+    try {
+      tizen.filesystem.resolve(uri, function (file) {
+        var result = { 'size': file.fileSize, 'lastModifiedDate': file.modified };
+        successCallback && successCallback(result);
+      }, function (err) {
+        errorCallback && errorCallback(ConvertTizenFileError(err));
+      }, 'r');
+    } catch (exception) {
+      console.error('Error - resolve failed');
+      errorCallback && errorCallback(ConvertTizenFileError(exception));
+    }
+  },
   setMetadata: function(successCallback, errorCallback, args) {
     console.error('setMetadata - Not supported');
     errorCallback && errorCallback(FileError.ENCODING_ERR);
@@ -149,7 +159,12 @@ module.exports = {
     changeFile('copyTo', successCallback, errorCallback, args);
   },
   remove: function(successCallback, errorCallback, args) {
-    var url = args[0];
+    var url = rootsUtils.internalUrlToNativePath(args[0]);
+
+    if (!url) {
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
+    }
 
     if (rootsUtils.isRootUri(url)) {
       console.error('It is not allowed to remove root directory.');
@@ -181,7 +196,12 @@ module.exports = {
     );
   },
   getParent: function(successCallback, errorCallback, args) {
-    var url = args[0];
+    var url = rootsUtils.internalUrlToNativePath(args[0]);
+
+    if (!url) {
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
+    }
 
     if (rootsUtils.isRootUri(url)) {
       successCallback && successCallback(rootsUtils.findFilesystem(url));

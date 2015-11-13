@@ -55,10 +55,15 @@ function toUTF8Array(str) {
 
 module.exports = {
   write: function(successCallback, errorCallback, args) {
-    var uri = args[0];
+    var uri = rootsUtils.internalUrlToNativePath(args[0]);
     var data = args[1];
     var position = args[2];
     var isBinary = args[3];
+
+    if (!uri) {
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
+    }
 
     if (!isBinary) {
       if ('string' === typeof data) {
@@ -103,7 +108,7 @@ module.exports = {
           // for this, we need to truncate after write...
           module.exports.truncate(function() {
             successCallback && successCallback(length);
-          }, errorCallback, [uri, stream.position]);
+          }, errorCallback, [args[0], stream.position]);
         } catch (error) {
           errorCallback && errorCallback(ConvertTizenFileError(error));
         }
@@ -132,8 +137,18 @@ module.exports = {
   },
 
   truncate: function(successCallback, errorCallback, args) {
-    var uri = rootsUtils.getFullPath(args[0]);
+    var uri = rootsUtils.internalUrlToNativePath(args[0]);
     var length = args[1];
+
+    if (!uri) {
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
+    }
+
+    var uriPrefix = 'file://';
+    if (0 === uri.indexOf(uriPrefix)) {
+      uri = uri.substring(uriPrefix.length);
+    }
 
     var callArgs = {
       'uri': uri,

@@ -20,7 +20,13 @@ cordova.define('cordova-plugin-file.tizen.DirectoryReader', function(require, ex
 
 module.exports = {
   readEntries: function(successCallback, errorCallback, args) {
-    var uri = args[0];
+    var uri = rootsUtils.internalUrlToNativePath(args[0]);
+
+    if (!uri) {
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
+    }
+
     var fail = function(e) {
       errorCallback && errorCallback(ConvertTizenFileError(e));
     }

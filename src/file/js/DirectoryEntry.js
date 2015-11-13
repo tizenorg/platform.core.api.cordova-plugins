@@ -46,12 +46,17 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
   }
 
   var getFunction = function(successCallback, errorCallback, args, isDirectory) {
-    var uri = rootsUtils.stripTrailingSlash(args[0]),
+    var uri = rootsUtils.internalUrlToNativePath(args[0]),
         path = rootsUtils.stripTrailingSlash(args[1]),
         options = args[2] || {},
         create_flag = !!options.create,
         exclusive_flag = !!options.exclusive,
         absolute_path = '';
+
+    if (!uri) {
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
+    }
 
     if ('/' === path[0]) {
       // path seems absolute, checking if path is a child of this object URI
@@ -69,7 +74,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
       absolute_path = uri + '/' + path;
     }
 
-    var root = rootsUtils.findFilesystem(absolute_path).fullPath;
+    var root = rootsUtils.findFilesystem(absolute_path).nativeURL;
     var clean_path = sanitizePath(absolute_path);
 
     if (0 !== clean_path.indexOf(root)) {
@@ -147,7 +152,12 @@ module.exports = {
     getFunction(successCallback, errorCallback, args, true);
   },
   removeRecursively: function(successCallback, errorCallback, args) {
-    var uri = args[0];
+    var uri = rootsUtils.internalUrlToNativePath(args[0]);
+
+    if (!uri) {
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+      return;
+    }
 
     if (rootsUtils.isRootUri(uri)) {
       console.error('It is not allowed to remove root directory.');
