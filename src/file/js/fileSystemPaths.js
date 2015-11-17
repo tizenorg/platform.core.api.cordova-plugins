@@ -44,7 +44,11 @@ function setExternalStorage(callback) {
     }
 
     try {
-      tizen.filesystem.resolve(label, onSuccessStorage, onError);
+      if (label) {
+        tizen.filesystem.resolve(label, onSuccessStorage, onError);
+      } else {
+        callback(pathsPrefix);
+      }
     } catch(error) {
       console.error('Failed to resolve external storage: ' + error.message);
       callback(pathsPrefix);
