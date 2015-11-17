@@ -127,7 +127,7 @@ cordova.define(plugin_name, function(require, exports, module) {
             recorder = context.createJavaScriptNode(bufferSize, 2, 2);
 
             recorder.onaudioprocess = function(sample){
-                if(!recording) {
+                if (!recording) {
                     return;
                 }
                 var left = sample.inputBuffer.getChannelData(0);
@@ -215,7 +215,8 @@ cordova.define(plugin_name, function(require, exports, module) {
     console.log('media::create() - id =' + id + ', src =' + src);
 
     recorder = new Recorder(src);
-    audioObjects[id] = new Audio(src);
+    audioObjects[id] = new Audio();
+    audioObjects[id].isReady = false;
 
     audioObjects[id].onStalledCB = function () {
       console.log('media::onStalled()');
@@ -245,16 +246,19 @@ cordova.define(plugin_name, function(require, exports, module) {
         console.log('media::onErrorCB() - MEDIA_ERROR -> ' + event.srcElement.error);
 
         Media.onStatus(id, Media.MEDIA_ERROR, event.srcElement.error);
+        if (errorCallback) {
+            errorCallback(event.srcElement.error);
+        }
     };
 
     audioObjects[id].onPlayCB = function () {
-        console.log('media::onPlayCB() - MEDIA_STATE -> MEDIA_STARTING');
+        console.log('media::onPlayCB() - MEDIA_STATE -> MEDIA_STARTING ' + audioObjects[id].src);
 
         Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_STARTING);
     };
 
     audioObjects[id].onPlayingCB = function () {
-        console.log('media::onPlayingCB() - MEDIA_STATE -> MEDIA_RUNNING');
+        console.log('media::onPlayingCB() - MEDIA_STATE -> MEDIA_RUNNING ' + audioObjects[id].src);
 
         Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_RUNNING);
     };
@@ -271,29 +275,39 @@ cordova.define(plugin_name, function(require, exports, module) {
         Media.onStatus(id, Media.MEDIA_POSITION, audioObjects[id].currentTime);
     };
 
+    audioObjects[id].onSeekedCB = function () {
+        console.log('media::onSeekedCB() - MEDIA_POSITION -> ' +  audioObjects[id].currentTime);
+        successCallback(audioObjects[id].currentTime);
+        Media.onStatus(id, Media.MEDIA_POSITION, audioObjects[id].currentTime);
+    };
+
     audioObjects[id].onCanPlayCB = function () {
-        console.log('media::onCanPlayCB()');
+        console.log('media::onCanPlayCB() ' + audioObjects[id].src);
 
         window.clearTimeout(audioObjects[id].timer);
 
-        audioObjects[id].play();
+        if (audioObjects[id].isReady) {
+            audioObjects[id].play();
+        }
     };
-  },
-  startPlayingAudio: function(successCallback, errorCallback, args) {
-    var id = args[0], src = args[1];
 
-    console.log('media::startPlayingAudio() - id =' + id + ', src =' + src);
-
+    audioObjects[id].addEventListener('error', audioObjects[id].onErrorCB);
+    audioObjects[id].addEventListener('stalled', audioObjects[id].onStalledCB);
     audioObjects[id].addEventListener('canplay', audioObjects[id].onCanPlayCB);
     audioObjects[id].addEventListener('ended', audioObjects[id].onEndedCB);
     audioObjects[id].addEventListener('timeupdate', audioObjects[id].onTimeUpdateCB);
     audioObjects[id].addEventListener('durationchange', audioObjects[id].onDurationChangeCB);
     audioObjects[id].addEventListener('playing', audioObjects[id].onPlayingCB);
     audioObjects[id].addEventListener('play', audioObjects[id].onPlayCB);
-    audioObjects[id].addEventListener('error', audioObjects[id].onErrorCB);
-    audioObjects[id].addEventListener('stalled', audioObjects[id].onStalledCB);
+    audioObjects[id].addEventListener('seeked', audioObjects[id].onSeekedCB);
+  },
+  startPlayingAudio: function(successCallback, errorCallback, args) {
+    var id = args[0], src = args[1];
 
-    audioObjects[id].play();
+    console.log('media::startPlayingAudio() - id =' + id + ', src =' + src);
+
+    audioObjects[id].isReady = true;
+    audioObjects[id].src = src;
   },
   stopPlayingAudio: function(successCallback, errorCallback, args) {
       var id = args[0];
@@ -301,6 +315,7 @@ cordova.define(plugin_name, function(require, exports, module) {
       clearTimeout(audioObjects[id].timer);
 
       audioObjects[id].pause();
+      audioObjects[id].isReady = false;
 
       if (audioObjects[id].currentTime !== 0)
           audioObjects[id].currentTime = 0;
@@ -315,6 +330,7 @@ cordova.define(plugin_name, function(require, exports, module) {
       audioObjects[id].removeEventListener('play', audioObjects[id].onPlayCB);
       audioObjects[id].removeEventListener('error', audioObjects[id].onErrorCB);
       audioObjects[id].removeEventListener('error', audioObjects[id].onStalledCB);
+      audioObjects[id].removeEventListener('seeked', audioObjects[id].onSeekedCB);
 
       Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_STOPPED);
   },
@@ -324,7 +340,6 @@ cordova.define(plugin_name, function(require, exports, module) {
       console.log('media::seekToAudio()');
 
       audioObjects[id].currentTime = milliseconds;
-      successCallback(audioObjects[id].currentTime);
   },
   pausePlayingAudio: function(successCallback, errorCallback, args) {
       var id = args[0];
@@ -332,20 +347,32 @@ cordova.define(plugin_name, function(require, exports, module) {
       console.log('media::pausePlayingAudio() - MEDIA_STATE -> MEDIA_PAUSED');
 
       audioObjects[id].pause();
+      audioObjects[id].isReady = false;
 
       Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_PAUSED);
   },
   getCurrentPositionAudio: function(successCallback, errorCallback, args) {
       var id = args[0];
       console.log('media::getCurrentPositionAudio()');
+      if (audioObjects[id].src === 'undefined') {
+          audioObjects[id].src = args[1];
+      }
       successCallback(audioObjects[id].currentTime);
   },
   startRecordingAudio: function(successCallback, errorCallback, args) {
+      var id = args[0];
       console.log('media::startRecordingAudio()');
+      if (audioObjects[id].src === 'undefined') {
+          audioObjects[id].src = args[1];
+      }
       recorder.rec();
   },
   stopRecordingAudio: function(successCallback, errorCallback, args) {
+      var id = args[0];
       console.log('media::stopRecordingAudio()');
+      if (audioObjects[id].src === 'undefined') {
+          audioObjects[id].src = args[1];
+      }
       recorder.stop();
   },
   release: function(successCallback, errorCallback, args) {
