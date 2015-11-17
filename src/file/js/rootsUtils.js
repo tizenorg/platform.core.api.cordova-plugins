@@ -46,7 +46,7 @@ var rootsUtils = (function() {
     return {
       name: getName(uri),
       fullPath: getFullPath(uri),
-      nativeURL: getNativeUrl(uri),
+      nativeURL: encodeURI(getNativeUrl(uri)),
       filesystemName: fsName
     };
   }
@@ -186,7 +186,7 @@ var rootsUtils = (function() {
     }
 
     if (url) {
-      url = getNativeUrl(url);
+      url = decodeURI(getNativeUrl(url));
     } else {
       console.error('Failed to decode internal URL: ' + input);
     }

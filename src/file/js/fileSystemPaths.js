@@ -19,27 +19,36 @@ cordova.define('cordova-plugin-file.tizen.fileSystemPaths', function(require, ex
 // TODO: remove -> end
 
 var pathsPrefix = {
-  applicationDirectory: 'wgt-package/',
-  dataDirectory: 'wgt-private/',
-  cacheDirectory:'wgt-private-tmp/',
-  sharedDirectory: '/opt/usr/media/',
+  sharedDirectory: 'file:///opt/usr/media/'
 };
 
 function setExternalStorage(callback) {
-  var onSuccess = function(storages) {
-    for (var i = 0; i < storages.length; ++i) {
-      if (storages[i].type === 'EXTERNAL' && storages[i].state === 'MOUNTED') {
-        pathsPrefix.externalRootDirectory = storages[i].label + '/';
-        break;
-      }
-    }
-
-    callback(pathsPrefix);
-  }
+  var label = '';
 
   var onError = function(error) {
     console.error('Failed to get external storage: ' + error.message);
     callback(pathsPrefix);
+  }
+
+  var onSuccess = function(storages) {
+    for (var i = 0; i < storages.length; ++i) {
+      if (storages[i].type === 'EXTERNAL' && storages[i].state === 'MOUNTED') {
+        label = storages[i].label;
+        break;
+      }
+    }
+
+    var onSuccessStorage = function(storage) {
+      pathsPrefix.externalRootDirectory = 'file://' + storage.fullPath + '/';
+      callback(pathsPrefix);
+    }
+
+    try {
+      tizen.filesystem.resolve(label, onSuccessStorage, onError);
+    } catch(error) {
+      console.error('Failed to resolve external storage: ' + error.message);
+      callback(pathsPrefix);
+    }
   }
 
   try {
@@ -53,7 +62,11 @@ function setExternalStorage(callback) {
 function setApplicationStorageDirectory(callback) {
   try {
     var app = tizen.application.getCurrentApplication();
-    pathsPrefix.applicationStorageDirectory = '/opt/usr/apps/' + app.appInfo.packageId + '/';
+    var basePath = 'file:///opt/usr/apps/' + app.appInfo.packageId + '/';
+    pathsPrefix.applicationStorageDirectory = basePath;
+    pathsPrefix.applicationDirectory = basePath + 'res/wgt/';
+    pathsPrefix.dataDirectory = basePath + 'data/';
+    pathsPrefix.cacheDirectory = basePath + 'tmp/';
     setExternalStorage(callback);
   } catch(error) {
     console.error('Failed to get current application: ' + error.message);
