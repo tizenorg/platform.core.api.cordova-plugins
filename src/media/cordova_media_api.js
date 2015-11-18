@@ -277,7 +277,7 @@ cordova.define(plugin_name, function(require, exports, module) {
 
     audioObjects[id].onSeekedCB = function () {
         console.log('media::onSeekedCB() - MEDIA_POSITION -> ' +  audioObjects[id].currentTime);
-        successCallback(audioObjects[id].currentTime);
+
         Media.onStatus(id, Media.MEDIA_POSITION, audioObjects[id].currentTime);
     };
 
@@ -307,7 +307,13 @@ cordova.define(plugin_name, function(require, exports, module) {
     console.log('media::startPlayingAudio() - id =' + id + ', src =' + src);
 
     audioObjects[id].isReady = true;
-    audioObjects[id].src = src;
+
+    if (!audioObjects[id].src) {
+      audioObjects[id].src = src;
+      return;
+    }
+
+    audioObjects[id].play();
   },
   stopPlayingAudio: function(successCallback, errorCallback, args) {
       var id = args[0];
@@ -335,11 +341,10 @@ cordova.define(plugin_name, function(require, exports, module) {
       Media.onStatus(id, Media.MEDIA_STATE, Media.MEDIA_STOPPED);
   },
   seekToAudio: function(successCallback, errorCallback, args) {
-      var id = args[0], milliseconds = args[1];
-
       console.log('media::seekToAudio()');
+      var id = args[0], seconds = args[1] / 1000;
 
-      audioObjects[id].currentTime = milliseconds;
+      audioObjects[id].currentTime = seconds;
   },
   pausePlayingAudio: function(successCallback, errorCallback, args) {
       var id = args[0];
