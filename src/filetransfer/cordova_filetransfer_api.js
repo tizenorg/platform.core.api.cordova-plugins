@@ -20,6 +20,16 @@ var plugin_name = 'cordova-plugin-file-transfer.tizen.FileTransfer';
 cordova.define(plugin_name, function(require, exports, module) {
 // TODO: remove -> end
 
+function getParentPath(filePath) {
+  var pos = filePath.lastIndexOf('/');
+  return filePath.substring(0, pos + 1);
+}
+
+function getFileName(filePath) {
+  var pos = filePath.lastIndexOf('/');
+  return filePath.substring(pos + 1);
+}
+
 function TizenErrCodeToErrCode(err_code) {
   switch (err_code) {
     case WebAPIException.NOT_FOUND_ERR:
@@ -39,6 +49,10 @@ function TizenErrCodeToErrCode(err_code) {
   }
 }
 
+function checkURL(url) {
+  return url.indexOf(' ') === -1;
+}
+
 var uploads = {};
 var downloads = {};
 
@@ -50,7 +64,7 @@ exports = {
         fileName = args[3],
         mimeType = args[4],
         params = args[5],
-        trustAllHosts = args[6],  // not used
+        trustAllHosts = args[6], // not used
         chunkedMode = args[7],
         headers = args[8],
         id = args[9],
@@ -94,7 +108,7 @@ exports = {
                   responseCode: xhr.status,
                   response: xhr.response
                 });
-              } else if (xhr.status == 404) {
+              } else if (xhr.status === 404) {
                 fail(FileTransferError.INVALID_URL_ERR, this.status, this.response);
               } else {
                 fail(FileTransferError.CONNECTION_ERR, this.status, this.response);
@@ -145,52 +159,110 @@ exports = {
       fail(FileTransferError.CONNECTION_ERR);
     }
 
-    window.webkitResolveLocalFilSystemURL(filePath, successCB, errorCB);
+    window.webkitResolveLocalFileSystemURL(filePath, successCB, errorCB);
   },
   download: function(successCallback, errorCallback, args) {
-    var source = args[0],
-        target = args[1],
+    var url = args[0],
+        filePath = args[1],
         trustAllHosts = args[2],  // not used
         id = args[3],
         headers = args[4];
 
-    var fail = function(code) {
-      downloads[id] && delete downloads[id];
-      var error = new FileTransferError(code, source, target);
-      errorCallback && errorCallback(error);
+    if (!checkURL(url)) {
+      errorCallback(new FileTransferError(FileTransferError.INVALID_URL_ERR, url, filePath));
+      return;
     }
 
-    var listener = {
-      onprogress: function(id, receivedSize, totalSize) {
-        successCallback({
-          lengthComputable: true,
-          loaded: receivedSize,
-          total: totalSize
-        });
-      },
-      onpaused: function(id) {
-        // not needed in file-transfer plugin
-      },
-      oncanceled: function(id) {
-        fail(FileTransferError.ABORT_ERR);
-      },
-      oncompleted: function(id, fullPath) {
-        if (successCallback) {
-          // TODO: success callback should receive FileEntry Object
-          successCallback(null);
-        }
-      },
-      onfailed: function(id, error) {
-        fail(TizenErrCodeToErrCode(error.code));
+    var dirPath = getParentPath(filePath);
+    var fileName = getFileName(filePath);
+
+    var xhr = downloads[id] = new XMLHttpRequest();
+
+    function fail(code, body) {
+      delete downloads[id];
+      errorCallback(new FileTransferError(code,
+                                          url,
+                                          filePath,
+                                          xhr.status,
+                                          body,
+                                          null));
+    }
+
+    xhr.addEventListener('progress', function (evt) {
+      successCallback(evt);
+    });
+
+    xhr.addEventListener('abort', function (evt) {
+      fail(FileTransferError.ABORT_ERR, xhr.response);
+    });
+
+    xhr.addEventListener('error', function (evt) {
+      fail(FileTransferError.CONNECTION_ERR, xhr.response);
+    });
+
+    xhr.addEventListener('load', function (evt) {
+      if ((xhr.status === 200 || xhr.status === 0) && xhr.response) {
+
+        tizen.filesystem.resolve(dirPath, function (dir) {
+          if (dir.isFile) {
+            fail(FileTransferError.FILE_NOT_FOUND_ERR);
+            return;
+          }
+
+          function writeFile(dir) {
+            var file = dir.createFile(fileName);
+
+            file.openStream(
+              'rw',
+              function (stream) {
+                stream.writeBytes(Array.prototype.slice.call(new Uint8Array(xhr.response)));
+
+                delete downloads[id];
+
+                resolveLocalFileSystemURL(
+                  filePath,
+                  function (fileEntry) {
+                    fileEntry.filesystemName = fileEntry.filesystem.name;
+                    successCallback(fileEntry);
+                  }, function (err) {
+                    fail(TizenErrCodeToErrCode(err.code));
+                  });
+              }, function (err) {
+                fail(TizenErrCodeToErrCode(err.code));
+              }
+            );
+          }
+
+          dir.deleteFile(
+            filePath,
+            function() {
+              writeFile(dir);
+            }, function (err) {
+              writeFile(dir);
+            });
+
+        }, function (err) {
+          fail(TizenErrCodeToErrCode(err.code));
+        },
+        'rw');
+      } else if (xhr.status === 404) {
+        fail(FileTransferError.INVALID_URL_ERR,
+             String.fromCharCode.apply(null, new Uint8Array(xhr.response)));
+      } else {
+        fail(FileTransferError.CONNECTION_ERR,
+             String.fromCharCode.apply(null, new Uint8Array(xhr.response)));
       }
-    };
+    });
 
-    var idx = target.lastIndexOf('/');
-    var targetPath = target.substr(0, idx);
-    var targetFilename = target.substr(idx + 1);
-
-    var downloadRequest = new tizen.DownloadRequest(source, targetPath, targetFilename, 'ALL', headers);
-    downloads[id] = tizen.download.start(downloadRequest, listener);
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+    // Fill XHR headers
+    for (var header in headers) {
+      if (headers.hasOwnProperty(header)) {
+        xhr.setRequestHeader(header, headers[header]);
+      }
+    }
+    xhr.send();
   },
   abort: function(successCallback, errorCallback, args) {
     var id = args[0];
@@ -198,7 +270,7 @@ exports = {
       uploads[id].abort();
       delete uploads[id];
     } else if (downloads[id]) {
-      tizen.download.cancel(downloads[id]);
+      downloads[id].abort();
       delete downloads[id];
     } else {
       console.warn('Unknown file transfer ID: ' + id);
