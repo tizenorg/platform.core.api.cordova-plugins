@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!--
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+
+-->
+
+
+<html>
+<head>
+  <title>Cordova: API Specs</title>
+
+  <meta name="viewport" content="width=device-width, height=device-height, user-scalable=yes, initial-scale=1.0;" />
+  <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+  <!-- Load jasmine -->
+
+  <link rel="stylesheet" type="text/css" href="jasmine-2.2.0/jasmine.css" media="screen">
+
+  <script type="text/javascript" src="jasmine-2.2.0/jasmine.js"></script>
+  <script type="text/javascript" src="jasmine-2.2.0/jasmine-html.js"></script>
+  <script type="text/javascript" src="jasmine-2.2.0/console.js"></script>
+  <script type="text/javascript" src="jasmine-2.2.0/jasmine_helper.js"></script>
+
+  <!-- Source -->
+  <script type="text/javascript" src="../lib/cordova.js"></script>
+
+
+  <script type="text/javascript">
+    var exports = {};
+
+    function getQueryVariable(variable) {
+      var query = window.location.search.substring(1);
+      var vars = query.split("&");
+      for (var i = 0; i < vars.length; ++i) {
+        var pair = vars[i].split("=");
+        if (pair[0] === variable) {
+          return pair[1];
+        }
+      }
+      return(false);
+    }
+
+    function createActionButton(title, callback, appendTo) {
+      appendTo = appendTo ? appendTo : 'buttons';
+      var buttons = document.getElementById(appendTo);
+      var div = document.createElement('div');
+      var button = document.createElement('a');
+      button.textContent = title;
+      button.onclick = function(e) {
+        e.preventDefault();
+        callback();
+      };
+      button.classList.add('btn');
+      button.classList.add('large');
+      div.appendChild(button);
+      buttons.appendChild(div);
+    }
+    
+    function clearContent() {
+      var content = document.getElementById('content');
+      content.innerHTML = '';
+    }
+
+    function injectJs(test, onload) {
+      var scr = document.createElement('script');
+      scr.type = 'text/javascript';
+      scr.src = 'tests/' + test + '.tests.js';
+      scr.onload = onload;
+      document.getElementsByTagName('head')[0].appendChild(scr);
+    }
+
+    function addTests() {
+      var tests = {
+        accelerometer: 'accelerometer',
+        battery: 'battery',
+        // bridge: 'bridge', // test code was not updated
+        camera: 'camera',
+        capture: 'capture',
+        compass: 'compass',
+        console: 'console',
+        contacts: 'contacts',
+        // datauri: 'datauri', // test code was not updated
+        device: 'device',
+        file: 'file',
+        filetransfer: 'filetransfer',
+        geolocation: 'geolocation',
+        globalization: 'globalization',
+        media: 'media',
+        network: 'network',
+        notification: 'notification',
+        platform: 'platform',
+        splashscreen: 'splashscreen',
+        statusbar: 'statusbar',
+        // storage: 'storage', // test code was not updated
+        vibration: 'vibration',
+      };
+
+      var t = getQueryVariable('t');
+
+      if (!t || !tests[t]) {
+        alert('Tests for "' + t + '" do not exist.');
+      } else {
+        // prepare Jasmine
+        JasmineHelper.setup();
+
+        // inject tests
+        injectJs(tests[t], function() {
+          exports.defineAutoTests();
+          createActionButton('Run auto tests', function () {
+            clearContent();
+            JasmineHelper.run();
+          });
+          createActionButton('Run manual tests', function () {
+            clearContent();
+            exports.defineManualTests(document.getElementById('content'), createActionButton);
+          });
+        });
+      }
+    }
+
+    addTests();
+  </script>
+</head>
+
+<body id="stage" class="theme">
+  <a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
+    <div id='title'></div>
+    <div id='middle'>
+      <div id='buttons'></div>
+      <div id='content'></div>
+    </div>
+</body>
+</html>

@@ -13,7 +13,13 @@
 *.swn
 *.swm
 *.log
+*.wgt
 /.project
 /.cproject
 /.pydevproject
 /.settings
+/test/.build
+/test/.rds_delta
+/test/.sdk_delta.info
+/test/.settings
+/test/.sign
