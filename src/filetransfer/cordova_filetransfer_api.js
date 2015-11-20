@@ -56,13 +56,15 @@ function checkURL(url) {
 var uploads = {};
 var downloads = {};
 
+var filePrefix = 'file://';
+
 exports = {
   upload: function(successCallback, errorCallback, args) {
     var filePath = args[0],
         server = args[1],
-        fileKey = args[2],
-        fileName = args[3],
-        mimeType = args[4],
+        fileKey = args[2] || 'file',
+        fileName = args[3] || 'image.jpg',
+        mimeType = args[4] || 'image/jpeg',
         params = args[5],
         trustAllHosts = args[6], // not used
         chunkedMode = args[7],
@@ -70,11 +72,20 @@ exports = {
         id = args[9],
         httpMethod = args[10];
 
+    if (0 !== filePath.indexOf(filePrefix)) {
+      filePath = filePrefix + filePath;
+    }
+
     var fail = function(code, status, response) {
       uploads[id] && delete uploads[id];
       var error = new FileTransferError(code, filePath, server, status, response);
       errorCallback && errorCallback(error);
     };
+
+    if (!checkURL(server)) {
+      fail(FileTransferError.INVALID_URL_ERR);
+      return;
+    }
 
     function successCB(entry) {
       if (entry.isFile) {
@@ -132,23 +143,17 @@ exports = {
             };
 
             xhr.send(fd);
+
+            // Special case when transfer already aborted, but XHR isn't sent.
+            // In this case XHR won't fire an abort event, so we need to check if transfers record
+            // isn't deleted by filetransfer.abort and if so, call XHR's abort method again
+            if (!uploads[id]) {
+              xhr.abort();
+            }
           }
 
-          var bytesPerChunk;
+          uploadFile(file);
 
-          if (options.chunkedMode === true) {
-            bytesPerChunk = 1024 * 1024; // 1MB chunk sizes.
-          } else {
-            bytesPerChunk = file.size;
-          }
-          var start = 0;
-          var end = bytesPerChunk;
-          while (start < file.size) {
-            var chunk = file.webkitSlice(start, end, mimeType);
-            uploadFile(chunk);
-            start = end;
-            end = start + bytesPerChunk;
-          }
         }, function(error) {
           fail(FileTransferError.CONNECTION_ERR);
         });
@@ -156,10 +161,10 @@ exports = {
     }
 
     function errorCB() {
-      fail(FileTransferError.CONNECTION_ERR);
+      fail(FileTransferError.FILE_NOT_FOUND_ERR);
     }
 
-    window.webkitResolveLocalFileSystemURL(filePath, successCB, errorCB);
+    resolveLocalFileSystemURL(filePath, successCB, errorCB);
   },
   download: function(successCallback, errorCallback, args) {
     var url = args[0],
