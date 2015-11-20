@@ -18,6 +18,8 @@
 cordova.define('cordova-plugin-file.tizen.resolveLocalFileSystemURI', function(require, exports, module) {
 // TODO: remove -> end
 
+var filePrefix = 'file://';
+
 module.exports = {
   resolveLocalFileSystemURI: function(successCallback, errorCallback, args) {
     var path = rootsUtils.internalUrlToNativePath(args[0]);
@@ -41,7 +43,19 @@ module.exports = {
     }
 
     tizen.filesystem.resolve(path, onResolve, onError, 'r');
-  }
+  },
+  _getLocalFilesystemPath: function(successCallback, errorCallback, args) {
+    var path = rootsUtils.internalUrlToNativePath(args[0]);
+
+    if (!path) {
+      errorCallback && errorCallback(FileError.ENCODING_ERR);
+    } else {
+      if (0 === path.indexOf(filePrefix)) {
+        path = path.substring(filePrefix.length);
+      }
+      successCallback && successCallback(path);
+    }
+  },
 };
 
 //TODO: remove when added to public cordova repository -> begin
