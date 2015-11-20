@@ -309,7 +309,13 @@ cordova.define(plugin_name, function(require, exports, module) {
     audioObjects[id].isReady = true;
 
     if (!audioObjects[id].src) {
+      //assigning src sets playbackRate to default value equal to 1
+      //so if playbackRate was set before first run of play() function
+      //it should be saved and restored.
+      var rate = audioObjects[id].playbackRate;
+
       audioObjects[id].src = src;
+      audioObjects[id].playbackRate = rate;
       return;
     }
 
@@ -392,6 +398,15 @@ cordova.define(plugin_name, function(require, exports, module) {
       console.log('media::setVolume()');
 
       audioObjects[id].volume = volume;
+  },
+  //cordova common layer supports setRate function for ios platform only
+  //it is for future use
+  setRate: function(successCallback, errorCallback, args) {
+      var id = args[0], rate = args[1];
+
+      console.log('media::setRate()');
+
+      audioObjects[id].playbackRate = rate;
   }
 };
 require('cordova/exec/proxy').add('Media', exports);
