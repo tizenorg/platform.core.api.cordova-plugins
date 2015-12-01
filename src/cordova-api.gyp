@@ -10,6 +10,7 @@
       'dependencies': [
         'cordova/cordova.gyp:*',
         'device/cordova_device.gyp:*',
+        'devicemotion/cordova_devicemotion.gyp:*',
         'dialog/cordova_dialog.gyp:*',
         'file/cordova_file.gyp:*',
         'globalization/cordova_globalization.gyp:*',

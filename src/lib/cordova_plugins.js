@@ -22,6 +22,20 @@ module.exports = [
         ]
     },
     {
+        "file": "plugins/cordova-plugin-device-motion/www/accelerometer.js",
+        "id": "cordova-plugin-device-motion.Accelerometer",
+        "clobbers": [
+            "navigator.accelerometer"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-device-motion/www/Acceleration.js",
+        "id": "cordova-plugin-device-motion.Acceleration",
+        "clobbers": [
+            "navigator.Acceleration"
+        ]
+    },
+    {
         "file": "plugins/cordova-plugin-dialogs/www/notification.js",
         "id": "cordova-plugin-dialogs.notification",
         "merges": [
@@ -229,12 +243,13 @@ module.exports.metadata =
 {
     "cordova-plugin-console": "1.0.1",
     "cordova-plugin-device": "1.0.1",
+    "cordova-plugin-device-motion": "1.2.0",
     "cordova-plugin-dialogs": "1.1.1",
     "cordova-plugin-file": "3.0.0",
     "cordova-plugin-file-transfer": "1.3.0",
-    "cordova-plugin-network-information": "1.0.1",
     "cordova-plugin-globalization": "1.0.1",
     "cordova-plugin-media": "1.0.1",
+    "cordova-plugin-network-information": "1.0.1",
 }
 // BOTTOM OF METADATA
 });
