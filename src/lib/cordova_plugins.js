@@ -43,6 +43,11 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-events/www/register.js",
+      "id": "cordova-plugin-events.register",
+      "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
         "id": "cordova-plugin-file.DirectoryEntry",
         "clobbers": [
@@ -245,6 +250,7 @@ module.exports.metadata =
     "cordova-plugin-device": "1.0.1",
     "cordova-plugin-device-motion": "1.2.0",
     "cordova-plugin-dialogs": "1.1.1",
+    "cordova-plugin-events": "0.0.1",
     "cordova-plugin-file": "3.0.0",
     "cordova-plugin-file-transfer": "1.3.0",
     "cordova-plugin-globalization": "1.0.1",
