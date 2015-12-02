@@ -34,10 +34,11 @@ EventHandler.prototype.stopListener = function() {
 };
 
 //////////////////////////// WindowEventHandler
-function WindowEventHandler(name, event_type, callback) {
+function WindowEventHandler(name, event_type, callback, target) {
   EventHandler.call(this, name);
   this.event_type = event_type;
   this.callback = callback;
+  this.target = target || window;
 }
 
 WindowEventHandler.prototype = Object.create(EventHandler.prototype);
@@ -46,7 +47,7 @@ WindowEventHandler.prototype.constructor = WindowEventHandler;
 WindowEventHandler.prototype.startListener = function(l) {
   if (this.callback) {
     this.listener = l;
-    window.addEventListener(this.event_type, this.callback);
+    this.target.addEventListener(this.event_type, this.callback);
   } else {
     Object.getPrototypeOf(WindowEventHandler.prototype).startListener.call(this, l);
   }
@@ -54,7 +55,7 @@ WindowEventHandler.prototype.startListener = function(l) {
 
 WindowEventHandler.prototype.stopListener = function() {
   if (this.callback) {
-    window.removeEventListener(this.event_type, this.callback);
+    this.target.removeEventListener(this.event_type, this.callback);
     this.listener = undefined;
   } else {
     Object.getPrototypeOf(WindowEventHandler.prototype).stopListener.call(this);
@@ -96,7 +97,7 @@ function VisibilityEventHandler(name, hidden) {
     };
   }
 
-  WindowEventHandler.call(this, name, visibility_event, callback);
+  WindowEventHandler.call(this, name, visibility_event, callback, document);
 }
 
 VisibilityEventHandler.prototype = Object.create(WindowEventHandler.prototype);

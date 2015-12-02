@@ -26,7 +26,13 @@ var handled_events = {};
 
 function fireEventListener(e) {
   if (handled_events[e]) {
-    cordova.fireDocumentEvent(e);
+    if ('pause' === e) {
+      // pause event needs to be fired synchronously, otherwise it will appear
+      // after the application is resumed
+      cordova.fireDocumentEvent(e, null, true);
+    } else {
+      cordova.fireDocumentEvent(e);
+    }
   } else {
     console.error('Unknown event: ' + e);
   }
