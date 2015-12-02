@@ -1,0 +1,96 @@
+* {
+    font-family: Lucida Sans, Arial, Helvetica, sans-serif;
+}
+
+p {
+	margin: 3px 10px 3px 10px;
+}
+
+div#everything {
+	width: 80%;
+	margin: 100px auto 20px auto;
+}
+
+div#content {	
+}
+
+div#top {
+	height: 120px;
+}
+
+#top h1 {
+	text-align: center;
+	font-size: 3em;
+	font-variant: small-caps;
+	margin: 10px 0px 0px 0px;
+	padding: 0px;
+	letter-spacing: 5px;
+}
+
+div#left_column {
+	width: 300px;
+	float: left;
+}
+
+div#right_column {
+	float: left;
+	margin: 0px 0px 0px 50px;
+}
+
+a.normal, a:visited.normal, a.special, a:visited.special, a.active, a:visited.active {
+	display: block;
+	width: 250px;
+	height: 40px;
+	margin: 5px 20px 5px 20px;
+	padding: 0px 0px 0px 0px;
+	line-height: 40px;
+	font-size: 16pt;
+	font-weight: bold;
+	text-decoration: none;
+	text-align: center;
+}
+
+#content p {
+}
+
+.info {
+	font-size: 1.5em;
+}
+
+#resultsLog {
+	font-family: Monospace;
+	font-size: 1.7em;
+	margin: 15px 0px 0px 3em;
+}
+
+div#footer {
+	clear: both;
+}
+
+#footer p {
+    text-align: center;
+    font-size: 1.3em;
+    margin: 0px 0px 0px 0px;
+}
+
+.name {
+	font-weight: bold;
+}
+
+@media screen and (max-width:640px){
+    div#everything {
+	width: 100%;
+	margin: 0px auto;
+    }
+    
+    div#left_column {
+	width: 50%;
+	float: left;
+    }
+    
+    div#right_column {
+	width: 50%;
+        float: left;
+	margin: 0px 0px 0px 50px;
+    }
+}

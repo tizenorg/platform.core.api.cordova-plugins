@@ -1,0 +1,19 @@
+div#everything {
+	background-color: #93a1a1; /* solarized-base1 */
+}
+
+div#top {
+	background-color: #859900; /* solarized-green */
+}
+
+div#left_column {
+	background-color: #268bd2; /* solarized-blue */
+}
+
+div#right_column {
+	background-color: #6c71c4; /* solarized-violet */
+}
+
+div#footer {
+	background-color: #b58900; /* solarized-yellow */
+}

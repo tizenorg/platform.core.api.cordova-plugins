@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!--
+/*
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+-->
+<html>
+    <head>
+        <title>Media Sample App</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/colors.css" />
+        <link rel="stylesheet" type="text/css" href="media.css" />
+        <script type="text/javascript" src="../../lib/cordova.js"></script>
+        <script src="../../js/SimpleLogger.js"></script>
+        <script src="media.js"></script>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="player">
+              <div id="left">  
+                <div id="playerInput">
+                    <span>Filename: </span>
+                    <input id="inputFile" value="http://cordova.apache.org/downloads/BlueZedEx.mp3" type="text">
+                </div>
+                <div id="progressBar">
+                    <span id="progress"></span>
+                </div>
+                <div id="playerControl">
+                    <button class="control" id="play" onclick="play();" >|></button>
+                    <button class="control" onclick="stop();" >|_|</button>
+                    <button class="control" onclick="recordAudio();" >O</button>
+                    <button class="control" id="reload" onclick="create();">Reload</button>
+                </div>
+              </div>
+              <div id="right">  
+                <input id="inputFile2" value="0" type="range" min="0" max="10" step="1">
+              </div>
+            </div>
+            <div >
+                <p class="info">Commands' output:</p>
+                <p id="resultsLog">Use the buttons on the left to see some output.</p>
+            </div>
+            <a id="back" href="../../index.html" >Back</a>
+        </div>
+    </body>
+</html>

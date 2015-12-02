@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!--
+/*
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+-->
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="Cordova demo app"/>
+
+    <title>Tizen Cordova WebAPI Demonstration</title>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="stylesheet" type="text/css" href="css/colors.css" />
+    <!--   
+    <link rel="stylesheet" type="text/css" href="css/debug.css" />
+     -->
+    <script type="text/javascript" src="lib/cordova.js"></script>
+    <script src="js/SimpleLogger.js"></script>
+    <script src="js/remotemenu.js"></script>
+    
+    <script src="js/stylechooser.js"></script>
+    
+    <!-- load main.js as the last one: -->
+    <script src="js/main.js"></script>
+</head>
+
+<body>
+  <div id="everything">
+    <div id="top">
+      <h1>Cordova WebAPI</h1>
+    </div>
+    <div id="content">
+      <div id="left_column">
+          <a href="#" id="btn0" class="active">Console</a>
+          <a href="#" id="btn1" class="normal">Device</a>
+          <a href="#" id="btn8" class="normal">Device Motion</a>
+          <a href="#" id="btn2" class="normal">Dialogs</a>
+          <a href="#" id="btn9" class="normal">Events</a>
+          <a href="#" id="btn3" class="normal">File</a>
+          <a href="#" id="btn4" class="normal">FileTransfer</a>
+          <a href="#" id="btn5" class="normal">Globalization</a>
+          <a href="plugins/media/media.html" id="btn6" class="normal">Media</a>
+          <a href="#" id="btn7" class="normal">Network Information</a>
+          <hr />
+          <a href="#" id="btns0" class="special red" onClick="logger.clear();">Clear log</a>
+          <a href="#" id="btns1" class="special green" onClick="window.logger.log('Button B pressed.')">Quick Access B</a>
+          <a href="#" id="btns2" class="special yellow" onClick="window.logger.log('Button C pressed.');">Quick Access C</a>
+          <a href="#" id="btns3" class="special blue" onClick="window.styleChooser.setNextStyle();">Change appearance</a>
+      </div>
+      <div id="right_column">
+        <p class="info">Commands' output:</p>
+        <p id="resultsLog">Use the buttons on the left to see some output.</p>
+      </div>
+    </div>
+    <div id="footer">
+      <footer>
+        <p>Created by <span class="name">Cordova Tizen Team</span>, 2015</p>
+      </footer>  
+    </div>
+  </div>    
+</body>
+</html>

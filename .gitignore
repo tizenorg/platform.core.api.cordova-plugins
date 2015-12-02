@@ -23,3 +23,8 @@
 /test/.sdk_delta.info
 /test/.settings
 /test/.sign
+/sample/.build
+/sample/.rds_delta
+/sample/.sdk_delta.info
+/sample/.settings
+/sample/.sign
