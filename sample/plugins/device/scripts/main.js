@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2014-2015 Telerik AD
  * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,29 @@
  *    limitations under the License.
  */
 
-var deviceReady = function() {
-  console.log('Device ready');
-};
+(function() {
+  function onDeviceReady() {
+    document.addEventListener('backbutton', function() {
+      window.history.back();
+    }, false);
 
-var init = function () {
-  console.log('Main window loaded');
-  document.addEventListener('deviceready', deviceReady, true);
-  console.log('Listener device ready added');
-};
+    var info = document.getElementById('infoField');
 
-window.onload = init;
+    function callbackBuilder(value) {
+      return function() {
+        info.innerHTML = value;
+      };
+    }
+
+    for (var p in device) {
+      if (device.hasOwnProperty(p)) {
+        var x = document.getElementById('device-' + p);
+        if (x) {
+          x.addEventListener('click', callbackBuilder(device[p]));
+        }
+      }
+    }
+  }
+
+  document.addEventListener('deviceready', onDeviceReady, false);
+})();
