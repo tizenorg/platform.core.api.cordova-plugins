@@ -26,6 +26,18 @@ var init = function () {
 
 window.onload = init;
 
+$(document).ready(function() {
+    var table = $('#example').DataTable({
+        select: 'single',
+        bLengthChange: false,
+        paging: true,
+        searching: false,
+        info: false,
+        scrollY:     100,
+        scroller:    true
+    });
+} );
+
 var success = function() {
   window.logger.log('succes');
 };
