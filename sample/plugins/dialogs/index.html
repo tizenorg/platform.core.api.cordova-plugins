@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--
+/*
+ * Copyright (c) 2014-2015 Telerik AD
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+-->
+<html>
+    <head>
+        <title>Notification Sample</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="styles/main.css" />
+        <script type="text/javascript" charset="utf-8" src="../../lib/cordova.js"></script>
+        <script type="text/javascript" charset="utf-8" src="scripts/main.js"></script>
+    </head>
+    <body>
+        <header class="header">
+            <h1>Notification Sample</h1>
+        </header>
+        <div class="content">
+            <div class="action-area ch70">
+                <button class="button dh" id="button-beep">Beep</button>
+                <button class="button dh" id="button-alert">Show Alert</button>
+                <button class="button dh" id="button-confirm">Show Confirm</button>
+                <button class="button dh" id="button-prompt">Show Prompt</button>
+                <button class="button dh" id="button-native-alert">Show built-in Alert</button>
+                <button class="button dh" id="button-native-confirm">Show built-in Confirm</button>
+                <button class="button dh" id="button-native-prompt">Show built-in Prompt</button>
+            </div>
+            <div class="result-area ch30">
+                <div class="results">
+                    <div id="infoField" class="desc" type="text" readonly="readonly"></div>
+                </div>
+                <div class="separator"></div>
+            </div>
+        </div>
+        <footer class="footer">
+            <div>Cordova API Samples</div>
+        </footer>
+    </body>
+</html>
