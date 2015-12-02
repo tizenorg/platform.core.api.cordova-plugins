@@ -22,8 +22,6 @@ var init = function () {
   window.logger.log('Main window loaded');
   document.addEventListener('deviceready', deviceReady, true);
   window.logger.log('Listener device ready added');
-  // register TV remote keys for controlling the application with [UP], [DOWN], [LEFT], [RIGHT] keys:
-  window.stateController.registerTizenRemoteKeys();
 };
 
 window.onload = init;
