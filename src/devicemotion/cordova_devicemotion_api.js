@@ -21,6 +21,7 @@ cordova.define(plugin_name, function(require, exports, module) {
 // TODO: remove -> end
 
 var successCB = null;
+var count = 0;
 
 function listener(eventData) {
   var accel = {};
@@ -35,12 +36,17 @@ function listener(eventData) {
     return;
   }
 
+  if (count++ === 0) {
+    return;
+  }
+
   successCB && successCB(accel);
 }
 
 var Accelerometer = {
   start: function (success, error) {
     if (!successCB) {
+      count = 0;
       successCB = success;
       window.addEventListener('devicemotion', listener, false);
     }
