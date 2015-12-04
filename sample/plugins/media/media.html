@@ -21,40 +21,102 @@
         <title>Media Sample App</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="../../css/style.css" />
-        <link rel="stylesheet" type="text/css" href="../../css/colors.css" />
         <link rel="stylesheet" type="text/css" href="media.css" />
+        <link rel="stylesheet" type="text/css" href="jquery.dataTables.min.css" />
+        <link rel="stylesheet" type="text/css" href="select.dataTables.min.css" />
+        <link rel="stylesheet" type="text/css" href="scroller.dataTables.min.css" />
         <script type="text/javascript" src="../../lib/cordova.js"></script>
         <script src="../../js/SimpleLogger.js"></script>
+        <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+        <script type="text/javascript" src="jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="dataTables.select.min.js"></script>
+        <script type="text/javascript" src="dataTables.scroller.min.js"></script>
         <script src="media.js"></script>
     </head>
     <body>
-        <div id="wrapper">
-            <div id="player">
-              <div id="left">  
-                <div id="playerInput">
-                    <span>Filename: </span>
+        <div class="header">
+            <h1>Player</h1>
+        </div>
+        <div class="content">
+            <div id="left">
+                <div>
+                    <h3>Filename: </h3>
                     <input id="inputFile" value="http://cordova.apache.org/downloads/BlueZedEx.mp3" type="text">
                 </div>
                 <div id="progressBar">
                     <span id="progress"></span>
                 </div>
-                <div id="playerControl">
-                    <button class="control" id="play" onclick="play();" >|></button>
-                    <button class="control" onclick="stop();" >|_|</button>
-                    <button class="control" onclick="recordAudio();" >O</button>
-                    <button class="control" id="reload" onclick="create();">Reload</button>
-                </div>
-              </div>
-              <div id="right">  
-                <input id="inputFile2" value="0" type="range" min="0" max="10" step="1">
-              </div>
             </div>
-            <div >
+            <div id="right">
+                <input id="inputFile2" value="0" type="range" min="0" max="10" step="1">
+            </div>
+            <div  class="action-area ch10">
+                <button class="button dh" onclick="play();" >|></button>
+                <button class="button dh" onclick="stop();" >|_|</button>
+                <button class="button dh" onclick="recordAudio();" >O</button>
+                <button class="button dh" onclick="create();">Reload</button>
+            </div>
+            <table id="example" class="display" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Track</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1.</td>
+                        <td>http://cordova.apache.org/downloads/BlueZedEx.mp3</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Test2.wav</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div>
                 <p class="info">Commands' output:</p>
-                <p id="resultsLog">Use the buttons on the left to see some output.</p>
             </div>
             <a id="back" href="../../index.html" >Back</a>
         </div>
+        <footer class="footer">
+            <div>Created by <span class="name">Cordova Tizen Team</span>, 2015</div>
+        </footer>
     </body>
 </html>
