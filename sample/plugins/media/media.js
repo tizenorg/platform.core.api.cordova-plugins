@@ -14,6 +14,11 @@
  *    limitations under the License.
  */
 
+var media;
+var myinterval;
+var table;
+var lastIndex;
+
 var deviceReady = function() {
   window.logger.log('Device ready');
 };
@@ -27,7 +32,7 @@ var init = function () {
 window.onload = init;
 
 $(document).ready(function() {
-    var table = $('#example').DataTable({
+    table = $('#example').DataTable({
         select: 'single',
         bLengthChange: false,
         paging: true,
@@ -35,6 +40,24 @@ $(document).ready(function() {
         info: false,
         scrollY:     100,
         scroller:    true
+    });
+    
+    table.on( 'select', function ( e, dt, type, indexes ) {
+        if ( type === 'row' ) {
+            //var data = table.row( indexes ).data().pluck( 'id' );
+            //window.logger.log(table.row(indexes).data()[1]);
+            document.getElementById('inputFile').value = table.row(indexes).data()[1];
+            if(media!=null){
+                release();
+            }
+            create();
+            lastIndex = table.row(indexes).data()[0].split("")[0];
+            window.logger.log("last index " + lastIndex);
+        }
+    });
+    
+    table.on('added', function(){
+        window.logger.log("dupa");
     });
 } );
 
@@ -45,9 +68,6 @@ var success = function() {
 var error = function(e) {
   window.logger.log(e);
 };
-
-var media;
-var myinterval;
 
 function status(s, pos) {
   window.logger.log('status: ' + s + ', pos: ' + pos);
@@ -79,13 +99,13 @@ function updateProgress() {
   var progress = document.getElementById('progress'), value = 0;
 
   media.getCurrentPosition(function(pos) {
-    window.logger.log('Get current position success 100 / ' + media.duration + " * "
+    console.log('Get current position success 1000 / ' + media.getDuration() + " * "
         + pos);
     if (pos > 0) {
-      value = Math.floor((100 / media.getDuration()) * pos);
+      value = Math.floor((1000 / media.getDuration()) * pos);
     }
-    progress.style.width = value + '%';
-    window.logger.log('width: ' + progress.style.width);
+    progress.value = value;
+    window.logger.log('width: ' + progress.value);
   });
 }
 
@@ -102,10 +122,11 @@ function play() {
       window.logger.log('Error ' + e);
     }
   } else {
-    playBtn.textContent = '|>';
+    playBtn.textContent = '|>';    
     window.logger.log('Pausing: ');
     try {
       media.pause();
+      clearInterval(myinterval);
     } catch (e) {
       window.logger.log("Error " + e);
     }
@@ -137,28 +158,27 @@ function getPos() {
   });
 }
 
-function setPos() {
-  var pos = document.getElementById('setPosValue').value;
-  window.logger.log('setPos');
-  media.seekTo(pos);
+function setPos(value) {
+  //var pos = document.getElementById('setPosValue').value;
+  clearInterval(myinterval);
+  //value = Math.floor((1000 / media.getDuration()) * pos);  
+  var pos = value * media.getDuration() / 1000;
+  console.log('setPos to ' + value + "*" + media.getDuration() + "/ 1000 = " + pos );
+  media.seekTo(pos*1000);
+  myinterval = setInterval(updateProgress, 100);
 }
 
-function setVolume() {
-  var volume = document.getElementById('setVolValue').value;
+function setVolume(value) {
   window.logger.log('setVol: ' + volume);
+  var volume = value / 10;
   media.setVolume(volume);
-}
-
-function expand() {
-  window.logger.log('expand');
-  var progress = document.getElementById('progress');
-  window.logger.log('width: ' + progress.style.width);
-  progress.style.width = 40 + '%';
 }
 
 function recordAudio() {
   window.logger.log('recordAudio');
-  media.startRecord();
+  create();
+  table.row.add([ '2.', media.src ]).draw(false);
+  //media.startRecord();
 }
 
 function stopRecAudio() {
