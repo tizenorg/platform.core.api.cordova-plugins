@@ -2,6 +2,7 @@
 %define _desktop_icondir %{TZ_SYS_SHARE}/icons/default/small
 
 %define crosswalk_extensions tizen-extensions-crosswalk
+%define crosswalk_extensions_path %{_libdir}/%{crosswalk_extensions}
 %define webapi_tools /usr/include/webapi-plugins/tools
 
 Name:       cordova-api
@@ -28,6 +29,7 @@ Cordova API using Tizen plugins.
 export GYP_GENERATORS='ninja'
 GYP_OPTIONS="--depth=. -Dtizen=1 -Dextension_build_type=Debug -Dextension_host_os=%{tizen_profile_name}"
 GYP_OPTIONS="$GYP_OPTIONS -Ddisplay_type=x11"
+GYP_OPTIONS="$GYP_OPTIONS -Dcrosswalk_extensions_path=%{crosswalk_extensions_path}"
 
 %{webapi_tools}/gyp/gyp $GYP_OPTIONS src/cordova-api.gyp
 
@@ -39,17 +41,19 @@ cp LICENSE %{buildroot}/usr/share/license/%{name}
 cat LICENSE.BSD-2.0 >> %{buildroot}/usr/share/license/%{name}
 
 # Extensions.
-mkdir -p %{buildroot}%{_libdir}/%{crosswalk_extensions}
-install -p -m 644 out/Default/libtizen*.so %{buildroot}%{_libdir}/%{crosswalk_extensions}
+mkdir -p %{buildroot}%{crosswalk_extensions_path}
+install -p -m 644 out/Default/libtizen*.so %{buildroot}%{crosswalk_extensions_path}
 
 # execute desc_gentool
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%{buildroot}%{_libdir}/%{crosswalk_extensions} %{webapi_tools}/desc_gentool %{buildroot}%{_libdir}/%{crosswalk_extensions} > cordova-api.json
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%{buildroot}%{crosswalk_extensions_path} %{webapi_tools}/desc_gentool \
+    %{crosswalk_extensions_path} \
+    %{buildroot}%{crosswalk_extensions_path} > cordova-api.json
 
 # temporary plugins description for lazy loading
-install -p -m 644 cordova-api.json %{buildroot}%{_libdir}/%{crosswalk_extensions}/cordova-api.json
+install -p -m 644 cordova-api.json %{buildroot}%{crosswalk_extensions_path}/cordova-api.json
 
 %files
-%{_libdir}/%{crosswalk_extensions}/libtizen*.so
-%{_libdir}/%{crosswalk_extensions}/cordova-api.json
+%{crosswalk_extensions_path}/libtizen*.so
+%{crosswalk_extensions_path}/cordova-api.json
 %{_datadir}/license/%{name}
 %manifest cordova-api.manifest
