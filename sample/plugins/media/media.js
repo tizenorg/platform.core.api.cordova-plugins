@@ -18,170 +18,216 @@ var media;
 var myinterval;
 var table;
 var lastIndex;
+var playfiles = {};
+var recording;
+var playPause;
 
-var deviceReady = function() {
-  window.logger.log('Device ready');
+var deviceReady = function () {
+  console.log('Device ready');
+
+  document.addEventListener('backbutton', function() {
+    window.history.back();
+  }, false);
+
+  getDirectoryContents('documents', function (files) {
+    var i;
+    for (i = 0; i < files.length; i++) {
+      console.log(files[i].fullPath);
+      if(!(files[i].name in playfiles) ){
+        playfiles[files[i].name] =  files[i];
+        table.row.add([i + '.', '/opt/usr/media/Documents/' + files[i].name]).draw(false);
+      }
+    }
+  });
 };
 
 var init = function () {
-  window.logger.log('Media window loaded');
+  console.log('Media window loaded');
   document.addEventListener('deviceready', deviceReady, true);
-  window.logger.log('Listener device ready added');
+  console.log('Listener device ready added');
+  playPause = false;
 };
 
 window.onload = init;
 
-$(document).ready(function() {
-    table = $('#example').DataTable({
-        select: 'single',
-        bLengthChange: false,
-        paging: true,
-        searching: false,
-        info: false,
-        scrollY:     100,
-        scroller:    true
-    });
-    
-    table.on( 'select', function ( e, dt, type, indexes ) {
-        if ( type === 'row' ) {
-            //var data = table.row( indexes ).data().pluck( 'id' );
-            //window.logger.log(table.row(indexes).data()[1]);
-            document.getElementById('inputFile').value = table.row(indexes).data()[1];
-            if(media!=null){
-                release();
-            }
-            create();
-            lastIndex = table.row(indexes).data()[0].split("")[0];
-            window.logger.log("last index " + lastIndex);
-        }
-    });
-    
-    table.on('added', function(){
-        window.logger.log("dupa");
-    });
-} );
+$(document).ready(function () {
+  table = $('#example').DataTable({
+    select: 'single',
+    bLengthChange: false,
+    paging: true,
+    searching: false,
+    info: false,
+    scrollY: 100,
+    scroller: true
+  });
 
-var success = function() {
-  window.logger.log('succes');
+  table.on('select', function (e, dt, type, indexes) {
+    if (type === 'row') {
+      document.getElementById('inputFile').value = table.row(indexes).data()[1];
+      create();
+      lastIndex = table.row(indexes).data()[0].split('')[0];
+    }
+  });
+});
+
+var success = function () {
+  console.log('succes');
 };
 
-var error = function(e) {
-  window.logger.log(e);
+var error = function (e) {
+  console.log(e);
 };
 
 function status(s, pos) {
-  window.logger.log('status: ' + s + ', pos: ' + pos);
+  console.log('status: ' + s + ', pos: ' + pos);
   if (s === Media.MEDIA_STOPPED) {
-    window.logger.log('clearing interval');
+    console.log('clearing interval');
     clearInterval(myinterval);
   }
 }
 
 function create() {
+  if (media != null) {
+    release();
+  }
   var file = document.getElementById('inputFile').value;
-  window.logger.log(file);
+  console.log(file);
   try {
     media = new Media(file, success, error, status);
-    window.logger.log('Media: ' + media);
+    console.log('Media: ' + media);
   } catch (e) {
-    window.logger.log(e);
+    console.log(e);
   }
 }
-
-var clicked = false;
 
 function updateProgress() {
   if (!media) {
     return;
   }
-
-  window.logger.log('update progress');
   var progress = document.getElementById('progress'), value = 0;
 
-  media.getCurrentPosition(function(pos) {
-    console.log('Get current position success 1000 / ' + media.getDuration() + " * "
-        + pos);
+  media.getCurrentPosition(function (pos) {
     if (pos > 0) {
       value = Math.floor((1000 / media.getDuration()) * pos);
     }
     progress.value = value;
-    window.logger.log('width: ' + progress.value);
   });
 }
 
-function play() {
-  clicked = !clicked;
+function togglePlayPause(toPlayPause){
   var playBtn = document.getElementById('play');
-  if (clicked) {
+  if( toPlayPause ){
+    playPause = toPlayPause;
     playBtn.textContent = '||';
-    window.logger.log('Playing: ');
+    console.log('Playing: ');
+  }
+  else {
+    playPause = toPlayPause;
+    playBtn.textContent = '|>';
+    console.log('Pausing: ');
+  }
+
+}
+
+function play() {
+  console.log('play');
+  recording = false;
+  if (!playPause) {
     try {
       media.play();
       myinterval = setInterval(updateProgress, 100);
     } catch (e) {
-      window.logger.log('Error ' + e);
+      console.log('Error ' + e);
     }
   } else {
-    playBtn.textContent = '|>';    
-    window.logger.log('Pausing: ');
     try {
       media.pause();
       clearInterval(myinterval);
     } catch (e) {
-      window.logger.log("Error " + e);
+      console.log('Error ' + e);
     }
   }
+  togglePlayPause(!playPause);
 }
 
 function stop() {
-  window.logger.log('clearing interval');
   clearInterval(myinterval);
-  media.stop();
-  var playBtn = document.getElementById('play');
-  playBtn.textContent = '|>';
-  window.logger.log('play released');
+  if(!recording){
+    media.stop();
+    togglePlayPause(false);
+  }
+  else{
+    stopRecAudio();
+  }
 }
 
 function release() {
   media.release();
-  window.logger.log('media released');
 }
 
 function getPos() {
-  window.logger.log('getPos');
-  media.getCurrentPosition(function(pos) {
-    window.logger.log(pos);
-    alert(pos);
-  }, function(err) {
-    window.logger.log(err);
-    alert(err);
+  media.getCurrentPosition(function (pos) {
+    console.log(pos);
+  }, function (err) {
+    console.log(err);
   });
 }
 
 function setPos(value) {
-  //var pos = document.getElementById('setPosValue').value;
-  clearInterval(myinterval);
-  //value = Math.floor((1000 / media.getDuration()) * pos);  
   var pos = value * media.getDuration() / 1000;
-  console.log('setPos to ' + value + "*" + media.getDuration() + "/ 1000 = " + pos );
-  media.seekTo(pos*1000);
-  myinterval = setInterval(updateProgress, 100);
+  console.log('setPos to ' + value + '*' + media.getDuration() + '/ 1000 = ' + pos);
+  media.seekTo(pos * 1000);
 }
 
 function setVolume(value) {
-  window.logger.log('setVol: ' + volume);
+  console.log('setVol: ' + volume);
   var volume = value / 10;
   media.setVolume(volume);
 }
 
 function recordAudio() {
-  window.logger.log('recordAudio');
+  console.log('recordAudio');
   create();
-  table.row.add([ '2.', media.src ]).draw(false);
-  //media.startRecord();
+  recording = true;
+  media.startRecord();
 }
 
 function stopRecAudio() {
-  window.logger.log('stopRecord');
+  console.log('stopRecord');
+  getDirectoryContents('documents', function (files) {
+    var i;
+    for (i = 0; i < files.length; i++) {
+      console.log(files[i].fullPath);
+      if(!(files[i].name in playfiles) ){
+        playfiles[files[i].name] =  files[i];
+        table.row.add([i + '.', '/opt/usr/media/Documents/' + files[i].name]).draw(false);
+      }
+    }
+  });
   media.stopRecord();
+}
+
+function getDirectoryContents(rootDirName, callback) {
+  tizen.filesystem.resolve(
+      rootDirName,
+      function (dir) {
+        dir.listFiles(
+            function (fileArray) {
+              if (fileArray.length > 0) {
+                callback(fileArray);
+              } else {
+                console.log('Directory ' + dir.fullPath + ' is empty.', 'WARNING');
+              }
+            },
+            function (e) {
+              console.log(e.message, 'WARNING');
+            }
+        );
+      },
+      function (e) {
+        console.log('Could not resolve the following virtual root: ' + rootDirName + 'WARNING');
+        console.log('Error: ' + e.message, 'ERROR');
+      },
+      'r'
+  );
 }
