@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!--
+/*
+ * Copyright (c) 2014-2015 Telerik AD
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<html>
+  <head>
+    <title>File Sample</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8">
+    <link href="styles/main.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../../lib/cordova.js"></script>
+    <script type="text/javascript" src="scripts/index.js"></script>
+  </head>
+  <body>
+    <header id="header_el" class="header">
+      <h1>File Sample</h1>
+    </header>
+
+    <!-- Main screen - File -->
+    <div id="content_file" class="content">
+      <div class="action-area ch60">
+        <button class="button" id="persistStor">Persistent Storage</button>
+        <button class="button" id="tmpStor">Temporary Storage</button>
+        <button class="button" id="createDir">Create Directory</button>
+        <button class="button" id="removeDir" disabled>Remove Directory</button>
+        <button class="button" id="writeToFile" disabled>Write File</button>
+        <button class="button" id="copyFile" disabled>Copy File</button>
+        <button class="button" id="moveFile" disabled>Move File</button>
+        <button class="button" id="readFile" disabled>Read File</button>
+        <button class="button" id="removeFile" disabled>Remove File</button>
+      </div>
+      <div class="result-area ch40">
+        <div class="results">
+          <div id="dirNameBlock" class="desc hidden">
+            <span>Directory: </span><span id="dirNameView">-</span>
+          </div>
+          <div id="fileNameBlock" class="desc hidden">
+            <span>File: </span><span class="fileNameView"></span>
+          </div>
+          <div id="copyNameBlock" class="desc hidden">
+            <span>Copy: </span><span class="copyNameView"></span>
+          </div>
+        </div>
+      </div>
+      <div class="separator"></div>
+    </div>
+
+    <!-- Create Directory screen -->
+    <div id="content_create_dir" class="content">
+      <div class="input-area ch100">
+        <input id="dir_name" class="inputBox" type="text" placeholder="Directory name" />
+        <div>
+          <button class="button" id="do_create_dir">Create</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Write File screen -->
+    <div id="content_write_file" class="content">
+      <div class="input-area ch100">
+        <input id="file_name" class="inputBox" type="text" placeholder="File name" />
+        <div></div>
+        <textarea id="file_content" class="inputBox" rows="4" placeholder="File content"></textarea>
+        <div>
+          <button class="button" id="do_write_file">Write</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copy File screen -->
+    <div id="content_copy_file" class="content">
+      <div class="info-area ch100">
+        <div class="info">
+          <div class="desc">
+            <span>Source file: </span><span class="fileNameView"></span>
+          </div>
+        </div>
+        <input id="copy_name" class="inputBox" type="text" placeholder="Target file name" />
+        <div>
+          <button class="button" id="do_copy_file">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Move File screen -->
+    <div id="content_move_file" class="content">
+      <div class="info-area ch100">
+        <div class="info">
+          <div class="desc">
+            <span>Source file: </span><span class="fileNameView"></span>
+          </div>
+        </div>
+        <input id="move_name" class="inputBox" type="text" placeholder="Target file name" />
+        <div>
+          <button class="button" id="do_move_file">Move</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Read File screen -->
+    <div id="content_read_file" class="content">
+      <div class="info-area ch50">
+        <div class="info">
+          <div class="desc">
+            <span>File: </span><span class="fileNameView"></span>
+            <div id="file_content_view"></div>
+          </div>
+        </div>
+      </div>
+      <div class="info-area ch50">
+        <div id="file_copy_read" class="info hidden">
+          <div class="desc">
+            <span>File copy: </span><span class="copyNameView"></span>
+            <div id="copy_content_view"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div>Cordova API Samples</div>
+    </footer>
+  </body>
+</html>
