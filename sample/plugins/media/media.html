@@ -41,17 +41,18 @@
             <div id="left">
                 <div>
                     <h3>Filename: </h3>
-                    <input id="inputFile" value="http://cordova.apache.org/downloads/BlueZedEx.mp3" type="text">
+                    <input id="inputFile" value="" type="text">
                 </div>
-                <div id="progressBar">
-                    <span id="progress"></span>
+                <div id="">
+                    <input id="progress" value="5" type="range" min="0" max="1000" step="1"
+                           onchange="setPos(this.value);">
                 </div>
             </div>
             <div id="right">
-                <input id="inputFile2" value="0" type="range" min="0" max="10" step="1">
+                <input id="volume" value="0" type="range" min="0" max="10" step="1" onchange="setVolume(this.value);">
             </div>
             <div  class="action-area ch10">
-                <button class="button dh" onclick="play();" >|></button>
+                <button id="play" class="button dh" onclick="play();" >|></button>
                 <button class="button dh" onclick="stop();" >|_|</button>
                 <button class="button dh" onclick="recordAudio();" >O</button>
                 <button class="button dh" onclick="create();">Reload</button>
@@ -70,48 +71,12 @@
                     </tr>
                     <tr>
                         <td>2.</td>
-                        <td>Test2.wav</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Test2.wav</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Test2.wav</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Test2.wav</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Test2.wav</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Test2.wav</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Test2.wav</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Test2.wav</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Test2.wav</td>
-                    </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>Test2.wav</td>
+                        <td>/opt/usr/media/Documents/BlueZedEx.mp3</td>
                     </tr>
                 </tbody>
             </table>
             <div>
-                <p class="info">Commands' output:</p>
+                <p class="info" id="resultsLog">Commands' output:</p>
             </div>
             <a id="back" href="../../index.html" >Back</a>
         </div>
