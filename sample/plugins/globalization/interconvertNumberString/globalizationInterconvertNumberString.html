@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!--
+/*
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+-->
+<html>
+    <head>
+        <title>Globalization - Interconvert Number And String</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="../../../css/style.css" />
+        <link rel="stylesheet" type="text/css" href="../globalization.css" />
+        <script type="text/javascript" src="../../../lib/cordova.js"></script>
+        <script src="../../../js/SimpleLogger.js"></script>
+        <script src="globalizationInterconvertNumberString.js"></script>
+    </head>
+    <body>
+        <header class="header">
+            <h1>Interconvert Number And String</h1>
+        </header>
+        <div class="content">
+            <div class="action-area ch60">
+                <div class="actions">
+                    Number <input type="text" id="interconverNumber" value="1000" /> </br>
+                    String <input type="text" id="interconverString" /> </br>
+                    <div class="actions">
+                        Type:
+                        <select id="selector-type">
+                          <option value="decimal">decimal</option>
+                          <option value="percent">percent</option>
+                          <option value="currency">currency</option>
+                        </select>
+                    </div>
+                    <button class="button dh" id="button-Number">To Number</button>
+                    <button class="button dh" id="button-String">To String</button>
+                </div>
+            </div>
+            <div class="result-area ch40">
+                <div class="results">
+                    <div class="result-info">
+                        <div id="messageResult"></div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+                <div class="separator"></div>
+            </div>
+        </div>
+    </body>
+    <footer class="footer">
+        <div>Cordova API Samples</div>
+    </footer>
+</html>

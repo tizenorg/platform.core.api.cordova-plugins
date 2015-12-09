@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--
+/*
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+-->
+<html>
+    <head>
+        <title>Globalization Sample App</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+        <link rel="stylesheet" type="text/css" href="globalization.css" />
+        <script type="text/javascript" src="../../lib/cordova.js"></script>
+        <script src="../../js/SimpleLogger.js"></script>
+        <script src="globalization.js"></script>
+    </head>
+    <body>
+        <header class="header">
+            <h1>Globalization</h1>
+        </header>
+        <div class="content">
+            <div class="action-area ch70">
+                <button class="button dh" id="button-localeInformation">Locale Information</button>
+                <button class="button dh" id="button-datePattern">Date Pattern</button>
+                <button class="button dh" id="button-numberPattern">Number Pattern</button>
+                <button class="button dh" id="button-currencyPattern">Currency Pattern</button>
+                <button class="button dh" id="button-interconvertNumberString">Interconvert number & string
+                <button class="button dh" id="button-interconvertDateString">Interconvert date & string
+</button>
+            </div>
+            <div class="result-area ch30">
+                <div class="results">
+                    <div class="result-info">
+                        <div id="messageResult"></div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+                <div class="separator"></div>
+            </div>
+        </div>
+    </body>
+    <footer class="footer">
+        <div>Cordova API Samples</div>
+    </footer>
+</html>

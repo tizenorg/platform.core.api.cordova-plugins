@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!--
+/*
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+-->
+<html>
+    <head>
+        <title>Globalization - Interconvert Date And String</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="../../../css/style.css" />
+        <link rel="stylesheet" type="text/css" href="../globalization.css" />
+        <script type="text/javascript" src="../../../lib/cordova.js"></script>
+        <script src="../../../js/SimpleLogger.js"></script>
+        <script src="globalizationInterconvertDateString.js"></script>
+    </head>
+    <body>
+        <header class="header">
+            <h1>Interconvert Date And String</h1>
+        </header>
+        <div class="content">
+            <div class="action-area ch50">
+                <div class="actions">
+                    Date <input type="text" id="interconvertDate" /> </br>
+                    String <input type="text" id="interconvertString" /> </br>
+                    <div class="actions">
+                        Format length:
+                        <select id="selector-format">
+                          <option value="short">short</option>
+                          <option value="medium">medium</option>
+                          <option value="long">long</option>
+                          <option value="full">full</option>
+                        </select>
+                    </div>
+                    <div class="actions">
+                        Selector:
+                        <select id="selector-selector">
+                          <option value="date">date</option>
+                          <option value="time">time</option>
+                          <option value="date and time">date and time</option>
+                        </select>
+                    </div>
+                    <button class="button dh" id="button-Date">To Date</button>
+                    <button class="button dh" id="button-String">To String</button>
+                </div>
+            </div>
+            <div class="result-area ch50">
+                <div class="results">
+                    <div class="result-info">
+                        <div id="messageResult"></div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+                <div class="separator"></div>
+            </div>
+        </div>
+    </body>
+    <footer class="footer">
+        <div>Cordova API Samples</div>
+    </footer>
+</html>
