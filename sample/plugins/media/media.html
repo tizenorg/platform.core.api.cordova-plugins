@@ -26,7 +26,6 @@
         <link rel="stylesheet" type="text/css" href="select.dataTables.min.css" />
         <link rel="stylesheet" type="text/css" href="scroller.dataTables.min.css" />
         <script type="text/javascript" src="../../lib/cordova.js"></script>
-        <script src="../../js/SimpleLogger.js"></script>
         <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
         <script type="text/javascript" src="jquery.dataTables.min.js"></script>
         <script type="text/javascript" src="dataTables.select.min.js"></script>
@@ -49,7 +48,7 @@
                 </div>
             </div>
             <div id="right">
-                <input id="volume" value="0" type="range" min="0" max="10" step="1" onchange="setVolume(this.value);">
+                <input id="volume" value="10" type="range" min="0" max="10" step="1" onchange="setVolume(this.value);">
             </div>
             <div  class="action-area ch10">
                 <button id="play" class="button dh" onclick="play();" >|></button>
@@ -69,16 +68,8 @@
                         <td>1.</td>
                         <td>http://cordova.apache.org/downloads/BlueZedEx.mp3</td>
                     </tr>
-                    <tr>
-                        <td>2.</td>
-                        <td>/opt/usr/media/Documents/BlueZedEx.mp3</td>
-                    </tr>
                 </tbody>
             </table>
-            <div>
-                <p class="info" id="resultsLog">Commands' output:</p>
-            </div>
-            <a id="back" href="../../index.html" >Back</a>
         </div>
         <footer class="footer">
             <div>Created by <span class="name">Cordova Tizen Team</span>, 2015</div>
