@@ -14,27 +14,29 @@
  *    limitations under the License.
  */
 
-#ifndef CORDOVA_MEDIA_MEDIA_EXTENSION_H_
-#define CORDOVA_MEDIA_MEDIA_EXTENSION_H_
+#ifndef MEDIA_CORDOVA_MEDIA_EXTENSION_H_
+#define MEDIA_CORDOVA_MEDIA_EXTENSION_H_
 
-#include "common/extension.h"
+#include <common/extension.h>
+#include <common/picojson.h>
+#include <common/filesystem/filesystem_provider_storage.h>
 
 namespace extension {
 namespace cordova {
 namespace media {
 
-class CordovaMediaExtension : public common::Extension {
+class CordovaMediaInstance : public common::ParsedInstance {
  public:
-  CordovaMediaExtension();
-  virtual ~CordovaMediaExtension();
+  CordovaMediaInstance();
+  virtual ~CordovaMediaInstance();
 
  private:
-  // common::Extension implementation.
-  virtual common::Instance* CreateInstance();
+  common::FilesystemProviderStorage& fs_provider_;
+  void GetRealPath(const picojson::value& args, picojson::object& out);
 };
 
-}  //media
-}  //cordova
-}  //extension
+}
+}
+} /* namespace media */
 
-#endif // CORDOVA_MEDIA_MEDIA_EXTENSION_H_
+#endif // MEDIA_CORDOVA_MEDIA_EXTENSION_H_
