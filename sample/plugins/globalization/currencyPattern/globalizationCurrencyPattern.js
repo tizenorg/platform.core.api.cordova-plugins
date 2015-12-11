@@ -35,7 +35,7 @@
                                            'rounding : ' + pattern.rounding + '</br>' +
                                            'decimal : ' + pattern.decimal + '</br>' +
                                            'grouping : ' + pattern.grouping + '</br>'; },
-        function (e) { info.innerHTML = 'Error while getting date pattern '+ e.name; }
+        function (e) { info.innerHTML = 'Error while getting currency pattern '+ e.name; }
     );
   }
 
