@@ -15,7 +15,6 @@
  */
 
 #include "media/cordova_media_extension.h"
-#include "media/cordova_media_instance.h"
 
 // This will be generated from cordova_media_api.js
 extern const char kSource_cordova_media_api[];
@@ -34,11 +33,6 @@ CordovaMediaExtension::CordovaMediaExtension() {
 }
 
 CordovaMediaExtension::~CordovaMediaExtension() {}
-
-common::Instance* CordovaMediaExtension::CreateInstance() {
-  LoggerD("Entered");
-  return new extension::cordova::media::CordovaMediaInstance();
-}
 
 }  // media
 }  // cordova
