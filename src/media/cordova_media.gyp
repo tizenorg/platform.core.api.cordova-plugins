@@ -10,6 +10,8 @@
         'cordova_media_api.js',
         'cordova_media_extension.cc',
         'cordova_media_extension.h',
+        'cordova_media_instance.h',
+        'cordova_media_instance.cc',
       ],
       'include_dirs': [
         '../',
@@ -17,6 +19,7 @@
       ],
       'variables': {
         'packages': [
+          'storage',
           'webapi-plugins',
         ],
       },

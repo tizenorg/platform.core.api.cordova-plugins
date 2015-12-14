@@ -17,6 +17,25 @@
 // TODO: remove when added to public cordova repository -> begin
 var plugin_name = 'cordova-plugin-media.tizen.Media';
 
+var utils_ = xwalk.utils;
+var native_ = new utils_.NativeManager(extension);
+var privilege_ = xwalk.utils.privilege;
+
+function GetRealPath(virtualPath) {
+
+    console.log("JS GetRealPath " + virtualPath);
+    xwalk.utils.checkPrivilegeAccess(privilege_.FILESYSTEM_READ);
+
+    var data = {
+        path : virtualPath
+    };
+
+    var result = native_.callSync('CordovaMediaInstance_GetRealPath', data);
+    var fullResult = native_.getResultObject(result);
+    console.log("Result of call " +  fullResult.path);
+    return fullResult.path;
+}
+
 cordova.define(plugin_name, function(require, exports, module) {
 // TODO: remove -> end
 
@@ -212,9 +231,10 @@ cordova.define(plugin_name, function(require, exports, module) {
   create: function(successCallback, errorCallback, args) {
     var id = args[0], src = args[1];
 
-    console.log('media::create() - id =' + id + ', src =' + src);
+    var realPath = GetRealPath(src);
+    console.log('media::create() - id =' + id + ', src =' + realPath);
 
-    recorder = new Recorder(src);
+    recorder = new Recorder(realPath);
     audioObjects[id] = new Audio();
     audioObjects[id].isReady = false;
 
@@ -304,7 +324,8 @@ cordova.define(plugin_name, function(require, exports, module) {
   startPlayingAudio: function(successCallback, errorCallback, args) {
     var id = args[0], src = args[1];
 
-    console.log('media::startPlayingAudio() - id =' + id + ', src =' + src);
+    var realPath = GetRealPath(src);
+    console.log('media::startPlayingAudio() - id =' + id + ', src =' + realPath);
 
     audioObjects[id].isReady = true;
 
@@ -314,7 +335,7 @@ cordova.define(plugin_name, function(require, exports, module) {
       //it should be saved and restored.
       var rate = audioObjects[id].playbackRate;
 
-      audioObjects[id].src = src;
+      audioObjects[id].src = realPath;
       audioObjects[id].playbackRate = rate;
       return;
     }
@@ -366,7 +387,7 @@ cordova.define(plugin_name, function(require, exports, module) {
       var id = args[0];
       console.log('media::getCurrentPositionAudio()');
       if (audioObjects[id].src === 'undefined') {
-          audioObjects[id].src = args[1];
+          audioObjects[id].src = GetRealPath(args[1]);
       }
       successCallback(audioObjects[id].currentTime);
   },
@@ -374,7 +395,7 @@ cordova.define(plugin_name, function(require, exports, module) {
       var id = args[0];
       console.log('media::startRecordingAudio()');
       if (audioObjects[id].src === 'undefined') {
-          audioObjects[id].src = args[1];
+          audioObjects[id].src = GetRealPath(args[1]);
       }
       recorder.rec();
   },
@@ -382,7 +403,7 @@ cordova.define(plugin_name, function(require, exports, module) {
       var id = args[0];
       console.log('media::stopRecordingAudio()');
       if (audioObjects[id].src === 'undefined') {
-          audioObjects[id].src = args[1];
+          audioObjects[id].src = GetRealPath(args[1]);
       }
       recorder.stop();
   },
