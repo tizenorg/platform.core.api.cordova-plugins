@@ -35,7 +35,7 @@ var deviceReady = function () {
       console.log(files[i].fullPath);
       if(!(files[i].name in playfiles) ){
         playfiles[files[i].name] =  files[i];
-        table.row.add([i + '.', 'documents/' + files[i].name]).draw(false);
+        table.row.add([i + '.', '/opt/usr/media/Documents/' + files[i].name]).draw(false);
       }
     }
   });
@@ -200,7 +200,7 @@ function stopRecAudio() {
       console.log(files[i].fullPath);
       if(!(files[i].name in playfiles) ){
         playfiles[files[i].name] =  files[i];
-        table.row.add([i + '.', 'documents' + files[i].name]).draw(false);
+        table.row.add([i + '.', '/opt/usr/media/Documents/' + files[i].name]).draw(false);
       }
     }
   });

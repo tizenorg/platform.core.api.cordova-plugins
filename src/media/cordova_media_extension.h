@@ -27,10 +27,6 @@ class CordovaMediaExtension : public common::Extension {
  public:
   CordovaMediaExtension();
   virtual ~CordovaMediaExtension();
-
- private:
-  // common::Extension implementation.
-  virtual common::Instance* CreateInstance();
 };
 
 }  //media
