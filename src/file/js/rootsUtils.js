@@ -34,6 +34,9 @@ var rootsUtils = (function() {
     if (!tmp) {
       tmp = '/';
     }
+    if ('/' !== tmp[0]) {
+      tmp = '/' + tmp;
+    }
     return tmp;
   }
 
