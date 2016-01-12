@@ -56,7 +56,7 @@ class CordovaGlobalizationTools{
                                                       const std::string& selector);
   static DateFormat::EStyle GetDateFormat(const std::string& length);
   static std::string GetDateString(UDate date, DateFormat::EStyle format,
-                                              const std::string& selector);
+                                   const std::string& selector);
   static common::PlatformResult GetUDateFromString(const std::string& date,
                                                    DateFormat::EStyle format,
                                                    const std::string& selector,
@@ -64,8 +64,9 @@ class CordovaGlobalizationTools{
   static common::PlatformResult GetDatePattern(DateFormat::EStyle format,
                                                const std::string& selector,
                                                std::string* result);
+  static common::PlatformResult GetTimezoneAbbreviation(std::string *result_tring);
   static common::PlatformResult GetNames(const std::string& item, const std::string& type,
-                                             std::vector<std::string>* result);
+                                         std::vector<std::string>* result);
   static common::PlatformResult GetFirstDayOfWeek(double* result);
   static common::PlatformResult FormatNumber(double number, const std::string& type,
                                              std::string* result);

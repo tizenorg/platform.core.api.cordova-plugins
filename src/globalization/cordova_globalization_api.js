@@ -103,7 +103,7 @@ function Globalization_getDatePattern(successCb, errorCb, options) {
   var selector = (options && options.selector) || selectorDateAndTimeStr;
 
   var callback = function(result) {
-    // Checking succes of gathering pattern
+    // Checking success of gathering pattern
     var fullResult = {};
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -118,19 +118,13 @@ function Globalization_getDatePattern(successCb, errorCb, options) {
     // looking for missing pieces of fullResult object
     var currentDateTime = tizen.time.getCurrentDateTime();
     if (currentDateTime) {
-      // TODO currently value as "GMT+09:00" will be returned,
-      // to get value "Asia/Seoul" use .getTimezone() instead
-      var timezoneAbbreviation = currentDateTime.getTimezoneAbbreviation();
-
       // TODO method secondsFromUTC returns inverted offset: if time zone is GMT+8, it will return -32,400.
       // TODO currently utcOffset will include DST additional hour if it is present, value will be
       // timezoneOffset = timezoneOffsetWithoutDST + DSTAdditionalOffset
-      // if other behaviour is correct, just need to substract dstOffset from utcOffset
+      // if other behavior is correct, just need to subtract dstOffset from utcOffset
       var utcOffset = currentDateTime.secondsFromUTC() * (-1);
       var dstOffset = currentDateTime.isDST() ? oneHourSeconds : 0;
 
-      //adding missing parts of result
-      fullResult["timezone"] = timezoneAbbreviation;
       fullResult["utc_offset"] = utcOffset;
       fullResult["dst_offset"] = dstOffset;
       successCb(fullResult);
@@ -146,6 +140,7 @@ function Globalization_getDatePattern(successCb, errorCb, options) {
   };
   native_.call('CordovaGlobalization_getDatePattern', callArgs, callback);
 }
+
 
 function Globalization_getDateNames(successCb, errorCb, options) {
   var type = (options && options.type) || typeWide;
@@ -166,6 +161,7 @@ function Globalization_getDateNames(successCb, errorCb, options) {
   };
   native_.call('CordovaGlobalization_getDateNames', callArgs, callback);
 }
+
 
 function Globalization_isDayLightSavingsTime(timestamp, successCb, errorCb) {
   var tzdate = new tizen.TZDate(new Date(timestamp)); //creates tzdate with local default timezone

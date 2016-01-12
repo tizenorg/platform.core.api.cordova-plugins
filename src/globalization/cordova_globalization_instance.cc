@@ -185,10 +185,16 @@ void CordovaGlobalizationInstance::GetDatePattern(const picojson::value& args,
       picojson::value result = picojson::value(picojson::object());
       picojson::object& result_obj = result.get<picojson::object>();
 
-      // returning only pattern of date, rest of result should be added in JS using web device API
       result_obj.insert(std::make_pair("pattern", picojson::value(result_str)));
 
-      ReportSuccess(result, response->get<picojson::object>());
+      std::string result_str;
+      ret = CordovaGlobalizationTools::GetTimezoneAbbreviation(&result_str);
+      if (ret.IsSuccess()) {
+        result_obj.insert(std::make_pair("timezone", picojson::value(result_str)));
+        ReportSuccess(result, response->get<picojson::object>());
+      } else {
+        ReportError(ret, &(response->get<picojson::object>()));
+      }
     } else {
       ReportError(ret, &(response->get<picojson::object>()));
     }
