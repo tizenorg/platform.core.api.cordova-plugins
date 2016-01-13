@@ -65,6 +65,7 @@ Locale CordovaGlobalizationTools::GetDefaultLocale() {
       return result;
     }
   }
+
   return Locale::createFromName("en_US");
 }
 
@@ -169,6 +170,39 @@ PlatformResult CordovaGlobalizationTools::GetDatePattern(DateFormat::EStyle form
     }
   }
   return PlatformResult(ErrorCode::UNKNOWN_ERR, "Could not get date pattern");
+}
+
+
+PlatformResult CordovaGlobalizationTools::GetTimezoneAbbreviation(std::string *result_string) {
+  LoggerD("Entered");
+  UErrorCode uec = U_ZERO_ERROR;
+  UnicodeString str;
+  PlatformResult pr(ErrorCode::NO_ERROR);
+  std::unique_ptr<DateFormat> fmt(
+      new SimpleDateFormat(UnicodeString("z"), Locale::getEnglish(), uec));
+  if (U_SUCCESS(uec)) {
+    std::unique_ptr<TimeZone> tz(TimeZone::createDefault());
+    fmt->setTimeZone(*tz);
+    fmt->format(0L, str);
+    if ((str.length() > 3) && (str.compare(0, 3, "GMT") == 0)) {
+      LoggerD("Returned time zone is a GMT offset.");
+      str.remove();
+      std::unique_ptr<DateFormat> gmt(
+          new SimpleDateFormat(UnicodeString("OOOO"), Locale::getEnglish(), uec));
+      gmt->setTimeZone(*tz);
+      gmt->format(0L, str);
+    } else {
+      LoggerD("Returned time zone is not a GMT offset.");
+    }
+
+    *result_string = ToUTF8String(str);
+  } else {
+    LoggerE("Error: could not obtain the time zone.");
+    *result_string = "";
+    pr = PlatformResult(ErrorCode::UNKNOWN_ERR, "Could not obtain the time zone.");
+  }
+
+  return pr;
 }
 
 PlatformResult CordovaGlobalizationTools::GetNames(const std::string& item,
