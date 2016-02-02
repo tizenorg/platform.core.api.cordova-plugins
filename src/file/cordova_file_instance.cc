@@ -53,7 +53,7 @@ CordovaFileInstance::~CordovaFileInstance() {
 void CordovaFileInstance::Truncate(const picojson::value& args, picojson::object& out) {
   LoggerD("Entered");
 
-  if (!args.contains("uri") || !args.contains("length")) {
+  if (!args.contains("uri") || !args.contains("length") || !args.get("length").is<double>()) {
     LoggerE("Invalid parameter passed.");
     ReportError(PlatformResult(ErrorCode::INVALID_VALUES_ERR, "Invalid parameter passed."), &out);
     return;
