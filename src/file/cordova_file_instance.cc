@@ -21,10 +21,15 @@
 #include <common/logger.h>
 #include <common/picojson.h>
 #include <common/platform_result.h>
+#include <common/tools.h>
 
 namespace extension {
 namespace cordova {
 namespace file {
+
+namespace {
+const std::string kPrivilegeFilesystemWrite = "http://tizen.org/privilege/filesystem.write";
+}
 
 using common::ErrorCode;
 using common::PlatformResult;
@@ -52,6 +57,8 @@ CordovaFileInstance::~CordovaFileInstance() {
 
 void CordovaFileInstance::Truncate(const picojson::value& args, picojson::object& out) {
   LoggerD("Entered");
+
+  CHECK_PRIVILEGE_ACCESS(kPrivilegeFilesystemWrite, &out);
 
   if (!args.contains("uri") || !args.contains("length") || !args.get("length").is<double>()) {
     LoggerE("Invalid parameter passed.");
