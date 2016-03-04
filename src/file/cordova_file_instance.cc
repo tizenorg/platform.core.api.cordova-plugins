@@ -28,7 +28,7 @@ namespace cordova {
 namespace file {
 
 namespace {
-const std::string kPrivilegeFilesystemWrite = "http://tizen.org/privilege/filesystem.write";
+const std::string kPrivilegeFilesystemWrite = "http://tizen.org/privilege/systemsettings.admin";
 }
 
 using common::ErrorCode;
