@@ -127,25 +127,29 @@ void CordovaGlobalizationInstance::StringToDate(const picojson::value& args,
       // UDate holds milliseconds, conversion to time_t needs seconds
       time_t seconds_ts = (time_t)(result_date / 1000);
 
-      struct tm * result_time = localtime(&seconds_ts);
-      picojson::value result = picojson::value(picojson::object());
-      picojson::object& result_obj = result.get<picojson::object>();
-      result_obj.insert(std::make_pair(
-          "year", picojson::value(static_cast<double>(result_time->tm_year + 1900))));
-      result_obj.insert(std::make_pair(
-          "month", picojson::value(static_cast<double>(result_time->tm_mon))));
-      result_obj.insert(std::make_pair(
-          "day", picojson::value(static_cast<double>(result_time->tm_mday))));
-      result_obj.insert(std::make_pair(
-          "hour", picojson::value(static_cast<double>(result_time->tm_hour))));
-      result_obj.insert(std::make_pair(
-          "minute", picojson::value(static_cast<double>(result_time->tm_min))));
-      result_obj.insert(std::make_pair(
-          "second", picojson::value(static_cast<double>(result_time->tm_sec))));
-      result_obj.insert(std::make_pair(
-          "millisecond", picojson::value(static_cast<double>(0.0))));
+      struct tm result_time = {0};
+      if (nullptr != localtime_r(&seconds_ts, &result_time)) {
+        picojson::value result = picojson::value(picojson::object());
+        picojson::object& result_obj = result.get<picojson::object>();
+        result_obj.insert(std::make_pair(
+            "year", picojson::value(static_cast<double>(result_time.tm_year + 1900))));
+        result_obj.insert(std::make_pair(
+            "month", picojson::value(static_cast<double>(result_time.tm_mon))));
+        result_obj.insert(std::make_pair(
+            "day", picojson::value(static_cast<double>(result_time.tm_mday))));
+        result_obj.insert(std::make_pair(
+            "hour", picojson::value(static_cast<double>(result_time.tm_hour))));
+        result_obj.insert(std::make_pair(
+            "minute", picojson::value(static_cast<double>(result_time.tm_min))));
+        result_obj.insert(std::make_pair(
+            "second", picojson::value(static_cast<double>(result_time.tm_sec))));
+        result_obj.insert(std::make_pair(
+            "millisecond", picojson::value(static_cast<double>(0.0))));
 
-      ReportSuccess(result, response->get<picojson::object>());
+        ReportSuccess(result, response->get<picojson::object>());
+      } else {
+        ReportError(PlatformResult(ErrorCode::INVALID_VALUES_ERR, "Failed to convert"), &(response->get<picojson::object>()));
+      }
     } else {
       ReportError(ret, &(response->get<picojson::object>()));
     }
