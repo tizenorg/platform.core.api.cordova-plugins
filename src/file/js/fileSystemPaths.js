@@ -64,14 +64,26 @@ function setExternalStorage(callback) {
 }
 
 function setApplicationStorageDirectory(callback) {
+  var onError = function (error) {
+    console.error('Failed to get directory: ' + error.message);
+    callback(pathsPrefix);
+  };
+
   try {
-    var app = tizen.application.getCurrentApplication();
-    var basePath = 'file:///opt/usr/apps/' + app.appInfo.packageId + '/';
-    pathsPrefix.applicationStorageDirectory = basePath;
-    pathsPrefix.applicationDirectory = basePath + 'res/wgt/';
-    pathsPrefix.dataDirectory = basePath + 'data/';
-    pathsPrefix.cacheDirectory = basePath + 'tmp/';
-    setExternalStorage(callback);
+    tizen.filesystem.resolve('wgt-package', function(appDir) {
+      pathsPrefix.applicationDirectory = appDir.toURI() + '/';
+
+      tizen.filesystem.resolve('wgt-private', function(dataDir) {
+        pathsPrefix.applicationStorageDirectory = dataDir.toURI() + '/';
+        pathsPrefix.dataDirectory = dataDir.toURI() + '/';
+
+        tizen.filesystem.resolve('wgt-private-tmp', function(cacheDir) {
+          pathsPrefix.cacheDirectory = cacheDir.toURI() + '/';
+
+          setExternalStorage(callback);
+        }, onError, 'r');
+      }, onError, 'r');
+    }, onError, 'r');
   } catch(error) {
     console.error('Failed to get current application: ' + error.message);
     callback(pathsPrefix);
