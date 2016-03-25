@@ -366,11 +366,14 @@ PlatformResult CordovaGlobalizationTools::GetNumberPattern(const std::string& ty
     DecimalFormat* df = dynamic_cast<DecimalFormat*>(nfmt.get());
     if (!df) {
       LoggerE("Casting failed");
-      *pattern = "";
+      *pattern = "error";
+      *fraction = -1.0;
+      *rounding = -1.0;
+    } else {
+      *pattern = ToUTF8String(df->toLocalizedPattern(res));
+      *fraction = df->getMaximumFractionDigits();
+      *rounding = df->getRoundingIncrement();
     }
-    *pattern = ToUTF8String(df->toLocalizedPattern(res));
-    *fraction = df->getMaximumFractionDigits();
-    *rounding = df->getRoundingIncrement();
     *positive = ToUTF8String(dfs.getSymbol(DecimalFormatSymbols::kPlusSignSymbol));
     *negative = ToUTF8String(dfs.getSymbol(DecimalFormatSymbols::kMinusSignSymbol));
     *decimal = ToUTF8String(dfs.getSymbol(DecimalFormatSymbols::kDecimalSeparatorSymbol));
