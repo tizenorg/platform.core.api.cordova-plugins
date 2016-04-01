@@ -70,7 +70,7 @@ exports = {
         chunkedMode = args[7],
         headers = args[8],
         id = args[9],
-        httpMethod = args[10];
+        httpMethod = args[10] || 'POST';
 
     if (0 !== filePath.indexOf(filePrefix)) {
       filePath = filePrefix + filePath;
