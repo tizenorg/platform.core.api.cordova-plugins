@@ -14,6 +14,9 @@
  *    limitations under the License.
  */
 
+var utils_ = xwalk.utils;
+var native_ = new utils_.NativeManager(extension);
+
 // TODO: remove when added to public cordova repository -> begin
 var plugin_name = 'cordova-plugin-dialogs.tizen.Notification';
 
@@ -26,16 +29,34 @@ var playback = (function() {
   var soundElement;
   var counter = 1;
 
-  tizen.systemsetting && tizen.systemsetting.getProperty("NOTIFICATION_EMAIL", function(v) {
-    soundElement = new Audio(v);
-    soundElement.addEventListener('ended', function() {
-      if (--counter > 0) {
-        soundElement.play();
-      }
+  var result = native_.callSync('CordovaDialog_getProfile', {});
+
+  result = native_.getResultObject(result);
+
+  if ("TV" == result.profile) {
+    tizen.filesystem.resolve('/usr/share/feedback/sound/operation/operation.wav', function(file) {
+      soundElement = new Audio(file.toURI());
+      soundElement.addEventListener('ended', function() {
+        if (--counter > 0) {
+          soundElement.play();
+        }
+      });
+    }, function(e) {
+      console.error('Failed to get the notification sound: ' + e);
+    }, "r");
+  } else {
+    tizen.systemsetting && tizen.systemsetting.getProperty("NOTIFICATION_EMAIL", function(v) {
+      soundElement = new Audio(v);
+      soundElement.addEventListener('ended', function() {
+        if (--counter > 0) {
+          soundElement.play();
+        }
+      });
+    }, function(e) {
+      console.error('Failed to get the notification sound: ' + e);
     });
-  }, function(e) {
-    console.error('Failed to get the notification sound: ' + e);
-  });
+  }
+
 
   function beep(times) {
     counter = times || 1;

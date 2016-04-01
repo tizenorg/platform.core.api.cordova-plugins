@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd All Rights Reserved
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,27 +14,26 @@
  *    limitations under the License.
  */
 
-#ifndef DIALOG_CORDOVA_DIALOG_EXTENSION_H_
-#define DIALOG_CORDOVA_DIALOG_EXTENSION_H_
+#ifndef DIALOG_CORDOVA_DIALOG_INSTANCE_H_
+#define DIALOG_CORDOVA_DIALOG_INSTANCE_H_
 
 #include <common/extension.h>
+#include <common/picojson.h>
 
 namespace extension {
 namespace cordova {
 namespace dialog {
 
-class CordovaDialogExtension : public common::Extension {
+class CordovaDialogInstance : public common::ParsedInstance {
  public:
-  CordovaDialogExtension();
-  virtual ~CordovaDialogExtension();
+  CordovaDialogInstance();
+  virtual ~CordovaDialogInstance();
 
  private:
-  // common::Extension implementation.
-  virtual common::Instance* CreateInstance();
+  void GetProfile(const picojson::value& args, picojson::object& out);
 };
-
 }  // dialog
 }  // cordova
 }  // extension
 
-#endif // DIALOG_CORDOVA_DIALOG_EXTENSION_H_
+#endif  // DIALOG_CORDOVA_DIALOG_INSTANCE_H_
