@@ -973,9 +973,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         downloadImg(imageURL, function (entry) { return entry.toURL(); }, new Image());
     }, 'native_image');
 
-    createActionButton('Download to a non-existent dir (should work)', function () {
+    /*createActionButton('Download to a non-existent dir (should work)', function () {
         downloadImg(imageURL, function (entry) { return entry.toURL(); }, new Image(), '/nonExistentDirTest/');
-    }, 'non-existent_dir');
+    }, 'non-existent_dir');*/
 
     createActionButton('Download and play video (cdvfile)', function () {
         var videoElement = document.createElement('video');

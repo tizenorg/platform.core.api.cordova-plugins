@@ -57,12 +57,6 @@ exports.defineManualTests = function (content, createActionButton) {
       'Expected result: \"backbutton\" event should be fired each time \"Back\" key is pressed.' +
       '<p/> <div id="menubutton"></div>' +
       'Expected result: \"menubutton\" event should be fired each time \"Menu\" key is pressed.' +
-      '<p/> <div id="searchbutton"></div>' +
-      'Expected result: \"searchbutton\" event should be fired each time \"Search\" key is pressed.' +
-      '<p/> <div id="startcallbutton"></div>' +
-      'Expected result: \"startcallbutton\" event should be fired each time \"Start call\" key is pressed.' +
-      '<p/> <div id="endcallbutton"></div>' +
-      'Expected result: \"endcallbutton\" event should be fired each time \"End call\" key is pressed.' +
       '<p/> <div id="volumedownbutton"></div>' +
       'Expected result: \"volumedownbutton\" event should be fired each time \"Volume down\" key is pressed.' +
       '<p/> <div id="volumeupbutton"></div>' +
