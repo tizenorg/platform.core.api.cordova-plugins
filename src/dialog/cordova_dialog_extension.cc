@@ -15,6 +15,7 @@
  */
 
 #include "dialog/cordova_dialog_extension.h"
+#include "dialog/cordova_dialog_instance.h"
 
 // This will be generated from cordova_dialog_api.js
 extern const char kSource_cordova_dialog_api[];
@@ -33,6 +34,11 @@ CordovaDialogExtension::CordovaDialogExtension() {
 }
 
 CordovaDialogExtension::~CordovaDialogExtension() {}
+
+common::Instance* CordovaDialogExtension::CreateInstance() {
+  LoggerD("Entered");
+  return new extension::cordova::dialog::CordovaDialogInstance();
+}
 
 }  // dialog
 }  // cordova

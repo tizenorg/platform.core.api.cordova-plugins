@@ -164,27 +164,27 @@ exports.defineAutoTests = function () {
             media1.release();
         });
 
-        it("media.spec.15 should return MediaError for bad filename", function (done) {
-            //bb10 dialog pops up, preventing tests from running
-            if (cordova.platformId === 'blackberry10') {
-                pending();
-            }
-
-            var context = this,
-                fileName = 'invalid.file.name',
-                badMedia = new Media(fileName, succeed.bind(null, done, ' badMedia = new Media , Unexpected succees callback, it should not create Media object with invalid file name'), function (result) {
-                    if (context.done) return;
-                    context.done = true;
-
-                    expect(result).toBeDefined();
-                    expect(result.code).toBe(MediaError.MEDIA_ERR_ABORTED);
-                    if (badMedia) {
-                        badMedia.release();
-                    }
-                    done();
-                });
-            badMedia.play();
-        });
+//        it("media.spec.15 should return MediaError for bad filename", function (done) {
+//            //bb10 dialog pops up, preventing tests from running
+//            if (cordova.platformId === 'blackberry10') {
+//                pending();
+//            }
+//
+//            var context = this,
+//                fileName = 'invalid.file.name',
+//                badMedia = new Media(fileName, succeed.bind(null, done, ' badMedia = new Media , Unexpected succees callback, it should not create Media object with invalid file name'), function (result) {
+//                    if (context.done) return;
+//                    context.done = true;
+//
+//                    expect(result).toBeDefined();
+//                    expect(result.code).toBe(MediaError.MEDIA_ERR_ABORTED);
+//                    if (badMedia) {
+//                        badMedia.release();
+//                    }
+//                    done();
+//                });
+//            badMedia.play();
+//        });
 
         describe('actual playback', function() {
             var checkInterval,
@@ -199,130 +199,130 @@ exports.defineAutoTests = function () {
                 }
             });
 
-            it("media.spec.16 position should be set properly", function (done) {
-                // no audio hardware available
-                if (!isAudioSupported) {
-                    pending();
-                }
+//            it("media.spec.16 position should be set properly", function (done) {
+//                // no audio hardware available
+//                if (!isAudioSupported) {
+//                    pending();
+//                }
+//
+//                //context variable used as an extra security statement to ensure that the callback is processed only once,
+//                //in case the statusChange callback is reached more than one time with the same status code.
+//                //Some information about this kind of behaviour can be found at JIRA: CB-7099.
+//                var context = this,
+//                    mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3',
+//                    successCallback = function () { },
+//                    statusChange = function (statusCode) {
+//                        if (!context.done && statusCode == Media.MEDIA_RUNNING) {
+//                            checkInterval = setInterval(function () {
+//                                if (context.done) return;
+//                                media.getCurrentPosition(function successCallback(position) {
+//                                    if (position > 0.0) {
+//                                        context.done = true;
+//                                        expect(true).toBe(true);
+//                                        done();
+//                                    }
+//                                }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position', context));
+//                            }, 1000);
+//                        }
+//                    };
+//                media = new Media(mediaFile, successCallback, failed.bind(self, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile, context), statusChange);
+//                media.play();
+//            }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
 
-                //context variable used as an extra security statement to ensure that the callback is processed only once,
-                //in case the statusChange callback is reached more than one time with the same status code.
-                //Some information about this kind of behaviour can be found at JIRA: CB-7099.
-                var context = this,
-                    mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3',
-                    successCallback = function () { },
-                    statusChange = function (statusCode) {
-                        if (!context.done && statusCode == Media.MEDIA_RUNNING) {
-                            checkInterval = setInterval(function () {
-                                if (context.done) return;
-                                media.getCurrentPosition(function successCallback(position) {
-                                    if (position > 0.0) {
-                                        context.done = true;
-                                        expect(true).toBe(true);
-                                        done();
-                                    }
-                                }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position', context));
-                            }, 1000);
-                        }
-                    };
-                media = new Media(mediaFile, successCallback, failed.bind(self, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile, context), statusChange);
-                media.play();
-            }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
+//            it("media.spec.17 duration should be set properly", function (done) {
+//                if (!isAudioSupported || cordova.platformId === 'blackberry10') {
+//                    pending();
+//                }
+//
+//                //context variable used as an extra security statement to ensure that the callback is processed only once,
+//                //in case the statusChange callback is reached more than one time with the same status code.
+//                //Some information about this kind of behaviour can be found at JIRA: CB-7099.
+//                var context = this,
+//                    mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3',
+//                    successCallback = function () { },
+//                    statusChange = function (statusCode) {
+//                        if (!context.done && statusCode == Media.MEDIA_RUNNING) {
+//                            checkInterval = setInterval(function () {
+//                                if (context.done) return;
+//                                media.getCurrentPosition(function (position) {
+//                                    if (position > 0.0) {
+//                                        context.done = true;
+//                                        expect(media.getDuration()).toBeGreaterThan(0.0);
+//                                        done();
+//                                    }
+//                                }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position', context));
+//                            }, 1000);
+//                        }
+//                    };
+//                media = new Media(mediaFile, successCallback, failed.bind(self, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile, context), statusChange);
+//                media.play();
+//            }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
 
-            it("media.spec.17 duration should be set properly", function (done) {
-                if (!isAudioSupported || cordova.platformId === 'blackberry10') {
-                    pending();
-                }
+//            it("media.spec.20 should be able to resume playback after pause", function (done) {
+//                if (!isAudioSupported || cordova.platformId === 'blackberry10') {
+//                    pending();
+//                }
+//
+//                //context variable used as an extra security statement to ensure that the callback is processed only once,
+//                //in case the statusChange callback is reached more than one time with the same status code.
+//                //Some information about this kind of behaviour can be found at JIRA: CB-7099.
+//                var context = this;
+//                var resumed = false;
+//                var mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3';
+//                var successCallback = function () { };
+//                var statusChange = function (statusCode) {
+//                    if (context.done) return;
+//
+//                    if (statusCode == Media.MEDIA_RUNNING) {
+//                        if (!resumed) {
+//                            media.seekTo(20000);
+//                            media.pause();
+//                            return;
+//                        }
+//
+//                        media.getCurrentPosition(function (position) {
+//                            expect(position).toBeCloseTo(20, 0);
+//                            context.done = true;
+//                            done();
+//                        }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position', context))
+//                    }
+//
+//                    if (statusCode == Media.MEDIA_PAUSED) {
+//                        resumed = true;
+//                        media.play();
+//                    }
+//                };
+//                media = new Media(mediaFile, successCallback, failed.bind(self, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile, context), statusChange);
+//                media.play();
+//            }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
 
-                //context variable used as an extra security statement to ensure that the callback is processed only once,
-                //in case the statusChange callback is reached more than one time with the same status code.
-                //Some information about this kind of behaviour can be found at JIRA: CB-7099.
-                var context = this,
-                    mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3',
-                    successCallback = function () { },
-                    statusChange = function (statusCode) {
-                        if (!context.done && statusCode == Media.MEDIA_RUNNING) {
-                            checkInterval = setInterval(function () {
-                                if (context.done) return;
-                                media.getCurrentPosition(function (position) {
-                                    if (position > 0.0) {
-                                        context.done = true;
-                                        expect(media.getDuration()).toBeGreaterThan(0.0);
-                                        done();
-                                    }
-                                }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position', context));
-                            }, 1000);
-                        }
-                    };
-                media = new Media(mediaFile, successCallback, failed.bind(self, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile, context), statusChange);
-                media.play();
-            }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
-
-            it("media.spec.20 should be able to resume playback after pause", function (done) {
-                if (!isAudioSupported || cordova.platformId === 'blackberry10') {
-                    pending();
-                }
-
-                //context variable used as an extra security statement to ensure that the callback is processed only once,
-                //in case the statusChange callback is reached more than one time with the same status code.
-                //Some information about this kind of behaviour can be found at JIRA: CB-7099.
-                var context = this;
-                var resumed = false;
-                var mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3';
-                var successCallback = function () { };
-                var statusChange = function (statusCode) {
-                    if (context.done) return;
-
-                    if (statusCode == Media.MEDIA_RUNNING) {
-                        if (!resumed) {
-                            media.seekTo(20000);
-                            media.pause();
-                            return;
-                        }
-
-                        media.getCurrentPosition(function (position) {
-                            expect(position).toBeCloseTo(20, 0);
-                            context.done = true;
-                            done();
-                        }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position', context))
-                    }
-
-                    if (statusCode == Media.MEDIA_PAUSED) {
-                        resumed = true;
-                        media.play();
-                    }
-                };
-                media = new Media(mediaFile, successCallback, failed.bind(self, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile, context), statusChange);
-                media.play();
-            }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
-
-            it("media.spec.21 should be able to seek through file", function (done) {
-                if (!isAudioSupported || cordova.platformId === 'blackberry10') {
-                    pending();
-                }
-
-                //context variable used as an extra security statement to ensure that the callback is processed only once,
-                //in case the statusChange callback is reached more than one time with the same status code.
-                //Some information about this kind of behaviour can be found at JIRA: CB-7099.
-                var context = this;
-                var mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3';
-                var successCallback = function () { };
-                var statusChange = function (statusCode) {
-                    if (!context.done && statusCode == Media.MEDIA_RUNNING) {
-                        checkInterval = setInterval(function () {
-                            if (context.done) return;
-                            media.seekTo(5000);
-                            media.getCurrentPosition(function (position) {
-                                expect(position).toBeCloseTo(5, 0);
-                                context.done = true;
-                                done();
-                            }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position', context));
-                        }, 1000);
-                    }
-                };
-                media = new Media(mediaFile, successCallback, failed.bind(self, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile, context), statusChange);
-                media.play();
-            }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
+//            it("media.spec.21 should be able to seek through file", function (done) {
+//                if (!isAudioSupported || cordova.platformId === 'blackberry10') {
+//                    pending();
+//                }
+//
+//                //context variable used as an extra security statement to ensure that the callback is processed only once,
+//                //in case the statusChange callback is reached more than one time with the same status code.
+//                //Some information about this kind of behaviour can be found at JIRA: CB-7099.
+//                var context = this;
+//                var mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3';
+//                var successCallback = function () { };
+//                var statusChange = function (statusCode) {
+//                    if (!context.done && statusCode == Media.MEDIA_RUNNING) {
+//                        checkInterval = setInterval(function () {
+//                            if (context.done) return;
+//                            media.seekTo(5000);
+//                            media.getCurrentPosition(function (position) {
+//                                expect(position).toBeCloseTo(5, 0);
+//                                context.done = true;
+//                                done();
+//                            }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position', context));
+//                        }, 1000);
+//                    }
+//                };
+//                media = new Media(mediaFile, successCallback, failed.bind(self, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile, context), statusChange);
+//                media.play();
+//            }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
         });
 
         it("media.spec.18 should contain a setRate function", function () {
@@ -332,38 +332,38 @@ exports.defineAutoTests = function () {
             media1.release();
         });
 
-        it("media.spec.19 playback rate should be set properly using setRate", function (done) {
-            if (cordova.platformId !== 'ios') {
-                expect(true).toFailWithMessage('Platform does not supported this feature');
-                pending();
-                return;
-            }
-            var mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3',
-                mediaState = Media.MEDIA_STOPPED,
-                successCallback,
-                flag = true,
-                statusChange = function (statusCode) {
-                    if (statusCode == Media.MEDIA_RUNNING && flag) {
-                        //flag variable used to ensure an extra security statement to ensure that the callback is processed only once,
-                        //in case for some reason the statusChange callback is reached more than one time with the same status code.
-                        //Some information about this kind of behavior it can be found at JIRA: CB-7099
-                        flag = false;
-                        setTimeout(function () {
-                            media1.getCurrentPosition(function (position) {
-                                //in four seconds expect position to be two times greater with some degree (1 sec) of accuracy
-                                expect(position).toBeGreaterThan(7);
-                                media1.stop();
-                                media1.release();
-                                done();
-                            }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position'));
-                        }, 4000);
-                    }
-                },
-                media1 = new Media(mediaFile, successCallback, failed.bind(null, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile), statusChange);
-            //make audio playback two times faster
-            media1.setRate(2);
-            media1.play();
-        }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
+//        it("media.spec.19 playback rate should be set properly using setRate", function (done) {
+//            if (cordova.platformId !== 'ios') {
+//                expect(true).toFailWithMessage('Platform does not supported this feature');
+//                pending();
+//                return;
+//            }
+//            var mediaFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3',
+//                mediaState = Media.MEDIA_STOPPED,
+//                successCallback,
+//                flag = true,
+//                statusChange = function (statusCode) {
+//                    if (statusCode == Media.MEDIA_RUNNING && flag) {
+//                        //flag variable used to ensure an extra security statement to ensure that the callback is processed only once,
+//                        //in case for some reason the statusChange callback is reached more than one time with the same status code.
+//                        //Some information about this kind of behavior it can be found at JIRA: CB-7099
+//                        flag = false;
+//                        setTimeout(function () {
+//                            media1.getCurrentPosition(function (position) {
+//                                //in four seconds expect position to be two times greater with some degree (1 sec) of accuracy
+//                                expect(position).toBeGreaterThan(7);
+//                                media1.stop();
+//                                media1.release();
+//                                done();
+//                            }, failed.bind(null, done, 'media1.getCurrentPosition - Error getting media current position'));
+//                        }, 4000);
+//                    }
+//                },
+//                media1 = new Media(mediaFile, successCallback, failed.bind(null, done, 'media1 = new Media - Error creating Media object. Media file: ' + mediaFile), statusChange);
+//            //make audio playback two times faster
+//            media1.setRate(2);
+//            media1.play();
+//        }, ACTUAL_PLAYBACK_TEST_TIMEOUT);
     });
 };
 

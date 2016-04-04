@@ -586,28 +586,28 @@ exports.defineAutoTests = function () {
             // handled by the implementation.
             // If a particular platform uses paths internally rather than URLs, // then that platform should careful to pass them correctly to its
             // backend.
-            xit("file.spec.25 DirectoryEntry.getDirectory: create new dir with space resolveLocalFileSystemURL with encoded URI", function (done) {
-                var dirName = "de create dir2",
-                dirPath = joinURL(root.fullPath, dirName),
-                getDir = function (dirEntry) {
-                    var dirURI = dirEntry.toURL();
-                    // now encode URI and try to resolve
-                    window.resolveLocalFileSystemURL(encodeURI(dirURI), win, failed.bind(null, done, 'window.resolveLocalFileSystemURL - getDir function - Error resolving directory: ' + dirURI));
-                },
-                win = function (directory) {
-                    expect(directory).toBeDefined();
-                    expect(directory.isFile).toBe(false);
-                    expect(directory.isDirectory).toBe(true);
-                    expect(directory.name).toCanonicallyMatch(dirName);
-                    expect(directory.fullPath).toCanonicallyMatch(dirPath);
-                    // cleanup
-                    deleteEntry(directory.name, done);
-                };
-                // create:true, exclusive:false, directory does not exist
-                root.getDirectory(dirName, {
-                    create : true
-                }, getDir, failed.bind(null, done, 'root.getDirectory - Error creating directory : ' + dirName));
-            });
+//            xit("file.spec.25 DirectoryEntry.getDirectory: create new dir with space resolveLocalFileSystemURL with encoded URI", function (done) {
+//                var dirName = "de create dir2",
+//                dirPath = joinURL(root.fullPath, dirName),
+//                getDir = function (dirEntry) {
+//                    var dirURI = dirEntry.toURL();
+//                    // now encode URI and try to resolve
+//                    window.resolveLocalFileSystemURL(encodeURI(dirURI), win, failed.bind(null, done, 'window.resolveLocalFileSystemURL - getDir function - Error resolving directory: ' + dirURI));
+//                },
+//                win = function (directory) {
+//                    expect(directory).toBeDefined();
+//                    expect(directory.isFile).toBe(false);
+//                    expect(directory.isDirectory).toBe(true);
+//                    expect(directory.name).toCanonicallyMatch(dirName);
+//                    expect(directory.fullPath).toCanonicallyMatch(dirPath);
+//                    // cleanup
+//                    deleteEntry(directory.name, done);
+//                };
+//                // create:true, exclusive:false, directory does not exist
+//                root.getDirectory(dirName, {
+//                    create : true
+//                }, getDir, failed.bind(null, done, 'root.getDirectory - Error creating directory : ' + dirName));
+//            });
             it("file.spec.26 DirectoryEntry.getDirectory: create new directory", function (done) {
                 var dirName = "de.create.dir",
                 dirPath = joinURL(root.fullPath, dirName),

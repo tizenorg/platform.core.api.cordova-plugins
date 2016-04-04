@@ -321,64 +321,64 @@ exports.defineAutoTests = function () {
                     deleteFile(root, fileName, done);
                 });
 
-                it('filetransfer.spec.4 should download a file', function (done) {
+//                it('filetransfer.spec.4 should download a file', function (done) {
+//
+//                    var fileURL = SERVER + '/robots.txt';
+//
+//                    var fileWin = function (blob) {
+//
+//                        if (transfer.onprogress.calls.any()) {
+//                            var lastProgressEvent = transfer.onprogress.calls.mostRecent().args[0];
+//                            expect(lastProgressEvent.loaded).not.toBeGreaterThan(blob.size);
+//                        } else {
+//                            console.log('no progress events were emitted');
+//                        }
+//
+//                        done();
+//                    };
+//
+//                    var downloadWin = function (entry) {
+//
+//                        verifyDownload(entry);
+//
+//                        // verify the FileEntry representing this file
+//                        entry.file(fileWin, unexpectedCallbacks.fileSystemFail);
+//                    };
+//
+//                    transfer.download(fileURL, localFilePath, downloadWin, unexpectedCallbacks.httpFail);
+//                }, DOWNLOAD_TIMEOUT);
 
-                    var fileURL = SERVER + '/robots.txt';
+//                it('filetransfer.spec.5 should download a file using http basic auth', function (done) {
+//
+//                    var fileURL = SERVER_WITH_CREDENTIALS + '/download_basic_auth';
+//
+//                    var downloadWin = function (entry) {
+//                        verifyDownload(entry);
+//                        done();
+//                    };
+//
+//                    transfer.download(fileURL, localFilePath, downloadWin, unexpectedCallbacks.httpFail);
+//                }, DOWNLOAD_TIMEOUT);
 
-                    var fileWin = function (blob) {
-
-                        if (transfer.onprogress.calls.any()) {
-                            var lastProgressEvent = transfer.onprogress.calls.mostRecent().args[0];
-                            expect(lastProgressEvent.loaded).not.toBeGreaterThan(blob.size);
-                        } else {
-                            console.log('no progress events were emitted');
-                        }
-
-                        done();
-                    };
-
-                    var downloadWin = function (entry) {
-
-                        verifyDownload(entry);
-
-                        // verify the FileEntry representing this file
-                        entry.file(fileWin, unexpectedCallbacks.fileSystemFail);
-                    };
-
-                    transfer.download(fileURL, localFilePath, downloadWin, unexpectedCallbacks.httpFail);
-                }, DOWNLOAD_TIMEOUT);
-
-                it('filetransfer.spec.5 should download a file using http basic auth', function (done) {
-
-                    var fileURL = SERVER_WITH_CREDENTIALS + '/download_basic_auth';
-
-                    var downloadWin = function (entry) {
-                        verifyDownload(entry);
-                        done();
-                    };
-
-                    transfer.download(fileURL, localFilePath, downloadWin, unexpectedCallbacks.httpFail);
-                }, DOWNLOAD_TIMEOUT);
-
-                it('filetransfer.spec.6 should get 401 status on http basic auth failure', function (done) {
-
-                    // NOTE:
-                    //      using server without credentials
-                    var fileURL = SERVER + '/download_basic_auth';
-
-                    var downloadFail = function (error) {
-                        expect(error.http_status).toBe(401);
-                        expect(error.http_status).not.toBe(404, "Ensure " + fileURL + " is in the white list");
-                        done();
-                    };
-
-                    transfer.download(fileURL, localFilePath, unexpectedCallbacks.httpWin, downloadFail, null,
-                        {
-                            headers: {
-                                'If-Modified-Since': 'Thu, 19 Mar 2015 00:00:00 GMT'
-                            }
-                        });
-                }, DOWNLOAD_TIMEOUT);
+//                it('filetransfer.spec.6 should get 401 status on http basic auth failure', function (done) {
+//
+//                    // NOTE:
+//                    //      using server without credentials
+//                    var fileURL = SERVER + '/download_basic_auth';
+//
+//                    var downloadFail = function (error) {
+//                        expect(error.http_status).toBe(401);
+//                        expect(error.http_status).not.toBe(404, "Ensure " + fileURL + " is in the white list");
+//                        done();
+//                    };
+//
+//                    transfer.download(fileURL, localFilePath, unexpectedCallbacks.httpWin, downloadFail, null,
+//                        {
+//                            headers: {
+//                                'If-Modified-Since': 'Thu, 19 Mar 2015 00:00:00 GMT'
+//                            }
+//                        });
+//                }, DOWNLOAD_TIMEOUT);
 
                 it("filetransfer.spec.7 should download a file using file:// (when hosted from file://)", function (done) {
 
@@ -493,38 +493,38 @@ exports.defineAutoTests = function () {
                     }, GRACE_TIME_DELTA);
                 }, DOWNLOAD_TIMEOUT);
 
-                it("filetransfer.spec.12 should get http status on failure", function (done) {
+//                it("filetransfer.spec.12 should get http status on failure", function (done) {
+//
+//                    var fileURL = SERVER + "/404";
+//
+//                    var downloadFail = function (error) {
+//
+//                        expect(error.http_status).not.toBe(401, "Ensure " + fileURL + " is in the white list");
+//                        expect(error.http_status).toBe(404);
+//
+//                        done();
+//                    };
+//
+//                    transfer.download(fileURL, localFilePath, unexpectedCallbacks.httpWin, downloadFail);
+//                }, DOWNLOAD_TIMEOUT);
 
-                    var fileURL = SERVER + "/404";
-
-                    var downloadFail = function (error) {
-
-                        expect(error.http_status).not.toBe(401, "Ensure " + fileURL + " is in the white list");
-                        expect(error.http_status).toBe(404);
-
-                        done();
-                    };
-
-                    transfer.download(fileURL, localFilePath, unexpectedCallbacks.httpWin, downloadFail);
-                }, DOWNLOAD_TIMEOUT);
-
-                it("filetransfer.spec.13 should get http body on failure", function (done) {
-
-                    var fileURL = SERVER + "/404";
-
-                    var downloadFail = function (error) {
-
-                        expect(error.http_status).not.toBe(401, "Ensure " + fileURL + " is in the white list");
-                        expect(error.http_status).toBe(404);
-
-                        expect(error.body).toBeDefined();
-                        expect(error.body).toMatch('You requested a 404');
-
-                        done();
-                    };
-
-                    transfer.download(fileURL, localFilePath, unexpectedCallbacks.httpWin, downloadFail);
-                }, DOWNLOAD_TIMEOUT);
+//                it("filetransfer.spec.13 should get http body on failure", function (done) {
+//
+//                    var fileURL = SERVER + "/404";
+//
+//                    var downloadFail = function (error) {
+//
+//                        expect(error.http_status).not.toBe(401, "Ensure " + fileURL + " is in the white list");
+//                        expect(error.http_status).toBe(404);
+//
+//                        expect(error.body).toBeDefined();
+//                        expect(error.body).toMatch('You requested a 404');
+//
+//                        done();
+//                    };
+//
+//                    transfer.download(fileURL, localFilePath, unexpectedCallbacks.httpWin, downloadFail);
+//                }, DOWNLOAD_TIMEOUT);
 
                 it("filetransfer.spec.14 should handle malformed urls", function (done) {
 
@@ -581,68 +581,68 @@ exports.defineAutoTests = function () {
                     transfer.download(fileURL, localFilePath, downloadWin, unexpectedCallbacks.httpFail);
                 }, DOWNLOAD_TIMEOUT);
 
-                it("filetransfer.spec.30 downloaded file entries should have a toNativeURL method", function (done) {
+//                it("filetransfer.spec.30 downloaded file entries should have a toNativeURL method", function (done) {
+//
+//                    if (cordova.platformId === 'browser') {
+//                        pending();
+//                        return;
+//                    }
+//
+//                    var fileURL = SERVER + "/robots.txt";
+//
+//                    var downloadWin = function (entry) {
+//
+//                        expect(entry.toNativeURL).toBeDefined();
+//                        expect(entry.toNativeURL).toEqual(jasmine.any(Function));
+//
+//                        var nativeURL = entry.toNativeURL();
+//
+//                        expect(nativeURL).toBeTruthy();
+//                        expect(nativeURL).toEqual(jasmine.any(String));
+//
+//                        if (isWindows) {
+//                            expect(nativeURL.substring(0, 14)).toBe('ms-appdata:///');
+//                        } else if (isWP8) {
+//                            expect(nativeURL.substring(0, 1)).toBe('/');
+//                        } else {
+//                            expect(nativeURL.substring(0, 7)).toBe('file://');
+//                        }
+//
+//                        done();
+//                    };
+//
+//                    transfer.download(fileURL, localFilePath, downloadWin, unexpectedCallbacks.httpFail);
+//                }, DOWNLOAD_TIMEOUT);
 
-                    if (cordova.platformId === 'browser') {
-                        pending();
-                        return;
-                    }
-
-                    var fileURL = SERVER + "/robots.txt";
-
-                    var downloadWin = function (entry) {
-
-                        expect(entry.toNativeURL).toBeDefined();
-                        expect(entry.toNativeURL).toEqual(jasmine.any(Function));
-
-                        var nativeURL = entry.toNativeURL();
-
-                        expect(nativeURL).toBeTruthy();
-                        expect(nativeURL).toEqual(jasmine.any(String));
-
-                        if (isWindows) {
-                            expect(nativeURL.substring(0, 14)).toBe('ms-appdata:///');
-                        } else if (isWP8) {
-                            expect(nativeURL.substring(0, 1)).toBe('/');
-                        } else {
-                            expect(nativeURL.substring(0, 7)).toBe('file://');
-                        }
-
-                        done();
-                    };
-
-                    transfer.download(fileURL, localFilePath, downloadWin, unexpectedCallbacks.httpFail);
-                }, DOWNLOAD_TIMEOUT);
-
-                it("filetransfer.spec.28 (compatibility) should be able to download a file using local paths", function (done) {
-
-                    var fileURL = SERVER + "/robots.txt";
-
-                    var unsupported = function (response) {
-                        expectedCallbacks.unsupportedOperation(response);
-                        done();
-                    };
-
-                    var downloadWin = function (entry) {
-                        verifyDownload(entry);
-                        done();
-                    };
-
-                    var internalFilePath;
-                    if (root.toInternalURL) {
-                        internalFilePath = root.toInternalURL() + fileName;
-                    } else {
-                        internalFilePath = localFilePath;
-                    }
-
-                    // This is an undocumented interface to File which exists only for testing
-                    // backwards compatibilty. By obtaining the raw filesystem path of the download
-                    // location, we can pass that to transfer.download() to make sure that previously-stored
-                    // paths are still valid.
-                    cordova.exec(function (localPath) {
-                        transfer.download(fileURL, localPath, downloadWin, unexpectedCallbacks.httpFail);
-                    }, unsupported, 'File', '_getLocalFilesystemPath', [internalFilePath]);
-                });
+//                it("filetransfer.spec.28 (compatibility) should be able to download a file using local paths", function (done) {
+//
+//                    var fileURL = SERVER + "/robots.txt";
+//
+//                    var unsupported = function (response) {
+//                        expectedCallbacks.unsupportedOperation(response);
+//                        done();
+//                    };
+//
+//                    var downloadWin = function (entry) {
+//                        verifyDownload(entry);
+//                        done();
+//                    };
+//
+//                    var internalFilePath;
+//                    if (root.toInternalURL) {
+//                        internalFilePath = root.toInternalURL() + fileName;
+//                    } else {
+//                        internalFilePath = localFilePath;
+//                    }
+//
+//                    // This is an undocumented interface to File which exists only for testing
+//                    // backwards compatibilty. By obtaining the raw filesystem path of the download
+//                    // location, we can pass that to transfer.download() to make sure that previously-stored
+//                    // paths are still valid.
+//                    cordova.exec(function (localPath) {
+//                        transfer.download(fileURL, localPath, downloadWin, unexpectedCallbacks.httpFail);
+//                    }, unsupported, 'File', '_getLocalFilesystemPath', [internalFilePath]);
+//                });
             });
 
             describe('upload', function() {
@@ -702,38 +702,38 @@ exports.defineAutoTests = function () {
                     deleteFile(root, fileName, done);
                 });
 
-                it("filetransfer.spec.18 should be able to upload a file", function (done) {
+//                it("filetransfer.spec.18 should be able to upload a file", function (done) {
+//
+//                    var fileURL = SERVER + '/upload';
+//
+//                    var uploadWin = function (uploadResult) {
+//
+//                        verifyUpload(uploadResult);
+//
+//                        if (cordova.platformId === 'ios') {
+//                            expect(uploadResult.headers).toBeDefined('Expected headers to be defined.');
+//                            expect(uploadResult.headers['Content-Type']).toBeDefined('Expected content-type header to be defined.');
+//                        }
+//
+//                        done();
+//                    };
+//
+//                    // NOTE: removing uploadOptions cause Android to timeout
+//                    transfer.upload(localFilePath, fileURL, uploadWin, unexpectedCallbacks.httpFail, uploadOptions);
+//                }, UPLOAD_TIMEOUT);
 
-                    var fileURL = SERVER + '/upload';
-
-                    var uploadWin = function (uploadResult) {
-
-                        verifyUpload(uploadResult);
-
-                        if (cordova.platformId === 'ios') {
-                            expect(uploadResult.headers).toBeDefined('Expected headers to be defined.');
-                            expect(uploadResult.headers['Content-Type']).toBeDefined('Expected content-type header to be defined.');
-                        }
-
-                        done();
-                    };
-
-                    // NOTE: removing uploadOptions cause Android to timeout
-                    transfer.upload(localFilePath, fileURL, uploadWin, unexpectedCallbacks.httpFail, uploadOptions);
-                }, UPLOAD_TIMEOUT);
-
-                it("filetransfer.spec.19 should be able to upload a file with http basic auth", function (done) {
-
-                    var fileURL = SERVER_WITH_CREDENTIALS + "/upload_basic_auth";
-
-                    var uploadWin = function (uploadResult) {
-                        verifyUpload(uploadResult);
-                        done();
-                    };
-
-                    // NOTE: removing uploadOptions cause Android to timeout
-                    transfer.upload(localFilePath, fileURL, uploadWin, unexpectedCallbacks.httpFail, uploadOptions);
-                }, UPLOAD_TIMEOUT);
+//                it("filetransfer.spec.19 should be able to upload a file with http basic auth", function (done) {
+//
+//                    var fileURL = SERVER_WITH_CREDENTIALS + "/upload_basic_auth";
+//
+//                    var uploadWin = function (uploadResult) {
+//                        verifyUpload(uploadResult);
+//                        done();
+//                    };
+//
+//                    // NOTE: removing uploadOptions cause Android to timeout
+//                    transfer.upload(localFilePath, fileURL, uploadWin, unexpectedCallbacks.httpFail, uploadOptions);
+//                }, UPLOAD_TIMEOUT);
 
                 it("filetransfer.spec.21 should be stopped by abort() right away", function (done) {
 
@@ -768,18 +768,18 @@ exports.defineAutoTests = function () {
                     writeFile(root, fileName, new Array(100000).join('aborttest!'), fileWin);
                 }, UPLOAD_TIMEOUT);
 
-                it("filetransfer.spec.22 should get http status and body on failure", function (done) {
-
-                    var fileURL = SERVER + '/403';
-
-                    var uploadFail = function (error) {
-                        expect(error.http_status).toBe(403);
-                        expect(error.http_status).not.toBe(401, "Ensure " + fileURL + " is in the white list");
-                        done();
-                    };
-
-                    transfer.upload(localFilePath, fileURL, unexpectedCallbacks.httpWin, uploadFail, uploadOptions);
-                }, UPLOAD_TIMEOUT);
+//                it("filetransfer.spec.22 should get http status and body on failure", function (done) {
+//
+//                    var fileURL = SERVER + '/403';
+//
+//                    var uploadFail = function (error) {
+//                        expect(error.http_status).toBe(403);
+//                        expect(error.http_status).not.toBe(401, "Ensure " + fileURL + " is in the white list");
+//                        done();
+//                    };
+//
+//                    transfer.upload(localFilePath, fileURL, unexpectedCallbacks.httpWin, uploadFail, uploadOptions);
+//                }, UPLOAD_TIMEOUT);
 
                 it("filetransfer.spec.24 should handle malformed urls", function (done) {
 
@@ -863,35 +863,35 @@ exports.defineAutoTests = function () {
                     transfer.upload(localFilePath, fileURL, uploadWin, unexpectedCallbacks.httpFail, uploadOptions);
                 }, UPLOAD_TIMEOUT);
 
-                it("filetransfer.spec.29 (compatibility) should be able to upload a file using local paths", function (done) {
-
-                    var fileURL = SERVER + "/upload";
-
-                    var unsupported = function (response) {
-                        expectedCallbacks.unsupportedOperation(response);
-                        done();
-                    };
-
-                    var uploadWin = function (uploadResult) {
-                        verifyUpload(uploadResult);
-                        done();
-                    };
-
-                    var internalFilePath;
-                    if (root.toInternalURL) {
-                        internalFilePath = root.toInternalURL() + fileName;
-                    } else {
-                        internalFilePath = localFilePath;
-                    }
-
-                    // This is an undocumented interface to File which exists only for testing
-                    // backwards compatibilty. By obtaining the raw filesystem path of the download
-                    // location, we can pass that to transfer.download() to make sure that previously-stored
-                    // paths are still valid.
-                    cordova.exec(function (localPath) {
-                        transfer.upload(localPath, fileURL, uploadWin, unexpectedCallbacks.httpFail, uploadOptions);
-                    }, unsupported, 'File', '_getLocalFilesystemPath', [internalFilePath]);
-                }, UPLOAD_TIMEOUT);
+//                it("filetransfer.spec.29 (compatibility) should be able to upload a file using local paths", function (done) {
+//
+//                    var fileURL = SERVER + "/upload";
+//
+//                    var unsupported = function (response) {
+//                        expectedCallbacks.unsupportedOperation(response);
+//                        done();
+//                    };
+//
+//                    var uploadWin = function (uploadResult) {
+//                        verifyUpload(uploadResult);
+//                        done();
+//                    };
+//
+//                    var internalFilePath;
+//                    if (root.toInternalURL) {
+//                        internalFilePath = root.toInternalURL() + fileName;
+//                    } else {
+//                        internalFilePath = localFilePath;
+//                    }
+//
+//                    // This is an undocumented interface to File which exists only for testing
+//                    // backwards compatibilty. By obtaining the raw filesystem path of the download
+//                    // location, we can pass that to transfer.download() to make sure that previously-stored
+//                    // paths are still valid.
+//                    cordova.exec(function (localPath) {
+//                        transfer.upload(localPath, fileURL, uploadWin, unexpectedCallbacks.httpFail, uploadOptions);
+//                    }, unsupported, 'File', '_getLocalFilesystemPath', [internalFilePath]);
+//                }, UPLOAD_TIMEOUT);
             });
         });
     });
@@ -973,9 +973,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         downloadImg(imageURL, function (entry) { return entry.toURL(); }, new Image());
     }, 'native_image');
 
-    createActionButton('Download to a non-existent dir (should work)', function () {
+    /*createActionButton('Download to a non-existent dir (should work)', function () {
         downloadImg(imageURL, function (entry) { return entry.toURL(); }, new Image(), '/nonExistentDirTest/');
-    }, 'non-existent_dir');
+    }, 'non-existent_dir');*/
 
     createActionButton('Download and play video (cdvfile)', function () {
         var videoElement = document.createElement('video');

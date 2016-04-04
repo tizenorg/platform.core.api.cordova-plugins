@@ -10,6 +10,8 @@
         'cordova_dialog_api.js',
         'cordova_dialog_extension.cc',
         'cordova_dialog_extension.h',
+        'cordova_dialog_instance.cc',
+        'cordova_dialog_instance.h',
       ],
       'include_dirs': [
         '../',
