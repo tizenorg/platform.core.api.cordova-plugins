@@ -23,6 +23,10 @@ cordova.define(plugin_name, function(require, exports, module) {
     var audioObjects = {};
     var recorder = null;
 
+    // creates the audio context
+    var audioContext = window.AudioContext || window.webkitAudioContext;
+    var context = new audioContext();
+
     function Recorder(_filename) {
         var recorder = null;
         var recording = false;
@@ -31,11 +35,6 @@ cordova.define(plugin_name, function(require, exports, module) {
         var audioInput = null;
         var sampleRate = null;
         var filename = _filename;
-
-        // creates the audio context
-        var audioContext = window.AudioContext || window.webkitAudioContext;
-        var context = new audioContext();
-
         var audioBlob = null;
 
         this.rec = function(){
@@ -243,11 +242,16 @@ cordova.define(plugin_name, function(require, exports, module) {
     };
 
     audioObjects[id].onErrorCB = function (event) {
-        console.log('media::onErrorCB() - MEDIA_ERROR -> ' + event.srcElement.error);
+        var err = event.srcElement.error.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED ?
+            { code: MediaError.MEDIA_ERR_ABORTED } :
+            event.srcElement.error;
+        Object.freeze(err);
 
-        Media.onStatus(id, Media.MEDIA_ERROR, event.srcElement.error);
+        console.log('media::onErrorCB() - MEDIA_ERROR -> ' + err);
+
+        Media.onStatus(id, Media.MEDIA_ERROR, err);
         if (errorCallback) {
-            errorCallback(event.srcElement.error);
+            errorCallback(err);
         }
     };
 
