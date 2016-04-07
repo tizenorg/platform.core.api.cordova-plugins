@@ -220,6 +220,11 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-file-transfer/tizen/FileTransfer.js",
+      "id": "cordova-plugin-file-transfer.tizen.FileTransfer",
+      "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-network-information/www/network.js",
         "id": "cordova-plugin-network-information.network",
         "clobbers": [

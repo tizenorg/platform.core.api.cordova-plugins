@@ -289,8 +289,4 @@ console.log('Loaded cordova.file-transfer API');
 
 // TODO: remove when added to public cordova repository -> begin
 });
-
-exports = function(require) {
-  require('cordova-tizen').addPlugin('cordova-plugin-file-transfer.FileTransfer', plugin_name, 'runs');
-};
 // TODO: remove -> end
