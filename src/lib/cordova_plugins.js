@@ -266,6 +266,11 @@ module.exports = [
         "clobbers": [
             "window.Media"
         ]
+    },
+    {
+      "file": "plugins/cordova-plugin-media/tizen/Media.js",
+      "id": "cordova-plugin-media.tizen.Media",
+      "runs": true
     }
 ];
 module.exports.metadata =
