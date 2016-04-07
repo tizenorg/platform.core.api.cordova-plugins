@@ -90,42 +90,4 @@ console.log('Loaded cordova.networkinformation API');
 
 // TODO: remove when added to public cordova repository -> begin
 });
-
-var plugin_name_type = 'cordova-plugin-network-information.tizen.NetworkStatus.type';
-
-cordova.define(plugin_name_type, function(require, exports, module) {
 //TODO: remove -> end
-
-var exec = require('cordova/exec');
-
-function NetworkConnection() {
-  this.type = Connection.UNKNOWN;
-  var that = this;
-  function successCallback(info) {
-    that.type = info;
-  }
-
-  function errorCallback() {
-    that.type = Connection.UNKNOWN;
-  }
-
-  function getType() {
-    exec(successCallback, errorCallback, 'NetworkStatus', 'getConnectionInfo', []);
-  }
-
-  document.addEventListener('offline', getType);
-  document.addEventListener('online', getType);
-}
-var me = new NetworkConnection();
-
-module.exports = me;
-
-//TODO: remove when added to public cordova repository -> begin
-});
-
-exports = function(require) {
-  require('cordova-tizen').addPlugin('cordova-plugin-network-information.network', plugin_name, 'runs');
-  require('cordova-tizen').addPlugin('cordova-plugin-network-information.network', plugin_name_type, 'clobbers', 'navigator.connection');
-  require('cordova-tizen').addPlugin('cordova-plugin-network-information.network', plugin_name_type, 'clobbers', 'navigator.network.connection');
-};
-// TODO: remove -> end

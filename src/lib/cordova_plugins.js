@@ -240,6 +240,19 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-network-information/tizen/NetworkStatus.js",
+      "id": "cordova-plugin-network-information.tizen.NetworkStatus",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-network-information/tizen/Connection.js",
+      "id": "cordova-plugin-network-information.tizen.Connection",
+      "clobbers": [
+          "navigator.connection",
+          "navigator.network.connection"
+      ]
+    },
+    {
         "file": "plugins/cordova-plugin-globalization/www/GlobalizationError.js",
         "id": "cordova-plugin-globalization.GlobalizationError",
         "clobbers": [
