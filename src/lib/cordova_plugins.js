@@ -63,6 +63,11 @@ module.exports = [
       "runs": true
     },
     {
+      "file": "plugins/cordova-plugin-events/tizen/Events.js",
+      "id": "cordova-plugin-events.tizen.Events",
+      "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
         "id": "cordova-plugin-file.DirectoryEntry",
         "clobbers": [

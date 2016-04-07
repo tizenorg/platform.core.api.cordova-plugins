@@ -188,8 +188,4 @@ console.log('Loaded cordova.events API');
 
 // TODO: remove when added to public cordova repository -> begin
 });
-
-exports = function(require) {
-  require('cordova-tizen').addPlugin('cordova-plugin-events.register', plugin_name, 'runs');
-};
 // TODO: remove -> end
