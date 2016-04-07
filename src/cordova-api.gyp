@@ -9,7 +9,6 @@
       'type': 'none',
       'dependencies': [
         'cordova/cordova.gyp:*',
-        'dialog/cordova_dialog.gyp:*',
         'events/cordova_events.gyp:*',
         'file/cordova_file.gyp:*',
         'globalization/cordova_globalization.gyp:*',

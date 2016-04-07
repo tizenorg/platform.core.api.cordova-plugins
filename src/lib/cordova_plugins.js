@@ -53,6 +53,11 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-dialogs/tizen/Notification.js",
+      "id": "cordova-plugin-dialogs.tizen.Notification",
+      "runs": true
+    },
+    {
       "file": "plugins/cordova-plugin-events/www/register.js",
       "id": "cordova-plugin-events.register",
       "runs": true
