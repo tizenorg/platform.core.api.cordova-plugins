@@ -22,6 +22,11 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-device/tizen/Device.js",
+      "id": "cordova-plugin-device.tizen.Device",
+      "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-device-motion/www/accelerometer.js",
         "id": "cordova-plugin-device-motion.Accelerometer",
         "clobbers": [
