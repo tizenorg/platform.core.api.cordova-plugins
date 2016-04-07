@@ -63,8 +63,4 @@ console.log('Loaded cordova.device-motion API');
 
 // TODO: remove when added to public cordova repository -> begin
 });
-
-exports = function(require) {
-  require('cordova-tizen').addPlugin('cordova-plugin-device-motion.Accelerometer', plugin_name, 'runs');
-};
 // TODO: remove -> end

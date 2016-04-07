@@ -41,6 +41,11 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-device-motion/tizen/Accelerometer.js",
+      "id": "cordova-plugin-device-motion.tizen.Accelerometer",
+      "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-dialogs/www/notification.js",
         "id": "cordova-plugin-dialogs.notification",
         "merges": [
