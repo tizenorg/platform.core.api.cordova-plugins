@@ -27,10 +27,6 @@ class CordovaDialogExtension : public common::Extension {
  public:
   CordovaDialogExtension();
   virtual ~CordovaDialogExtension();
-
- private:
-  // common::Extension implementation.
-  virtual common::Instance* CreateInstance();
 };
 
 }  // dialog
