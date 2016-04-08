@@ -14,12 +14,16 @@
  *    limitations under the License.
  */
 
+// TODO: remove when added to public cordova repository -> begin
+cordova.define('cordova-plugin-file.tizen.Errors', function(require, exports, module) {
+// TODO: remove -> end
+
 /**
  * Function converting a Tizen error to a cordova error
  *
  * {unsigned short} WebAPIError error
  */
-function ConvertTizenFileError(err) {
+function convertTizenFileError(err) {
   switch (err.name) {
     case 'InvalidValuesError':
       return FileError.ENCODING_ERR;
@@ -34,3 +38,9 @@ function ConvertTizenFileError(err) {
       return FileError.ENCODING_ERR;
   }
 }
+
+module.exports = convertTizenFileError;
+
+//TODO: remove when added to public cordova repository -> begin
+});
+//TODO: remove -> end

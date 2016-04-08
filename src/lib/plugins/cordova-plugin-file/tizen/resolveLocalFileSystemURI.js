@@ -18,11 +18,14 @@
 cordova.define('cordova-plugin-file.tizen.resolveLocalFileSystemURI', function(require, exports, module) {
 // TODO: remove -> end
 
+var convertTizenFileError = require('cordova-plugin-file.tizen.Errors');
+var rootUtils = require('cordova-plugin-file.tizen.rootUtils');
+
 var filePrefix = 'file://';
 
 module.exports = {
   resolveLocalFileSystemURI: function(successCallback, errorCallback, args) {
-    var path = rootsUtils.internalUrlToNativePath(args[0]);
+    var path = rootUtils.internalUrlToNativePath(args[0]);
 
     if (!path) {
       errorCallback && errorCallback(FileError.ENCODING_ERR);
@@ -30,22 +33,22 @@ module.exports = {
     }
 
     function onResolve(file) {
-      var filesystem = rootsUtils.findFilesystem(file.toURI());
+      var filesystem = rootUtils.findFilesystem(file.toURI());
 
-      var entry = rootsUtils.createEntry(file, filesystem.filesystemName);
+      var entry = rootUtils.createEntry(file, filesystem.filesystemName);
       entry.isDirectory = file.isDirectory;
 
       successCallback(entry);
     }
 
     function onError(error) {
-      errorCallback && errorCallback(ConvertTizenFileError(error));
+      errorCallback && errorCallback(convertTizenFileError(error));
     }
 
     tizen.filesystem.resolve(path, onResolve, onError, 'r');
   },
   _getLocalFilesystemPath: function(successCallback, errorCallback, args) {
-    var path = rootsUtils.internalUrlToNativePath(args[0]);
+    var path = rootUtils.internalUrlToNativePath(args[0]);
 
     if (!path) {
       errorCallback && errorCallback(FileError.ENCODING_ERR);

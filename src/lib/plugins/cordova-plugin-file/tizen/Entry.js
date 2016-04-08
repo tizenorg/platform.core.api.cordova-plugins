@@ -18,6 +18,9 @@
 cordova.define('cordova-plugin-file.tizen.Entry', function(require, exports, module) {
 // TODO: remove -> end
 
+var convertTizenFileError = require('cordova-plugin-file.tizen.Errors');
+var rootUtils = require('cordova-plugin-file.tizen.rootUtils');
+
 var resolveParent = function(srcURL, errorCallback, rest){
   try {
     tizen.filesystem.resolve(
@@ -32,19 +35,19 @@ var resolveParent = function(srcURL, errorCallback, rest){
           }
         }, function (err) {
           console.error('Error - resolve file ' + srcURL + ' failed');
-          errorCallback && errorCallback(ConvertTizenFileError(err));
+          errorCallback && errorCallback(convertTizenFileError(err));
         },
     'r');
   } catch (exception) {
     console.error('Error - resolve ' + srcURL + ' file thrown exception');
-    errorCallback && errorCallback(ConvertTizenFileError(exception));
+    errorCallback && errorCallback(convertTizenFileError(exception));
   }
 };
 
 var changeFile = function(method, successCallback, errorCallback, args) {
-  var srcURL = rootsUtils.internalUrlToNativePath(args[0]);
+  var srcURL = rootUtils.internalUrlToNativePath(args[0]);
   var name = args[2];
-  var destDir = rootsUtils.internalUrlToNativePath(args[1]);
+  var destDir = rootUtils.internalUrlToNativePath(args[1]);
   var destURL = destDir + '/' + name;
 
   function fail(e, msg) {
@@ -59,7 +62,7 @@ var changeFile = function(method, successCallback, errorCallback, args) {
     return;
   }
 
-  if (!rootsUtils.isValidFileName(name)) {
+  if (!rootUtils.isValidFileName(name)) {
     fail(FileError.ENCODING_ERR, 'Error - Disallowed character detected in the file name: ' + name);
     return;
   }
@@ -79,22 +82,22 @@ var changeFile = function(method, successCallback, errorCallback, args) {
               tizen.filesystem.resolve(
                 destURL,
                 function (destFile) {
-                  var destEntry = rootsUtils.createEntry(destFile);
+                  var destEntry = rootUtils.createEntry(destFile);
                   destEntry.isDirectory = destFile.isDirectory;
                   successCallback && successCallback(destEntry);
                 }, function (err) {
-                  fail(ConvertTizenFileError(err), 'Error - resolve result entry failed');
+                  fail(convertTizenFileError(err), 'Error - resolve result entry failed');
                 }
               );
             } catch (exception) {
-              fail(ConvertTizenFileError(exception), 'Error - resolve result entry thrown exception');
+              fail(convertTizenFileError(exception), 'Error - resolve result entry thrown exception');
             }
           }, function (err) {
-            fail(ConvertTizenFileError(err), 'Error - ' + method + ' operation failed');
+            fail(convertTizenFileError(err), 'Error - ' + method + ' operation failed');
           }
       );
     } catch (exception) {
-      fail(ConvertTizenFileError(exception), 'Error - ' + method + ' operation thrown exception');
+      fail(convertTizenFileError(exception), 'Error - ' + method + ' operation thrown exception');
     }
   }
 
@@ -117,7 +120,7 @@ var changeFile = function(method, successCallback, errorCallback, args) {
                 performAction(srcFile, parentDir);
               }, 'r');
             } catch (exception) {
-              fail(ConvertTizenFileError(exception), 'Error - resolve destination entry threw exception');
+              fail(convertTizenFileError(exception), 'Error - resolve destination entry threw exception');
             }
           }
       );
@@ -125,13 +128,13 @@ var changeFile = function(method, successCallback, errorCallback, args) {
       fail(FileError.NOT_FOUND_ERR, 'Error - destination directory does not exist');
     }, 'r');
   } catch (e) {
-    fail(ConvertTizenFileError(e), 'Error - resolve destination directory threw exception');
+    fail(convertTizenFileError(e), 'Error - resolve destination directory threw exception');
   }
 };
 
 module.exports = {
   getFileMetadata: function(successCallback, errorCallback, args) {
-    var uri = rootsUtils.internalUrlToNativePath(args[0]);
+    var uri = rootUtils.internalUrlToNativePath(args[0]);
     if (!uri) {
       errorCallback && errorCallback(FileError.ENCODING_ERR);
       return;
@@ -141,11 +144,11 @@ module.exports = {
         var result = { 'size': file.fileSize, 'lastModifiedDate': file.modified };
         successCallback && successCallback(result);
       }, function (err) {
-        errorCallback && errorCallback(ConvertTizenFileError(err));
+        errorCallback && errorCallback(convertTizenFileError(err));
       }, 'r');
     } catch (exception) {
       console.error('Error - resolve failed');
-      errorCallback && errorCallback(ConvertTizenFileError(exception));
+      errorCallback && errorCallback(convertTizenFileError(exception));
     }
   },
   setMetadata: function(successCallback, errorCallback, args) {
@@ -159,14 +162,14 @@ module.exports = {
     changeFile('copyTo', successCallback, errorCallback, args);
   },
   remove: function(successCallback, errorCallback, args) {
-    var url = rootsUtils.internalUrlToNativePath(args[0]);
+    var url = rootUtils.internalUrlToNativePath(args[0]);
 
     if (!url) {
       errorCallback && errorCallback(FileError.ENCODING_ERR);
       return;
     }
 
-    if (rootsUtils.isRootUri(url)) {
+    if (rootUtils.isRootUri(url)) {
       console.error('It is not allowed to remove root directory.');
       errorCallback && errorCallback(FileError.NO_MODIFICATION_ALLOWED_ERR);
       return;
@@ -180,7 +183,7 @@ module.exports = {
                       function() {successCallback && successCallback();},
                       function(err) {
                         console.error('Error - ' + method + ' failed');
-                        errorCallback && errorCallback(ConvertTizenFileError(err));
+                        errorCallback && errorCallback(convertTizenFileError(err));
                         }];
           if (srcFile.isFile) {
             //remove recursive flag
@@ -190,27 +193,27 @@ module.exports = {
             parentDir[method].apply(parentDir, args);
           } catch (exception) {
             console.error('Error - ' + method + ' thrown exception ' + JSON.stringify(exception));
-            errorCallback && errorCallback(ConvertTizenFileError(exception));
+            errorCallback && errorCallback(convertTizenFileError(exception));
           }
         }
     );
   },
   getParent: function(successCallback, errorCallback, args) {
-    var url = rootsUtils.internalUrlToNativePath(args[0]);
+    var url = rootUtils.internalUrlToNativePath(args[0]);
 
     if (!url) {
       errorCallback && errorCallback(FileError.ENCODING_ERR);
       return;
     }
 
-    if (rootsUtils.isRootUri(url)) {
-      successCallback && successCallback(rootsUtils.findFilesystem(url));
+    if (rootUtils.isRootUri(url)) {
+      successCallback && successCallback(rootUtils.findFilesystem(url));
       return;
     }
 
     resolveParent(url, errorCallback,
         function(srcFile, parentDir){
-          successCallback && successCallback(rootsUtils.createEntry(srcFile.parent));
+          successCallback && successCallback(rootUtils.createEntry(srcFile.parent));
         }
     );
   }

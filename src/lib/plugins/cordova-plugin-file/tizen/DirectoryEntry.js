@@ -18,6 +18,9 @@
 cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exports, module) {
 // TODO: remove -> end
 
+  var convertTizenFileError = require('cordova-plugin-file.tizen.Errors');
+  var rootUtils = require('cordova-plugin-file.tizen.rootUtils');
+
   function sanitizePath(path) {
     var prepend = '/' === path[0];
     var input = path.split('/');
@@ -46,8 +49,8 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
   }
 
   var getFunction = function(successCallback, errorCallback, args, isDirectory) {
-    var uri = rootsUtils.internalUrlToNativePath(args[0]),
-        path = rootsUtils.stripTrailingSlash(args[1]),
+    var uri = rootUtils.internalUrlToNativePath(args[0]),
+        path = rootUtils.stripTrailingSlash(args[1]),
         options = args[2] || {},
         create_flag = !!options.create,
         exclusive_flag = !!options.exclusive,
@@ -74,7 +77,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
       absolute_path = uri + '/' + path;
     }
 
-    var root = rootsUtils.findFilesystem(absolute_path).nativeURL;
+    var root = rootUtils.findFilesystem(absolute_path).nativeURL;
     var clean_path = sanitizePath(absolute_path);
 
     if (0 !== clean_path.indexOf(root)) {
@@ -86,7 +89,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
     var parent_path = clean_path.substring(0, clean_path.lastIndexOf('/'));
     var child_name = clean_path.substring(clean_path.lastIndexOf('/') + 1);
 
-    if (!rootsUtils.isValidFileName(child_name)) {
+    if (!rootUtils.isValidFileName(child_name)) {
       console.error('Disallowed character detected in file name: ' + child_name);
       errorCallback && errorCallback(FileError.ENCODING_ERR);
       return;
@@ -101,7 +104,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
         console.error('Error while resolving dir - already exist file');
         errorCallback && errorCallback(FileError.TYPE_MISMATCH_ERR);
       } else {
-        successCallback && successCallback(rootsUtils.createEntry(dir));
+        successCallback && successCallback(rootUtils.createEntry(dir));
       }
     };
 
@@ -120,7 +123,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
                   new_obj = dir.createFile(child_name);
                 }
 
-                successCallback && successCallback(rootsUtils.createEntry(new_obj));
+                successCallback && successCallback(rootUtils.createEntry(new_obj));
               },
               function () {
                 console.error('Error -  immediate parent does not exist');
@@ -130,7 +133,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
           );
         } catch (err) {
           console.error('Error - Could not resolve');
-          errorCallback && errorCallback(ConvertTizenFileError(err));
+          errorCallback && errorCallback(convertTizenFileError(err));
         }
       } else {
         console.error('Error - create flag is false - new directory would not be created');
@@ -143,7 +146,7 @@ cordova.define('cordova-plugin-file.tizen.DirectoryEntry', function(require, exp
       tizen.filesystem.resolve(clean_path, resolveSuccess, resolveError, 'rw');
     } catch (err) {
       console.error('Error - Could not resolve');
-      errorCallback && errorCallback(ConvertTizenFileError(err));
+      errorCallback && errorCallback(convertTizenFileError(err));
     }
   };
 
@@ -152,14 +155,14 @@ module.exports = {
     getFunction(successCallback, errorCallback, args, true);
   },
   removeRecursively: function(successCallback, errorCallback, args) {
-    var uri = rootsUtils.internalUrlToNativePath(args[0]);
+    var uri = rootUtils.internalUrlToNativePath(args[0]);
 
     if (!uri) {
       errorCallback && errorCallback(FileError.ENCODING_ERR);
       return;
     }
 
-    if (rootsUtils.isRootUri(uri)) {
+    if (rootUtils.isRootUri(uri)) {
       console.error('It is not allowed to remove root directory.');
       errorCallback && errorCallback(FileError.NO_MODIFICATION_ALLOWED_ERR);
       return;
@@ -189,16 +192,16 @@ module.exports = {
               }
             } catch (err) {
               console.error('Error - Could not deleteDirectory');
-              errorCallback && errorCallback(ConvertTizenFileError(err));
+              errorCallback && errorCallback(convertTizenFileError(err));
             }
           }, function(e) {
             console.error('Error: ' + e.message);
-            errorCallback && errorCallback(ConvertTizenFileError(e));
+            errorCallback && errorCallback(convertTizenFileError(e));
           }, 'rw'
       );
     } catch (err) {
       console.error('Error - Could not resolve');
-      errorCallback && errorCallback(ConvertTizenFileError(err));
+      errorCallback && errorCallback(convertTizenFileError(err));
     }
   },
   getFile: function(successCallback, errorCallback, args) {

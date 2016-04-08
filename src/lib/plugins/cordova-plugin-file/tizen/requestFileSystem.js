@@ -18,6 +18,8 @@
 cordova.define('cordova-plugin-file.tizen.requestFileSystem', function(require, exports, module) {
 // TODO: remove -> end
 
+var rootUtils = require('cordova-plugin-file.tizen.rootUtils');
+
 module.exports = {
   requestFileSystem: function(successCallback, errorCallback, args) {
     var type = args[0];
@@ -45,7 +47,7 @@ module.exports = {
             // both filesystems are located on internal storage
             if ('INTERNAL' === r.units[i].type) {
               if (size < r.units[i].availableCapacity) {
-                rootsUtils.getRoots(function(roots) {
+                rootUtils.getRoots(function(roots) {
                   for (var i = 0; i < roots.length; ++i) {
                     if (fsName === roots[i].filesystemName) {
                       successCallback({ 'name': fsName, 'root': roots[i] });

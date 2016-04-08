@@ -18,18 +18,20 @@
 cordova.define('cordova-plugin-file.tizen.fileSystems-roots', function(require, exports, module) {
 // TODO: remove -> end
 
+var rootUtils = require('cordova-plugin-file.tizen.rootUtils');
+
 var channel = require('cordova/channel');
 
 channel.waitForInitialization('onGetRootsReady');
 channel.onCordovaReady.subscribe(function() {
-  rootsUtils.getRoots(function () {
+  rootUtils.getRoots(function () {
     channel.initializationComplete('onGetRootsReady');
   });
 });
 
 module.exports = {
   requestAllFileSystems: function(successCallback, errorCallback, args) {
-    rootsUtils.getRoots(successCallback);
+    rootUtils.getRoots(successCallback);
   }
 };
 

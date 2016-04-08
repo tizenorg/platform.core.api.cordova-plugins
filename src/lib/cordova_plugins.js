@@ -206,6 +206,73 @@ module.exports = [
         "runs": true
     },
     {
+      "file": "plugins/cordova-plugin-file/tizen/Errors.js",
+      "id": "cordova-plugin-file.tizen.Errors",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/rootUtils.js",
+      "id": "cordova-plugin-file.tizen.rootUtils",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/DirectoryEntry.js",
+      "id": "cordova-plugin-file.tizen.DirectoryEntry",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/DirectoryReader.js",
+      "id": "cordova-plugin-file.tizen.DirectoryReader",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/Entry.js",
+      "id": "cordova-plugin-file.tizen.Entry",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/FileReader.js",
+      "id": "cordova-plugin-file.tizen.FileReader",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/fileSystemPaths.js",
+      "id": "cordova-plugin-file.tizen.fileSystemPaths",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/fileSystems-roots.js",
+      "id": "cordova-plugin-file.tizen.fileSystems-roots",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/FileWriter.js",
+      "id": "cordova-plugin-file.tizen.FileWriter",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/requestFileSystem.js",
+      "id": "cordova-plugin-file.tizen.requestFileSystem",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/resolveLocalFileSystemURI.js",
+      "id": "cordova-plugin-file.tizen.resolveLocalFileSystemURI",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/File.js",
+      "id": "cordova-plugin-file.tizen.File",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/FileSystem.js",
+      "id": "cordova-plugin-file.tizen.FileSystem",
+      "merges": [
+        "window.FileSystem"
+      ]
+    },
+    {
         "file": "plugins/cordova-plugin-file-transfer/www/FileTransferError.js",
         "id": "cordova-plugin-file-transfer.FileTransferError",
         "clobbers": [

@@ -18,8 +18,11 @@
 cordova.define('cordova-plugin-file.tizen.FileReader', function(require, exports, module) {
 // TODO: remove -> end
 
+var convertTizenFileError = require('cordova-plugin-file.tizen.Errors');
+var rootUtils = require('cordova-plugin-file.tizen.rootUtils');
+
 function read(operation, url, start, end, successCallback, errorCallback, encoding) {
-  url = rootsUtils.internalUrlToNativePath(url);
+  url = rootUtils.internalUrlToNativePath(url);
 
   if (!url) {
     errorCallback && errorCallback(FileError.ENCODING_ERR);
@@ -27,7 +30,7 @@ function read(operation, url, start, end, successCallback, errorCallback, encodi
   }
 
   var fail = function(e) {
-    errorCallback && errorCallback(ConvertTizenFileError(e));
+    errorCallback && errorCallback(convertTizenFileError(e));
   }
   var win = function(size) {
     successCallback && successCallback(size);

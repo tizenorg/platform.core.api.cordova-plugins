@@ -14,7 +14,11 @@
  *    limitations under the License.
  */
 
-var rootsUtils = (function() {
+// TODO: remove when added to public cordova repository -> begin
+cordova.define('cordova-plugin-file.tizen.rootUtils', function(require, exports, module) {
+// TODO: remove -> end
+
+var rootUtils = (function() {
   var filePrefix = 'file:///';
 
   function stripTrailingSlash(str) {
@@ -210,3 +214,9 @@ var rootsUtils = (function() {
     internalUrlToNativePath: internalUrlToNativePath
   };
 })();
+
+module.exports = rootUtils;
+
+//TODO: remove when added to public cordova repository -> begin
+});
+//TODO: remove -> end

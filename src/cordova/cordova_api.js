@@ -52,8 +52,5 @@ exports = {
         }
       }
     });
-
-    // load file native plugin
-    tizen.cordova.file(require);
   }
 };

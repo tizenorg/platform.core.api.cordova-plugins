@@ -18,8 +18,8 @@
 cordova.define('cordova-plugin-file.tizen.FileWriter', function(require, exports, module) {
 // TODO: remove -> end
 
-var utils_ = xwalk.utils;
-var native_ = new utils_.NativeManager(extension);
+var convertTizenFileError = require('cordova-plugin-file.tizen.Errors');
+var rootUtils = require('cordova-plugin-file.tizen.rootUtils');
 
 // https://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
 function toUTF8Array(str) {
@@ -55,7 +55,7 @@ function toUTF8Array(str) {
 
 module.exports = {
   write: function(successCallback, errorCallback, args) {
-    var uri = rootsUtils.internalUrlToNativePath(args[0]);
+    var uri = rootUtils.internalUrlToNativePath(args[0]);
     var data = args[1];
     var position = args[2];
     var isBinary = args[3];
@@ -110,34 +110,34 @@ module.exports = {
             successCallback && successCallback(length);
           }, errorCallback, [args[0], stream.position]);
         } catch (error) {
-          errorCallback && errorCallback(ConvertTizenFileError(error));
+          errorCallback && errorCallback(convertTizenFileError(error));
         }
       }
 
       var openStreamError = function (error) {
-        errorCallback && errorCallback(ConvertTizenFileError(error));
+        errorCallback && errorCallback(convertTizenFileError(error));
       }
 
       try {
         file.openStream('rw', openStreamSuccess, openStreamError);
       } catch (error) {
-        errorCallback && errorCallback(ConvertTizenFileError(error));
+        errorCallback && errorCallback(convertTizenFileError(error));
       }
     }
 
     var onError = function (error) {
-      errorCallback && errorCallback(ConvertTizenFileError(error));
+      errorCallback && errorCallback(convertTizenFileError(error));
     }
 
     try {
       tizen.filesystem.resolve(uri, onSuccess, onError, 'rw');
     } catch (error) {
-      errorCallback && errorCallback(ConvertTizenFileError(error));
+      errorCallback && errorCallback(convertTizenFileError(error));
     }
   },
 
   truncate: function(successCallback, errorCallback, args) {
-    var uri = rootsUtils.internalUrlToNativePath(args[0]);
+    var uri = rootUtils.internalUrlToNativePath(args[0]);
     var length = args[1];
 
     if (!uri) {
@@ -150,17 +150,11 @@ module.exports = {
       uri = uri.substring(uriPrefix.length);
     }
 
-    var callArgs = {
-      'uri': uri,
-      'length': length
-    };
-
-    var result = native_.callSync('File_truncate', callArgs);
-    if (native_.isFailure(result)) {
-      errorCallback && errorCallback(ConvertTizenFileError(native_.getErrorObject(result)));
-    } else {
-      successCallback && successCallback(length);
-    }
+    tizen.cordova.file.truncate(uri, length, successCallback, function(error) {
+      if (errorCallback) {
+        errorCallback(convertTizenFileError(error));
+      }
+    });
   }
 };
 

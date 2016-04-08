@@ -18,9 +18,12 @@
 cordova.define('cordova-plugin-file.tizen.DirectoryReader', function(require, exports, module) {
 // TODO: remove -> end
 
+var convertTizenFileError = require('cordova-plugin-file.tizen.Errors');
+var rootUtils = require('cordova-plugin-file.tizen.rootUtils');
+
 module.exports = {
   readEntries: function(successCallback, errorCallback, args) {
-    var uri = rootsUtils.internalUrlToNativePath(args[0]);
+    var uri = rootUtils.internalUrlToNativePath(args[0]);
 
     if (!uri) {
       errorCallback && errorCallback(FileError.ENCODING_ERR);
@@ -28,7 +31,7 @@ module.exports = {
     }
 
     var fail = function(e) {
-      errorCallback && errorCallback(ConvertTizenFileError(e));
+      errorCallback && errorCallback(convertTizenFileError(e));
     }
     try {
       tizen.filesystem.resolve(uri,
@@ -36,7 +39,7 @@ module.exports = {
           f.listFiles(function(v) {
             var retVal = [];
             for (var i = 0; i < v.length; ++i) {
-              var obj = rootsUtils.createEntry(v[i], rootsUtils.findFilesystem(v[i].toURI()).filesystemName);
+              var obj = rootUtils.createEntry(v[i], rootUtils.findFilesystem(v[i].toURI()).filesystemName);
               obj.isDirectory = v[i].isDirectory;
               obj.isFile = v[i].isFile;
               retVal.push(obj);
