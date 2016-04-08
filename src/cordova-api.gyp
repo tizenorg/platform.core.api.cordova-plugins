@@ -8,7 +8,6 @@
       'target_name': 'cordova-api',
       'type': 'none',
       'dependencies': [
-        'cordova/cordova.gyp:*',
         'file/cordova_file.gyp:*',
         'globalization/cordova_globalization.gyp:*',
       ],
