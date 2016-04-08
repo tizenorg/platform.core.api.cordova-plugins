@@ -53,12 +53,7 @@ exports = {
       }
     });
 
-    // load all native plugins
-    for (var prop in tizen.cordova) {
-      if (tizen.cordova.hasOwnProperty(prop)) {
-        console.log('Trying to load: tizen.cordova.' + prop);
-        tizen.cordova[prop](require);
-      }
-    }
+    // load file native plugin
+    tizen.cordova.file(require);
   }
 };

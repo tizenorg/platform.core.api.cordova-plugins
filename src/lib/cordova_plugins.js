@@ -267,6 +267,11 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-globalization/tizen/Globalization.js",
+      "id": "cordova-plugin-globalization.tizen.Globalization",
+      "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-media/www/MediaError.js",
         "id": "cordova-plugin-media.MediaError",
         "clobbers": [
