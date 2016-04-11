@@ -14,51 +14,13 @@
  * limitations under the License.
  */
 
-var utils_ = xwalk.utils;
-var native_ = new utils_.NativeManager(extension);
+var native_ = new xwalk.utils.NativeManager(extension);
 
-///// Globalization //////
-var selectorDateStr = 'date';
-var selectorTimeStr = 'time';
-var selectorDateAndTimeStr = selectorDateStr + ' and ' + selectorTimeStr;
+var ONE_HOUR_SECONDS = 60 * 60;
 
-var formatShortStr = 'short';
-var formatMediumStr = 'medium';
-var formatLongStr = 'long';
-var formatFullStr = 'full';
+function GlobalizationManager() {}
 
-var typeWide = 'wide';
-var typeNarrow = 'narrow';
-var itemMonths = 'months';
-var itemDays = 'days';
-
-var numberTypeDecimal = 'decimal';
-var numberTypePercent = 'percent';
-var numberTypeCurrency = 'currency';
-
-var oneHourSeconds = 60*60;
-
-function Globalization_getPreferredLanguage(successCb, errorCb) {
-  // TODO Indicates the current language setting in the (LANGUAGE)_(REGION) syntax.
-  // The language setting is in the ISO 630-2 format and the region setting is in the ISO 3166-1 format.
-  tizen.systeminfo.getPropertyValue ('LOCALE',
-    function (locale) {
-      // replacing '_' with '-' to satisfy cordova language and region separator
-      var result = locale.language.replace('_', '-');
-      successCb( {'value': result} );
-    },
-    function(error) {
-      console.log('Cordova, getLocaleName, An error occurred ' + error.message);
-      errorCb(new GlobalizationError(GlobalizationError.UNKNOWN_ERROR ,
-          'cannot retrieve language name'));
-    }
-  );
-}
-
-function Globalization_dateToString(timestamp, successCb, errorCb, options) {
-  var formatLength = (options && options.formatLength) || formatShortStr;
-  var selector = (options && options.selector) || selectorDateAndTimeStr;
-
+GlobalizationManager.prototype.dateToString = function(timestamp, formatLength, selector, successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -74,13 +36,9 @@ function Globalization_dateToString(timestamp, successCb, errorCb, options) {
     timestamp: String(timestamp)
   };
   native_.call('CordovaGlobalization_dateToString', callArgs, callback);
-}
+};
 
-function Globalization_stringToDate(dateString, successCb, errorCb, options) {
-  var result = null;
-  var formatLength = (options && options.formatLength) || formatShortStr;
-  var selector = (options && options.selector) || selectorDateAndTimeStr;
-
+GlobalizationManager.prototype.stringToDate = function(dateString, formatLength, selector, successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -96,12 +54,9 @@ function Globalization_stringToDate(dateString, successCb, errorCb, options) {
       dateString : String(dateString)
   };
   native_.call('CordovaGlobalization_stringToDate', callArgs, callback);
-}
+};
 
-function Globalization_getDatePattern(successCb, errorCb, options) {
-  var formatLength = (options && options.formatLength) || formatShortStr;
-  var selector = (options && options.selector) || selectorDateAndTimeStr;
-
+GlobalizationManager.prototype.getDatePattern = function(formatLength, selector, successCb, errorCb) {
   var callback = function(result) {
     // Checking success of gathering pattern
     var fullResult = {};
@@ -123,7 +78,7 @@ function Globalization_getDatePattern(successCb, errorCb, options) {
       // timezoneOffset = timezoneOffsetWithoutDST + DSTAdditionalOffset
       // if other behavior is correct, just need to subtract dstOffset from utcOffset
       var utcOffset = currentDateTime.secondsFromUTC() * (-1);
-      var dstOffset = currentDateTime.isDST() ? oneHourSeconds : 0;
+      var dstOffset = currentDateTime.isDST() ? ONE_HOUR_SECONDS : 0;
 
       fullResult["utc_offset"] = utcOffset;
       fullResult["dst_offset"] = dstOffset;
@@ -139,13 +94,9 @@ function Globalization_getDatePattern(successCb, errorCb, options) {
       selector: String(selector)
   };
   native_.call('CordovaGlobalization_getDatePattern', callArgs, callback);
-}
+};
 
-
-function Globalization_getDateNames(successCb, errorCb, options) {
-  var type = (options && options.type) || typeWide;
-  var item = (options && options.item) || itemMonths;
-
+GlobalizationManager.prototype.getDateNames = function(type, item, successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -160,24 +111,9 @@ function Globalization_getDateNames(successCb, errorCb, options) {
       item: String(item)
   };
   native_.call('CordovaGlobalization_getDateNames', callArgs, callback);
-}
+};
 
-
-function Globalization_isDayLightSavingsTime(timestamp, successCb, errorCb) {
-  var tzdate = new tizen.TZDate(new Date(timestamp)); //creates tzdate with local default timezone
-  if (tzdate) {
-    var result = tzdate.isDST();
-    setTimeout( function() {
-      successCb ( {'dst' : result} );
-    }, 0);
-  } else {
-    setTimeout( function() {
-      errorCb(new GlobalizationError(GlobalizationError.UNKNOWN_ERROR , "cannot get information"));
-    }, 0);
-  }
-}
-
-function Globalization_getFirstDayOfWeek(successCb, errorCb) {
+GlobalizationManager.prototype.getFirstDayOfWeek = function(successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -188,11 +124,9 @@ function Globalization_getFirstDayOfWeek(successCb, errorCb) {
     }
   };
   native_.call('CordovaGlobalization_getFirstDayOfWeek', {}, callback);
-}
+};
 
-function Globalization_numberToString(number, successCb, errorCb, options) {
-  var type = (options && options.type) || numberTypeDecimal;
-
+GlobalizationManager.prototype.numberToString = function(number, type, successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -207,11 +141,9 @@ function Globalization_numberToString(number, successCb, errorCb, options) {
       type: String(type)
   };
   native_.call('CordovaGlobalization_numberToString', callArgs, callback);
-}
+};
 
-function Globalization_stringToNumber(numberStr, successCb, errorCb, options) {
-  var type = (options && options.type) || numberTypeDecimal;
-
+GlobalizationManager.prototype.stringToNumber = function(numberStr, type, successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -228,11 +160,9 @@ function Globalization_stringToNumber(numberStr, successCb, errorCb, options) {
       type: String(type)
   };
   native_.call('CordovaGlobalization_stringToNumber', callArgs, callback);
-}
+};
 
-function Globalization_getNumberPattern(successCb, errorCb, options) {
-  var type = (options && options.type) || numberTypeDecimal;
-
+GlobalizationManager.prototype.getNumberPattern = function(type, successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -246,9 +176,9 @@ function Globalization_getNumberPattern(successCb, errorCb, options) {
       type: String(type)
   };
   native_.call('CordovaGlobalization_getNumberPattern', callArgs, callback);
-}
+};
 
-function Globalization_getCurrencyPattern(currencyCode, successCb, errorCb) {
+GlobalizationManager.prototype.getCurrencyPattern = function(currencyCode, successCb, errorCb) {
   var callback = function(result) {
     if (native_.isFailure(result)) {
       var error = new GlobalizationError(
@@ -262,56 +192,6 @@ function Globalization_getCurrencyPattern(currencyCode, successCb, errorCb) {
       currencyCode : String(currencyCode)
   };
   native_.call('CordovaGlobalization_getCurrencyPattern', callArgs, callback);
-}
-
-
-//TODO: remove when added to public cordova repository -> begin
-var plugin_name = 'cordova-plugin-globalization.tizen.Globalization';
-cordova.define(plugin_name, function(require, exports, module) {
-//TODO: remove -> end
-  exports = {
-      getPreferredLanguage: function (successCb, errorCb, args) {
-        Globalization_getPreferredLanguage(successCb, errorCb);
-      },
-      getLocaleName: function (successCb, errorCb, args) {
-        Globalization_getPreferredLanguage(successCb, errorCb);
-      },
-      dateToString: function (successCb, errorCb, args) {
-        Globalization_dateToString(args[0]['date'], successCb, errorCb, args[0]['options']);
-      },
-      stringToDate: function (successCb, errorCb, args) {
-        Globalization_stringToDate(args[0]['dateString'], successCb, errorCb, args[0]['options']);
-      },
-      getDatePattern: function (successCb, errorCb, args) {
-        Globalization_getDatePattern(successCb, errorCb, args[0]['options']);
-      },
-      getDateNames: function (successCb, errorCb, args) {
-        Globalization_getDateNames(successCb, errorCb, args[0]['options']);
-      },
-      isDayLightSavingsTime: function (successCb, errorCb, args) {
-        Globalization_isDayLightSavingsTime(args[0]['date'], successCb, errorCb);
-      },
-      getFirstDayOfWeek: function (successCb, errorCb, args) {
-        Globalization_getFirstDayOfWeek(successCb, errorCb);
-      },
-      numberToString: function (successCb, errorCb, args) {
-        Globalization_numberToString(args[0]['number'], successCb, errorCb, args[0]['options']);
-      },
-      stringToNumber: function (successCb, errorCb, args) {
-        Globalization_stringToNumber(args[0]['numberString'], successCb, errorCb, args[0]['options']);
-      },
-      getNumberPattern: function (successCb, errorCb, args) {
-        Globalization_getNumberPattern(successCb, errorCb, args[0]['options']);
-      },
-      getCurrencyPattern: function (successCb, errorCb, args) {
-        Globalization_getCurrencyPattern(args[0]['currencyCode'], successCb, errorCb);
-      }
-  };
-  require("cordova/exec/proxy").add("Globalization", exports);
-  console.log('Loaded cordova.globalization API');
-// TODO: remove when added to public cordova repository -> begin
-});
-exports = function(require) {
-  require('cordova-tizen').addPlugin('cordova-plugin-globalization.globalization', plugin_name, 'runs');
 };
-// TODO: remove -> end
+
+exports = new GlobalizationManager();

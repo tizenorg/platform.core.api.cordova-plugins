@@ -14,17 +14,26 @@
  *    limitations under the License.
  */
 
-//= require('Errors.js');
-//= require('rootsUtils.js');
-//= require('DirectoryEntry.js');
-//= require('DirectoryReader.js');
-//= require('Entry.js');
-//= require('FileReader.js');
-//= require('fileSystemPaths.js');
-//= require('fileSystems-roots.js');
-//= require('FileWriter.js');
-//= require('requestFileSystem.js');
-//= require('resolveLocalFileSystemURI.js');
+var native_ = new xwalk.utils.NativeManager(extension);
 
-//= require('FileSystem.js');
-//= require('File.js');
+function FileManager() {}
+
+FileManager.prototype.truncate = function(uri, length, successCallback, errorCallback) {
+  var callArgs = {
+    'uri': uri,
+    'length': length
+  };
+
+  var result = native_.callSync('File_truncate', callArgs);
+  if (native_.isFailure(result)) {
+    if (errorCallback) {
+      errorCallback(native_.getErrorObject(result));
+    }
+  } else {
+    if (successCallback) {
+      successCallback(length);
+    }
+  }
+};
+
+exports = new FileManager();

@@ -1334,8 +1334,6 @@ module.exports = {
 
      modulemapper.clobbers('cordova/exec/proxy', 'cordova.commandProxy');
 
-     tizen.cordova.load(require);
-
      channel.onNativeReady.fire();
 
  // End of bootstrap

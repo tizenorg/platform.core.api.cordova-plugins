@@ -22,6 +22,11 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-device/tizen/Device.js",
+      "id": "cordova-plugin-device.tizen.Device",
+      "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-device-motion/www/accelerometer.js",
         "id": "cordova-plugin-device-motion.Accelerometer",
         "clobbers": [
@@ -36,6 +41,11 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-device-motion/tizen/Accelerometer.js",
+      "id": "cordova-plugin-device-motion.tizen.Accelerometer",
+      "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-dialogs/www/notification.js",
         "id": "cordova-plugin-dialogs.notification",
         "merges": [
@@ -43,8 +53,18 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-dialogs/tizen/Notification.js",
+      "id": "cordova-plugin-dialogs.tizen.Notification",
+      "runs": true
+    },
+    {
       "file": "plugins/cordova-plugin-events/www/register.js",
       "id": "cordova-plugin-events.register",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-events/tizen/Events.js",
+      "id": "cordova-plugin-events.tizen.Events",
       "runs": true
     },
     {
@@ -186,6 +206,73 @@ module.exports = [
         "runs": true
     },
     {
+      "file": "plugins/cordova-plugin-file/tizen/Errors.js",
+      "id": "cordova-plugin-file.tizen.Errors",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/rootUtils.js",
+      "id": "cordova-plugin-file.tizen.rootUtils",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/DirectoryEntry.js",
+      "id": "cordova-plugin-file.tizen.DirectoryEntry",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/DirectoryReader.js",
+      "id": "cordova-plugin-file.tizen.DirectoryReader",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/Entry.js",
+      "id": "cordova-plugin-file.tizen.Entry",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/FileReader.js",
+      "id": "cordova-plugin-file.tizen.FileReader",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/fileSystemPaths.js",
+      "id": "cordova-plugin-file.tizen.fileSystemPaths",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/fileSystems-roots.js",
+      "id": "cordova-plugin-file.tizen.fileSystems-roots",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/FileWriter.js",
+      "id": "cordova-plugin-file.tizen.FileWriter",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/requestFileSystem.js",
+      "id": "cordova-plugin-file.tizen.requestFileSystem",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/resolveLocalFileSystemURI.js",
+      "id": "cordova-plugin-file.tizen.resolveLocalFileSystemURI",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/File.js",
+      "id": "cordova-plugin-file.tizen.File",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-file/tizen/FileSystem.js",
+      "id": "cordova-plugin-file.tizen.FileSystem",
+      "merges": [
+        "window.FileSystem"
+      ]
+    },
+    {
         "file": "plugins/cordova-plugin-file-transfer/www/FileTransferError.js",
         "id": "cordova-plugin-file-transfer.FileTransferError",
         "clobbers": [
@@ -198,6 +285,11 @@ module.exports = [
         "clobbers": [
             "window.FileTransfer"
         ]
+    },
+    {
+      "file": "plugins/cordova-plugin-file-transfer/tizen/FileTransfer.js",
+      "id": "cordova-plugin-file-transfer.tizen.FileTransfer",
+      "runs": true
     },
     {
         "file": "plugins/cordova-plugin-network-information/www/network.js",
@@ -215,6 +307,19 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-network-information/tizen/NetworkStatus.js",
+      "id": "cordova-plugin-network-information.tizen.NetworkStatus",
+      "runs": true
+    },
+    {
+      "file": "plugins/cordova-plugin-network-information/tizen/Connection.js",
+      "id": "cordova-plugin-network-information.tizen.Connection",
+      "clobbers": [
+          "navigator.connection",
+          "navigator.network.connection"
+      ]
+    },
+    {
         "file": "plugins/cordova-plugin-globalization/www/GlobalizationError.js",
         "id": "cordova-plugin-globalization.GlobalizationError",
         "clobbers": [
@@ -229,6 +334,11 @@ module.exports = [
         ]
     },
     {
+      "file": "plugins/cordova-plugin-globalization/tizen/Globalization.js",
+      "id": "cordova-plugin-globalization.tizen.Globalization",
+      "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-media/www/MediaError.js",
         "id": "cordova-plugin-media.MediaError",
         "clobbers": [
@@ -241,6 +351,11 @@ module.exports = [
         "clobbers": [
             "window.Media"
         ]
+    },
+    {
+      "file": "plugins/cordova-plugin-media/tizen/Media.js",
+      "id": "cordova-plugin-media.tizen.Media",
+      "runs": true
     }
 ];
 module.exports.metadata =
