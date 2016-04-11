@@ -6,7 +6,7 @@
 %define webapi_tools /usr/include/webapi-plugins/tools
 
 Name:       cordova-api
-Version:    0.8
+Version:    0.9
 Release:    0
 License:    Apache-2.0 and BSD-2.0 and MIT
 Group:      Development/Libraries
