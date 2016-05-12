@@ -25,8 +25,11 @@ var _document = document || {};
 var playback = (function() {
   var soundElement;
   var counter = 1;
+  var soundPathArray = ['/usr/share/feedback/sound/operation/operation.wav', '/usr/share/feedback/sound/operation/back.wav'];
+  var soundPathCount = 0;
 
   function win(v) {
+    console.log('Success to get the notification sound: ' + v);
     soundElement = new Audio(v);
     soundElement.addEventListener('ended', function() {
       if (--counter > 0) {
@@ -39,10 +42,25 @@ var playback = (function() {
     console.error('Failed to get the notification sound: ' + e);
   }
 
-  if ('tv' === tizen.systeminfo.getCapability('http://tizen.org/feature/profile').toLowerCase()) {
-    tizen.filesystem.resolve('/usr/share/feedback/sound/operation/operation.wav', function(file) {
+  function recursiveFailCallback(e) {
+    fail(e);
+    console.warn("Retry with another path");
+    
+    if(soundPathCount >= soundPathArray.length){
+      console.error('Failed to get the notification sound: There is no available sound file path');
+      return;
+    }
+
+    tizen.filesystem.resolve(soundPathArray[soundPathCount++], function(file) {
       win(file.toURI());
-    }, fail, 'r');
+    }, recursiveFailCallback, 'r');
+
+  }
+
+  if ('tv' === tizen.systeminfo.getCapability('http://tizen.org/feature/profile').toLowerCase()) {
+    tizen.filesystem.resolve(soundPathArray[soundPathCount++], function(file) {
+      win(file.toURI());
+    }, recursiveFailCallback, 'r');
   } else {
     tizen.systemsetting.getProperty('NOTIFICATION_EMAIL', win, fail);
   }
