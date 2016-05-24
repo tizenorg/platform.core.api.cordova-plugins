@@ -25,7 +25,7 @@ var _document = document || {};
 var playback = (function() {
   var soundElement;
   var counter = 1;
-  var soundPathArray = ['/usr/share/feedback/sound/operation/operation.wav', '/usr/share/feedback/sound/operation/back.wav'];
+  var soundPathArray = ['/usr/share/feedback/sound/operation/operation.wav', '/usr/share/feedback/sound/operation/home.wav'];
   var soundPathCount = 0;
 
   function win(v) {
