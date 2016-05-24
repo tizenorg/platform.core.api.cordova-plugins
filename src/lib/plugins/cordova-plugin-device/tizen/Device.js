@@ -21,14 +21,40 @@ cordova.define(plugin_name, function(require, exports, module) {
 // TODO: remove -> end
 
 function DeviceInfo() {
-  this.cordovaVersion = require('cordova/platform').cordovaVersion;
-  this.model = tizen.systeminfo.getCapability('http://tizen.org/system/model_name');
-  this.platform = tizen.systeminfo.getCapability('http://tizen.org/system/platform.name');
-  this.uuid = tizen.systeminfo.getCapability('http://tizen.org/system/tizenid');
-  this.version = tizen.systeminfo.getCapability('http://tizen.org/feature/platform.version');
-  this.manufacturer = tizen.systeminfo.getCapability('http://tizen.org/system/manufacturer');
-  this.isVirtual = -1 !== this.model.toLowerCase().indexOf('emulator');
-  this.serial = this.uuid;
+  try {
+    this.model = tizen.systeminfo.getCapability('http://tizen.org/system/model_name');
+    this.isVirtual = -1 !== this.model.toLowerCase().indexOf('emulator');
+  } catch (e) {
+    console.log(e);
+    this.model = undefined;
+    this.isVirtual = undefined;
+  }
+  try {
+    this.platform = tizen.systeminfo.getCapability('http://tizen.org/system/platform.name');
+  } catch (e) {
+    console.log(e);
+    this.platform = undefined;
+  }
+  try {
+    this.uuid = tizen.systeminfo.getCapability('http://tizen.org/system/tizenid');
+    this.serial = this.uuid;
+  } catch (e) {
+    console.log(e);
+    this.uuid = undefined;
+    this.serial = undefined;
+  }
+  try {
+    this.version = tizen.systeminfo.getCapability('http://tizen.org/feature/platform.version');
+  } catch (e) {
+    console.log(e);
+    this.version = undefined;
+  }
+  try {
+    this.manufacturer = tizen.systeminfo.getCapability('http://tizen.org/system/manufacturer');
+  } catch (e) {
+    console.log(e);
+    this.manufacturer = undefined;
+  }
 }
 
 var di;
